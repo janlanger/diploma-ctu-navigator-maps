@@ -1,0 +1,20 @@
+{snippet grid}
+
+{foreach $flashes as $flash}
+<div class="flash {$flash->type}">{$flash->message}</div>
+{/foreach}
+
+{widget $control begin}
+{widget $control errors}
+{widget $control body}
+{widget $control end}
+
+
+<script type="text/javascript">
+$("a.confirm").live("click", function(event) {
+        
+        if (!confirm("Jste si jisti?")) event.preventDefault();
+});
+</script>
+
+{/snippet}

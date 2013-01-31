@@ -1,0 +1,4 @@
+# Redirect 301 /phpmyadmin http://phpmyadmin.quinix.cz
+Options +Indexes
+Redirect 301 /adminer /mysql/adminer
+Redirect 301 /phpmyadmin /mysql/phpmyadmin

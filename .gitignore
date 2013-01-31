@@ -1,0 +1,12 @@
+nbproject/
+/app/Proxies/
+data/
+/styl.css
+/_old
+.idea
+_thumbs
+/vendor
+/log
+/temp
+/www/images/articles/_thumbs
+/www/rss.xml
