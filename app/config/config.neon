@@ -5,32 +5,39 @@
 # http://nette.org/security-warning
 #
 common:
-	parameters:
-
-	php:
-		date.timezone: Europe/Prague
-		# zlib.output_compression: yes
-
-	nette:
-		application:
-			errorPresenter: Error
-
-		database:
-			dsn: 'mysql:host=localhost;dbname=navigator'
-			user:
-			password:
-
-		session:
-			expiration: 14 days
+    parameters:
+        ldap:
+            url: "ldap://ldap.fit.cvut.cz/ou=People,o=fit.cvut.cz"
 
 
-	services:
-		authenticator: Authenticator
-		routerFactory: RouterFactory
-		router: @routerFactory::createRouter
+
+    php:
+        date.timezone: Europe/Prague
+        # zlib.output_compression: yes
+    nette:
+        application:
+            errorPresenter: Error
+
+        database:
+            dsn: 'mysql:host=localhost;dbname=navigator'
+            user: root
+            password:
+
+        session:
+            expiration: 14 days
 
 
-	factories:
+    services:
+        authenticator: LDAPAuthenticator(parameters.ldap.url)
+        authorizator:
+            factory: Authorizator::getInstance
+        routerFactory: RouterFactory
+        router: @routerFactory::createRouter
+
+        ACLRepository: ACLRepository
+
+
+    factories:
 
 
 production < common:

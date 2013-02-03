@@ -45,11 +45,10 @@
                                 <li><a href="#">Menu</a></li>
                                 <li><a href="#">Menu</a></li>
                             </ul>
-                            <ul class="nav  pull-right">
-                                <li n:if="$user->loggedIn">Přihlášen: {$user->identity->nick}, {$user->identity->role}</li>
+                            <ul n:if="$user->loggedIn" class="nav  pull-right">
                                 <li><a n:href=":Sign:out">Odhlásit</a></li>
                             </ul>
-
+                            <div n:if="$user->loggedIn" class="pull-right navbar-text">Přihlášen: {$user->identity->name}, {$user->identity->role}</div>
                         </div>
                     </div>
                 </div></div>
