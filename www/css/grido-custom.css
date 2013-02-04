@@ -1,0 +1,168 @@
+
+table.grido {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0px;
+}
+
+table.grido thead th {
+    font-weight: bold;
+    font-size: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+table.grido p {
+    margin: 0px;
+}
+
+tbody.grido {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody.grido tr {
+    background: #fff;
+}
+
+table.grido tr.even {
+    background: #f3f3f3;
+}
+
+table.grido td,
+table.grido th {
+    padding: 10px;
+    line-height: 1.3em;
+}
+
+table.grido tfoot td .bulk-actions {
+    padding: 15px 0 5px 0;
+}
+
+table.grido tfoot td .bulk-actions select {
+    padding: 4px;
+    border: 1px solid #ccc;
+}
+table.grido thead a{
+    color:#0088cc;
+    text-decoration: none;
+    float: left;
+}
+table.grido span.positioner {
+    width: 22px;
+    height: 16px;
+    margin-right: 2px;
+    display: block;
+    float: left;
+}
+table.grido th span.positioner {
+}
+table.grido span.positioner a {
+    line-height: 0px;
+}
+table.grido span.positioner a span {
+    border: none;
+    display: block;
+    float: left;
+    margin: 2px;
+    width: 21px;
+    height: 4px;
+    opacity: 0.40;
+=filter: alpha(opacity=40);
+    padding-left: 0px !important;
+}
+table.grido span.positioner a span.up {
+    background: url('/images/datagrid/asc.gif') no-repeat right center;
+}
+table.grido span.positioner a span.down {
+    background: url('/images/datagrid/desc.gif') no-repeat right center;
+}
+table.grido span.positioner a span.down:hover, table.grido span.positioner a span.up:hover {
+    opacity: 1;
+=filter: alpha(opacity=100);
+}
+table.grido span.positioner a.active span, table.grido span.positioner a.active span:hover {
+    opacity: 1;
+=filter: alpha(opacity=100);
+    cursor: default;
+}
+table.grido span.positioner a.inactive span, table.grido span.positioner a.inactive span:hover {
+    background: none !important;
+    cursor: default;
+}
+table.grido tr.filters {
+    border-bottom: 1px solid #DDD;
+}
+table.grido tr.filters input[type=text], table.grido tr.filters select {
+    width: 100%;
+    padding: 3px;
+}
+table.grido tr.filters, table.grido tr.filters td {
+    padding: 3px 6px !important;
+}
+table.grido tfoot td {
+
+    color: #505767;
+    border-top: 1px solid #DDD;
+    padding: 10px 10px;
+    text-align: left;
+    font-weight: bold;
+    line-height: 1em;
+    font-size: 0.9em;
+}
+table.grido .paginator, table.grido .operations, table.grido .grid-info {
+    padding: 0.6em 1.8em 0.6em 0.1em;
+    float: left;
+}
+table.grido .grid-info {
+    float: right;
+}
+table.grido .grid-info select {
+    padding: 2px;
+    width: 45px;
+    margin-bottom: 0px;
+    font-size: 13px;
+    height: 26px;
+}
+table.grido .paginator {
+    padding: 13px 0px;
+}
+
+table.grido .paginator a{
+
+    padding: 3px 5px;
+    text-decoration: none;
+}
+table.grido .paginator a.number {
+    margin: 0 2px 0 2px;
+    border: 1px solid #ddd;
+}
+table.grido .paginator a.current {
+    background: #979797 !important;
+    border-color: #ddd !important;
+    color: #fff !important;
+}
+table.grido .paginator .button {
+    padding: 3px 5px;
+    display: inline-block;
+}
+table.grido input.datepicker {
+    background: white url('/images/datagrid/calendar.gif') no-repeat right !important;
+}
+table.grido input {
+    margin-bottom: 3px;
+}
+.grido th.column span {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: top;
+    content: "";
+    margin-left: 5px;
+    margin-top: 8px;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+.grido th.column.asc span {border-bottom: 4px solid #555}
+.grido th.column.desc span {border-top: 4px solid #555}
+table.grido .actions .btn {
+    background-color: #005580;
+}
