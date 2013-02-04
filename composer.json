@@ -1,8 +1,15 @@
 {
+"repositories": [
+        {
+            "type": "vcs",
+            "url": "git://github.com/o5/grido.git"
+        }
+    ]  ,
     "require": {
         "php" : ">=5.3",
         "nette/nette": "2.0.*",
         "kdyby/curl": "@dev",
-        "kdyby/bootstrap-form-renderer": "1.1.*"
+        "kdyby/bootstrap-form-renderer": "1.1.*",
+        "o5/grido": "dev-master"
     }
 }

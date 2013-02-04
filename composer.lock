@@ -1,5 +1,5 @@
 {
-    "hash": "496757897c1b09b1ccb446f36270e2a8",
+    "hash": "bbe38b8ce39ead1c129c5b074ea9db86",
     "packages": [
         {
             "name": "kdyby/bootstrap-form-renderer",
@@ -174,6 +174,60 @@
                 "mailing",
                 "images"
             ]
+        },
+        {
+            "name": "o5/grido",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/o5/grido.git",
+                "reference": "8c10a5052d6f9e3e49053d39c0c5dbfc2691308b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o5/grido/zipball/8c10a5052d6f9e3e49053d39c0c5dbfc2691308b",
+                "reference": "8c10a5052d6f9e3e49053d39c0c5dbfc2691308b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1",
+                "nette/nette": "2.0.*"
+            },
+            "time": "2013-02-04 17:03:45",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Grido": "libs/"
+                }
+            },
+            "license": [
+                "BSD-3",
+                "GPL-2.0",
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Petr Bugyík",
+                    "homepage": "http://petr.bugyik.cz/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Grido - DataGrid for Nette Framework",
+            "homepage": "http://o5.github.com/grido-sandbox/",
+            "keywords": [
+                "datagrid",
+                "datalist",
+                "tablegrid",
+                "grid",
+                "list",
+                "table",
+                "nette"
+            ],
+            "support": {
+                "issues": "https://github.com/o5/grido/issues/",
+                "forum": "http://forum.nette.org/cs/13109-grido-datagrid-pro-nette/",
+                "source": "https://github.com/o5/grido/tree/master"
+            }
         }
     ],
     "packages-dev": null,
@@ -182,6 +236,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "kdyby/curl": 20
+        "kdyby/curl": 20,
+        "o5/grido": 20
     }
 }

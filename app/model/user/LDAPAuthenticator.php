@@ -1,4 +1,7 @@
 <?php
+
+use Nette\Security\Identity;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -9,8 +12,10 @@
 class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthenticator
 {
     private $url;
-    function __construct($serverUrl) {
+    private $service;
+    function __construct($serverUrl, UserRepository $service) {
         $this->url = $serverUrl;
+        $this->service = $service;
     }
 
 
@@ -23,11 +28,25 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
      */
     function authenticate(array $credentials)
     {
-        return new \Nette\Security\Identity(1,['admin'],['name'=>'Jan Langer','mail'=>'langeja1@fit.cvut.cz']);
-        $username = $credentials[self::USERNAME];
-        $password = $credentials[self::PASSWORD];
-        $connection = ldap_connect($this->url);
-        $bind = ldap_bind($connection, $username, $password);
-        dump($bind);
+       // return new \Nette\Security\Identity(1,['admin'],['name'=>'Jan Langer','mail'=>'langeja1@fit.cvut.cz']);
+
+
+
+        list($username, $password) = $credentials;
+
+        // auth check via LDAP...
+        /*  $username = $credentials[self::USERNAME];
+          $password = $credentials[self::PASSWORD];
+          $connection = ldap_connect($this->url);
+          $bind = ldap_bind($connection, $username, $password);*/
+
+        //TODO create new user in DB if not exists
+
+        $row = $this->service->findBy(['username'=> $username])->fetch();
+
+
+
+
+        return new Identity($row->id, $row->role, $row->toArray());
     }
 }
