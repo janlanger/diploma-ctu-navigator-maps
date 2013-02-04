@@ -26,6 +26,10 @@ abstract class Repository extends \Nette\Object {
         return $this->connection->table(lcfirst($m[1]));
     }
 
+    public function getGridDatasource() {
+        return $this->getTable();
+    }
+
     /**
      * Vrací všechny řádky z tabulky.
      * @return \Nette\Database\Table\Selection

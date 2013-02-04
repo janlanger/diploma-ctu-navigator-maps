@@ -36,6 +36,7 @@ common:
 
         ACLRepository: ACLRepository
         UserRepository: UserRepository
+        BuildingRepository: BuildingRepository
 
 
     factories:

@@ -6,20 +6,32 @@
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.min.css"> 
         <link rel="stylesheet" type="text/css" href="/css/style.css"> 
-        <link rel="stylesheet" type="text/css" href="/css/smoothness/jquery-ui-1.9.2.custom.min.css"> 
+        <link rel="stylesheet" type="text/css" href="/css/smoothness/jquery-ui-1.9.2.custom.min.css">
+        <link rel="stylesheet" href="{$baseUri}/css/grido-custom.css">
 
     {block #css}{/block}
 
         <script type="text/javascript" src="/js/jquery-1.8.3.js"></script> 
 
-        <script type="text/javascript" src="/js/jquery-ui-1.9.2.custom.min.js"></script> 
+        <script type="text/javascript" src="/js/jquery-ui-1.9.2.custom.min.js"></script>
 
-        <script type="text/javascript" src="/js/admin.js"></script> 
-        <script type="text/javascript" src="/js/forms/netteForms.js"></script> 
-        <script type="text/javascript" src="/js/jquery.livequery.js"></script>
+
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/admin.js"></script>
+        <script type="text/javascript" src="/js/forms/netteForms.js"></script>
         <script type="text/javascript" src="/js/jquery.nette.js"></script>
-        <script type="text/javascript" src="/js/datagrid.js"></script>
+
+        <script src="{$baseUri}/js/jquery.hashchange.min.js"></script>
+        <script src="{$baseUri}/js/jquery.maskedinput.min.js"></script>
+        <script src="{$baseUri}/js/bootstrap-dropdown.js"></script>
+        <script src="{$baseUri}/js/bootstrap-typeahead.js"></script>
+        <script src="{$baseUri}/js/bootstrap-datepicker.js"></script>
+        <script src="{$baseUri}/js/jquery.ajaxform.js"></script>
+        <script src="{$baseUri}/js/jquery.grido.js"></script>
+        <script src="{$baseUri}/js/grido.ajax.js"></script>
+
+
+
     {block #js}{/block}
 
         <meta name="copyright" content="(c) 2012-{!=date("Y")} Jan Langer, All rights reserved" />
@@ -65,7 +77,7 @@
                             </li>
                         </ul>
                     </div> *}
-                    {*<div class="span9">*}
+                   {* <div class="span9">*}
                         <h1 n:ifset="#pageTitle">{include #pageTitle}</h1>
                         <div class="flashes" n:inner-foreach="$flashes as $flash">
                             <div class="flash {$flash->type} alert alert-{$flash->type}">{$flash->message}</div>
