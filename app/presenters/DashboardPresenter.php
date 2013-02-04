@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Homepage presenter.
+ * Dashboard presenter.
  */
-class HomepagePresenter extends SecuredPresenter
+class DashboardPresenter extends SecuredPresenter
 {
 
 	public function renderDefault()

@@ -27,7 +27,7 @@ abstract class SecuredPresenter extends BasePresenter {
             }*/
             if (!$user->isAllowed($this->getName(), $this->getAction())) {
                 $this->flashMessage('Přístup odepřen!', 'error');
-                $this->redirect('Homepage:');
+                $this->redirect('Dashboard:');
             }
         }
     }
