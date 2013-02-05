@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Presenter;
+use Maps\Components\Forms\EntityForm;
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -8,16 +9,35 @@ namespace Maps\Presenter;
  * To change this template use File | Settings | File Templates.
  */
 class UserPresenter extends SecuredPresenter {
+    /** @var \Maps\Model\Dao */
+    private $repository;
+
+    public function startup() {
+        parent::startup();
+        $this->repository = $this->getContext()->em->getRepository('Maps\Model\User\User');
+    }
+
 
     public function actionEdit($id) {
-        $this['form']->bind($this->getContext()->UserRepository->findBy(['id'=>$id]));
+        $this['form']->bindEntity($this->repository->find($id));
+    }
+
+    public function handleDelete($id) {
+        try {
+            $entity = $this->repository->find($id);
+            $this->repository->delete($entity);
+            $this->flashMessage("Záznam byl úspěšně smazán", self::FLASH_SUCCESS);
+        } catch (\Exception $e) {
+            $this->flashMessage('Záznam nebyl smazán. ' . $e->getMessage(), self::FLASH_ERROR);
+        }
+        $this->redirect('default');
     }
 
     public function createComponentUserGrid($name){
         $grid = new \DataGrid\DataGrid($this, $name);
         $q = new \Maps\Model\BaseDatagridQuery();
         $datasource = new \DataGrid\DataSources\Doctrine\QueryBuilder(
-            $q->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\User\User'))
+            $q->getQueryBuilder($this->repository)
         );
         $datasource->setMapping([
             "id"=>"b.id", "name"=>"b.name", "username"=>"b.username"
@@ -44,8 +64,8 @@ class UserPresenter extends SecuredPresenter {
     }
 
     public function createComponentForm($name) {
-        $form = new \Components\Forms\EntityForm($this, $name);
-        $form->setRepository($this->getContext()->UserRepository);
+        $form = new EntityForm($this, $name);
+        $form->setEntityService(new \Maps\Model\User\UserFormProcessor($this->repository));
 
         $form->addText("name","Jméno")
             ->setRequired();
@@ -55,5 +75,6 @@ class UserPresenter extends SecuredPresenter {
             ->setRequired();
 
         $form->addSubmit("send","Odeslat");
+        $form->setRedirect("default");
     }
 }

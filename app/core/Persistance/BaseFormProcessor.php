@@ -14,7 +14,7 @@ namespace Maps\Model\Persistence;
  *
  * @author Honza
  */
-class BaseFormProvider extends \Nette\Object {
+class BaseFormProcessor extends \Nette\Object {
 
     private $dao;
 

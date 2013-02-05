@@ -105,7 +105,7 @@ class EntityForm extends Form {
 
             $presenter = $this->getPresenter();
             if ($this->successFlashMessage) {
-                $presenter->flashMessage($this->successFlashMessage, \SeriesCMS\Presenter\BasePresenter::FLASH_SUCCESS);
+                $presenter->flashMessage($this->successFlashMessage, \Maps\Presenter\BasePresenter::FLASH_SUCCESS);
             }
             $this->onComplete($this->entity);
             if ($this->redirect) {
