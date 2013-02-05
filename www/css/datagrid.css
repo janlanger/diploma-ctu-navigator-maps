@@ -42,7 +42,7 @@ table.datagrid tfoot td .bulk-actions select {
     border: 1px solid #ccc;
 }
 table.datagrid thead a{
-    color:#0088cc;
+    color:#555;
     text-decoration: none;
     float: left;
 }
@@ -98,7 +98,7 @@ table.datagrid tr.filters input[type=text], table.datagrid tr.filters select {
 table.datagrid tr.filters, table.datagrid tr.filters td {
     padding: 3px 6px !important;
 }
-table.datagrid tfoot td {
+table.datagrid tr.footer td {
 
     color: #505767;
     border-top: 1px solid #DDD;
@@ -106,7 +106,6 @@ table.datagrid tfoot td {
     text-align: left;
     font-weight: bold;
     line-height: 1em;
-    font-size: 0.9em;
 }
 table.datagrid .paginator, table.datagrid .operations, table.datagrid .grid-info {
     padding: 0.6em 1.8em 0.6em 0.1em;
@@ -117,10 +116,7 @@ table.datagrid .grid-info {
 }
 table.datagrid .grid-info select {
     padding: 2px;
-    width: 45px;
-    margin-bottom: 0px;
-    font-size: 13px;
-    height: 26px;
+    width: 50px;
 }
 table.datagrid .paginator {
     padding: 13px 0px;
@@ -136,8 +132,8 @@ table.datagrid .paginator a.number {
     border: 1px solid #ddd;
 }
 table.datagrid .paginator a.current {
-    background: #979797 !important;
-    border-color: #ddd !important;
+    background: #005580  !important;
+    border-color: #000 !important;
     color: #fff !important;
 }
 table.datagrid .paginator .button {
@@ -149,20 +145,4 @@ table.datagrid input.datepicker {
 }
 table.datagrid input {
     margin-bottom: 3px;
-}
-.datagrid th.column span {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    vertical-align: top;
-    content: "";
-    margin-left: 5px;
-    margin-top: 8px;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
-}
-.datagrid th.column.asc span {border-bottom: 4px solid #555}
-.datagrid th.column.desc span {border-top: 4px solid #555}
-table.datagrid .btn {
-    margin-right: 5px;
 }
