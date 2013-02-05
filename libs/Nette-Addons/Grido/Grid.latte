@@ -42,7 +42,7 @@
                     </ul>
                 </div>
                 {if $control->hasFilters()}
-                    {input search}
+                    {input search, class=>'btn-small'}
                 {/if}
                 {input reset}
             {/formContainer}
@@ -95,8 +95,8 @@
                             </li>
                         </ul>
                     </div>
-                    {input search}
-                    {input reset}
+                    {input search, class=>'btn btn-small btn-primary'}
+                    {input reset, class=>'btn btn-small btn-danger'}
                 {/formContainer}
             </th>
         </tr>

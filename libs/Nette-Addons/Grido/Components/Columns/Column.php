@@ -59,7 +59,7 @@ abstract class Column extends \Grido\Base
     protected $customRender;
 
     /** @var bool */
-    protected $sortable = FALSE;
+    protected $sortable = TRUE;
 
     /** @var array of arrays('pattern' => 'replacement') */
     protected $replacements = array();

@@ -74,6 +74,12 @@ class Href extends Action
         if (!$this->elementPrototype) {
             $this->elementPrototype = \Nette\Utils\Html::el('a')
                 ->setClass(array('no-ajax grid-action-' . $this->getName(), 'btn', 'btn-mini'));
+            if($this->getName() == 'edit') {
+                $this->elementPrototype->addClass('btn-info');
+            }
+            if($this->getName() == 'delete') {
+                $this->elementPrototype->addClass('btn-danger');
+            }
         }
 
         return $this->elementPrototype;

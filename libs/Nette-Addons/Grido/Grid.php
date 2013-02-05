@@ -114,6 +114,8 @@ class Grid extends \Nette\Application\UI\Control
             $model = new DibiFluent($model);
         } elseif ($model instanceof \Nette\Database\Table\Selection) {
             $model = new NetteDatabase($model);
+        } elseif ($model instanceof \Repository) {
+            $model = new NetteDatabase($model->getGridDatasource());
         }
 
         if (!$model instanceof IDataSource) {
@@ -938,14 +940,15 @@ class Grid extends \Nette\Application\UI\Control
 
     protected function createComponentForm()
     {
-        $form = new \Nette\Application\UI\Form;
+        $form = new \Components\Forms\Form();
         $form->setTranslator($this->getTranslator());
         $form->setMethod(\Nette\Application\UI\Form::GET);
 
         $buttons = $form->addContainer(self::BUTTONS);
-        $buttons->addSubmit('search', 'Search');
+        $buttons->addSubmit('search', 'Hledat');
         $buttons->addSubmit('reset', 'Reset');
-        $buttons->addSubmit('perPage', 'Items per page');
+        $buttons->addSubmit('perPage', 'Položek na stránku');
+
 
         $form->addSelect('count', 'Count', array_combine($this->perPageList, $this->perPageList))
             ->controlPrototype->attrs['title'] = $this->getTranslator()->translate('Items per page');

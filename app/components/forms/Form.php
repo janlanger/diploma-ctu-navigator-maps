@@ -44,7 +44,7 @@ class Form extends AppForm {
 
     public function addError($message) {
         if(trim($message) != "")
-            $this->getPresenter()->flashMessage($message, \SeriesCMS\Presenter\BasePresenter::FLASH_ERROR);
+            $this->getPresenter()->flashMessage($message, \BasePresenter::FLASH_ERROR);
         $this->valid = FALSE;
     }
 
@@ -80,5 +80,13 @@ class Form extends AppForm {
         public function add3SCheckbox($name, $label = NULL) {
             return $this[$name] = new \SeriesCMS\Components\Forms\CBox3S($label);
         }
+
+    public function addSubmit($name, $caption = NULL) {
+        $component = parent::addSubmit($name, $caption);
+        $component->getControlPrototype()->addClass("btn-primary");
+        return $component;
+
+    }
+
 
 }

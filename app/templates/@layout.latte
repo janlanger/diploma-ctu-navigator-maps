@@ -4,8 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
         <title>{ifset #pageTitle}{include #pageTitle} :: {/ifset} ČVUT Navigátor - Správa mapových podkladů</title> 
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.min.css"> 
-        <link rel="stylesheet" type="text/css" href="/css/style.css"> 
+
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.min.css">
         <link rel="stylesheet" type="text/css" href="/css/smoothness/jquery-ui-1.9.2.custom.min.css">
         <link rel="stylesheet" href="{$baseUri}/css/grido-custom.css">
 
@@ -53,9 +54,9 @@
                         <a class="brand" n:href=":Admin:Dashboard:default">Správa mapových podkladů - ČVUT Navigátor</a>
                         <div class="nav-collapse">
                             <ul class="nav" id="menu">
-                                <li><a href="#">Menu</a></li>
-                                <li><a href="#">Menu</a></li>
-                                <li><a href="#">Menu</a></li>
+                                <li><a n:href="Building:">Budovy</a></li>
+                                <li><a n:href="User:">Uživatelé</a></li>
+
                             </ul>
                             <ul n:if="$user->loggedIn" class="nav  pull-right">
                                 <li><a n:href=":Sign:out">Odhlásit</a></li>
