@@ -11,9 +11,9 @@
 
 
 <script type="text/javascript">
-$("a.confirm").live("click", function(event) {
+$("a[data-confirm]").live("click", function(event) {
         
-        if (!confirm("Jste si jisti?")) event.preventDefault();
+        if (!confirm(this.getAttribute("data-confirm"))) event.preventDefault();
 });
 </script>
 

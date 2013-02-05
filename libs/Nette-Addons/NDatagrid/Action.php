@@ -87,6 +87,10 @@ class Action extends Nette\ComponentModel\Component implements IAction
 		$this->html->href($link);
 	}
 
+    public function addConfirmation($msg) {
+        $this->html->addAttributes(["data-confirm"=>$msg]);
+    }
+
 
 
 	/********************* interface DataGrid\IAction *********************/
