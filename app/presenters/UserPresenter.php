@@ -14,24 +14,33 @@ class UserPresenter extends SecuredPresenter {
     }
 
     public function createComponentUserGrid($name){
-        $grid = new \Grido\Grid($this, $name);
+        $grid = new \DataGrid\DataGrid($this, $name);
+        $q = new \Maps\Model\BaseDatagridQuery();
+        $datasource = new \DataGrid\DataSources\Doctrine\QueryBuilder(
+            $q->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\User\User'))
+        );
+        $datasource->setMapping([
+            "id"=>"b.id", "name"=>"b.name", "username"=>"b.username"
+        ]);
 
-        $grid->setModel($this->getContext()->UserRepository->getGridDatasource());
+
+        $grid->setDataSource($datasource);
 
         $grid->addColumn("id","ID#");
         $grid->addColumn("name","Jméno")
-            ->setFilter()
-            ->setSuggestion();
+            ->addFilter();
         $grid->addColumn("username","Uživatel")
-            ->setFilter()
-                ->setSuggestion();
+            ->addFilter();
 
-        $grid->addAction("edit","Upravit");
-        $grid->addAction("delete","Smazat")
-        ->setConfirm("Opravdu?");
+        $grid['id']->addDefaultSorting('asc');
+        $grid->keyName = "id";
+        $grid->addActionColumn("a","Akce");
 
-        $grid->setDefaultPerPage(10);
-        $grid->setDefaultSort(['id'=>"asc"]);
+        $grid->addAction("Upravit", "edit");
+        $grid->addAction("Smazat","delete!")
+            ->addConfirmation("Opravdu?");
+
+        $grid->itemsPerPage = 10;
     }
 
     public function createComponentForm($name) {

@@ -1,6 +1,5 @@
 <?php
 namespace Maps\Presenter;
-use Maps\Model\Building;
 use DataGrid\DataSources\Doctrine\QueryBuilder;
 /**
  * Dashboard presenter.
@@ -10,7 +9,7 @@ class DashboardPresenter extends SecuredPresenter
 
     public function createComponentBuildingsGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $query = new Building\DatagridQuery();
+        $query = new \Maps\Model\BaseDatagridQuery();
         $ds = new QueryBuilder($query->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\Building\Building')));
         $ds->setMapping([
             'id'=>'b.id',

@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\Building;
+namespace Maps\Model;
 use Maps\Model\Persistence\QueryObjectBase;
 use Maps\Model\Persistence\IQueryable;
 /**
@@ -9,14 +9,14 @@ use Maps\Model\Persistence\IQueryable;
  * Time: 20:01
  * To change this template use File | Settings | File Templates.
  */
-class DatagridQuery extends QueryObjectBase {
+class BaseDatagridQuery extends QueryObjectBase {
 
     /**
      * @param IQueryable $repository
      * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
      */
     protected function doCreateQuery(IQueryable $repository) {
-        $qb = $repository->createQueryBuilder("b")->select("b.id, b.name, b.address");
+        $qb = $repository->createQueryBuilder("b")->select();
         return $qb;
     }
 }
