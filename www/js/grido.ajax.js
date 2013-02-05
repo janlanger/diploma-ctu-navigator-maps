@@ -23,13 +23,13 @@ var ajax = {
     bindForm: function()
     {
         //bind form submit
-        this.$wrapper.on('submit', 'form', function() {
+        this.$wrapper.on('submit', 'form.grido', function() {
             $(this).ajaxSubmit();
             return false;
         });
 
         //bind form submit button click
-        this.$wrapper.on('click', 'form :submit', function() {
+        this.$wrapper.on('click', 'form.grido :submit', function() {
             $(this).ajaxSubmit();
             return false;
         });
