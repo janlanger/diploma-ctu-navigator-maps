@@ -744,7 +744,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	{
 		if ($this->renderer === NULL) {
 			$this->renderer = new Renderers\Conventional;
-                        $this->renderer->onActionRender[]= \callback($this, 'iconsConvertor');
+                        $this->renderer->onActionRender[]= \callback($this, 'bootstrapClasses');
 		}
 		return $this->renderer;
 	}
@@ -761,6 +761,16 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
         );
         if(isset($icons[$html->title]))
             $html->setHtml(Html::el('img')->src('/images/icons/'.$icons[$html->title])->title($html->title));
+    }
+
+    public function bootstrapClasses(Html $html, $data) {
+        $bootstrapMap = [
+            'Upravit' => 'btn-success',
+            'Smazat' => 'btn-danger',
+            'Zobrazit' => 'btn-info',
+            'Detail' => 'btn-warning',
+        ];
+        $html->addClass('btn btn-mini '.(isset($bootstrapMap[$html->title])?$bootstrapMap[$html->title]:""));
     }
 
 
