@@ -35,6 +35,7 @@ common:
 
     services:
         authenticator: Maps\Model\User\LDAPAuthenticator(parameters.ldap.url)
+        em: @doctrine.entityManager
         authorizator:
             factory: Maps\Model\ACL\Authorizator::getInstance
 
@@ -50,7 +51,7 @@ common:
                 proxyNamespace: Maps\Model\Proxies
                 connection: default
                 proxyAutogenerate: true
-                repositoryClass: Maps\Model\Dao
+        repositoryClass: Maps\Model\Dao
         useSimleAnnotation: true
         console:
             entityManager: default

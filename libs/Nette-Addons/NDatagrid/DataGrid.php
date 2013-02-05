@@ -759,8 +759,8 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
             'Zobrazit' => 'pack/Preview_16x16.png',
             'Nastavit oprávnění' => 'pack/Key_16x16.png',
         );
-
-        $html->setHtml(Html::el('img')->src('/images/icons/'.$icons[$html->title])->title($html->title));
+        if(isset($icons[$html->title]))
+            $html->setHtml(Html::el('img')->src('/images/icons/'.$icons[$html->title])->title($html->title));
     }
 
 

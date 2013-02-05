@@ -1,5 +1,7 @@
 <?php
 namespace Maps\Presenter;
+use Maps\Model\Building;
+use DataGrid\DataSources\Doctrine\QueryBuilder;
 /**
  * Dashboard presenter.
  */
@@ -7,23 +9,27 @@ class DashboardPresenter extends SecuredPresenter
 {
 
     public function createComponentBuildingsGrid($name) {
-        $grid = new \Grido\Grid($this, $name);
-        $grid->setModel($this->getContext()->BuildingRepository->getGridDatasource());
+        $grid = new \DataGrid\DataGrid($this, $name);
+        $query = new Building\DatagridQuery();
+        $ds = new QueryBuilder($query->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\Building\Building')));
+        $ds->setMapping([
+            'id'=>'b.id',
+            'name'=>'b.name',
+            'address'=>'b.address',
+        ]);
 
-        $grid->addColumn("id","ID#")
-            ->setSortable()
-            ->setFilter();
-        $grid->addColumn("name","Budova")
-            ->setSortable()
-            ->setFilter()
-                ->setSuggestion();
-        $grid->addColumn("address","Adresa")
-            ->setSortable();
+        $grid->setDataSource($ds);
 
-        $grid->setDefaultPerPage(10);
-        $grid->addAction('detail',"Detail", "Building:detail");
+        $grid->addColumn("id","ID#");
+        $grid->addColumn("name","Budova")->addFilter();
+        $grid->addColumn("address","Adresa")->addFilter();
 
-        $grid->setDefaultSort(['id'=>"asc"]);
+        $grid['id']->addDefaultSorting('asc');
+        $grid->keyName = "id";
+        $grid->addActionColumn("a","Akce");
+        $grid->addAction("Detail", "Building:detail");
+
+
     }
 
 }
