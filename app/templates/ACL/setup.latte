@@ -1,0 +1,39 @@
+{block #pageTitle}Oprávnění role "{$role}"{/block}
+{block #js}
+<script type="text/javascript" src="/js/forms/Box3S.js"></script>
+{/block}
+{block content}
+<p>Mějte na paměti, že role dědí oprávnění od svých předků. V tomto formuláři exitují tři stavy:
+<ul>
+    <li>Zaškrtnutí ("fajfka") - přístup je explicitně povolen pro tuto roli, bez ohledu na nastavení v předcích.</li>
+    <li>Křížek - přístup je pro tuto roli explicitně odepřen.</li>
+    <li>Prázdné pole - role má stejná práva jako jeho předek. Pokud není oprávnění v žádném předku povoleno, použije se implicitní - odepřít.</li>
+</ul>
+
+</p>
+
+{form setupForm}
+
+<table class="datagrid">
+    <thead>
+    <tr>
+        <th>Presenter</th>
+        <th>Všechny zdroje</th>
+        <th n:foreach="$actions as $action">{$action}</th>
+    </tr>
+    </thead>
+    <tr n:foreach="$presenters as $p" n:class="$iterator->even ? even">
+        <td>{$p}</td>
+        {var $px=str_replace(":","_",$p)}
+        <td>{input $px.'__all'}</td>
+        <td n:foreach="$actions as $action" >
+            {ifset $presenterActionMap[$p][$action]}
+            
+                {input $px.'__'.$presenterActionMap[$p][$action]}
+            {else}&nbsp;{/ifset}
+        </td>
+    </tr>
+
+</table>
+{input ok}
+{/form}
