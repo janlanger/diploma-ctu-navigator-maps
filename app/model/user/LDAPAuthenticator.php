@@ -42,11 +42,16 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
 
         //TODO create new user in DB if not exists
 
-        $row = $this->service->findBy(['username'=> $username])->fetch();
+        $row = $this->service->getUserByLogin($username);
 
 
 
 
-        return new Identity($row->id, $row->role, $row->toArray());
+        return new Identity($row->id, $row->role, [
+            "name"=>$row->name,
+            "username"=>$row->username,
+            "mail"=>$row->mail,
+            "role"=>$row->role,
+        ]);
     }
 }

@@ -29,7 +29,7 @@ class Service extends BaseService {
     }
 
     public function getUserByLogin($login) {
-        return $this->getFinder()->where('login', $login)->getSingleResultWithRefresh();
+        return $this->getFinder()->where('username', $login)->getSingleResultWithRefresh();
     }
 
 }
