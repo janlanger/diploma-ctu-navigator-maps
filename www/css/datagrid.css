@@ -122,7 +122,7 @@ table.datagrid .paginator {
     padding: 13px 0px;
 }
 
-table.datagrid .paginator a{
+/*table.datagrid .paginator a{
 
     padding: 3px 5px;
     text-decoration: none;
@@ -139,6 +139,9 @@ table.datagrid .paginator a.current {
 table.datagrid .paginator .button {
     padding: 3px 5px;
     display: inline-block;
+}*/
+table.datagrid .paginator .button-disabled {
+    color: #c0c0c0;
 }
 table.datagrid input.datepicker {
     background: white url('/images/datagrid/calendar.gif') no-repeat right !important;

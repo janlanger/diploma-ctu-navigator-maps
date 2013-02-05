@@ -49,7 +49,7 @@ class Conventional extends Nette\Object implements IRenderer
 			'control' => array(
 				'.input' => 'text',
 				'.select' => 'select',
-				'.submit' => 'button',
+				'.submit' => 'btn btn-small btn-primary',
 			),
 		),
 
@@ -71,8 +71,8 @@ class Conventional extends Nette\Object implements IRenderer
 		'paginator' => array(
 			'container' => 'span class=paginator',
 			'button' => array(
-				'first' => 'span class="paginator-first"',
-				'prev' => 'span class="paginator-prev"',
+				'first' => 'span class="btn paginator-first"',
+				'prev' => 'span class="btn paginator-prev"',
 				'next' => 'span class="paginator-next"',
 				'last' => 'span class="paginator-last"',
 			),

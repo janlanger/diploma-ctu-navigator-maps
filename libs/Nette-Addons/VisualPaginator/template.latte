@@ -7,24 +7,24 @@
 {if $paginator->pageCount > 1}
 <div class="paginator">
 	{if $paginator->isFirst()}
-	<span class="button">« Předchozí</span>
+	<span class="button btn btn-small button-disabled">« Předchozí</span>
 	{else}
-	<a href="{if $useSignal}{link page!, 'page' => $paginator->page - 1}{else}{link this, 'page' => $paginator->page - 1}{/if}" class="datagrid-ajax">« Předchozí</a>
+	<a href="{if $useSignal}{link page!, 'page' => $paginator->page - 1}{else}{link this, 'page' => $paginator->page - 1}{/if}" class="btn btn-small datagrid-ajax">« Předchozí</a>
 	{/if}
 
 	{foreach $steps as $step}
 	{if $step == $paginator->page}
-		<a href="#" class="current">{$step}</a>
+		<a href="#" class="current btn btn-small btn-primary">{$step}</a>
 	{else}
-		<a href="{if $useSignal}{link page!, 'page' => $step}{else}{link this, 'page' => $step}{/if}" class="number datagrid-ajax">{$step}</a>
+		<a href="{if $useSignal}{link page!, 'page' => $step}{else}{link this, 'page' => $step}{/if}" class="btn btn-small number datagrid-ajax">{$step}</a>
 	{/if}
 	{if $iterator->nextValue > $step + 1}<span>…</span>{/if}
 	{/foreach}
 
 	{if $paginator->isLast()}
-	<span class="button">Další »</span>
+	<span class="btn btn-small button-disabled">Další »</span>
 	{else}
-	<a href="{if $useSignal}{link page!, 'page' => $paginator->page + 1}{else}{link this, 'page' => $paginator->page + 1}{/if}" class="datagrid-ajax">Další »</a>
+	<a href="{if $useSignal}{link page!, 'page' => $paginator->page + 1}{else}{link this, 'page' => $paginator->page + 1}{/if}" class="btn btn-small datagrid-ajax">Další »</a>
 	{/if}
 </div>
 {/if}
