@@ -64,10 +64,10 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	/** @var int|string  session timeout (default: until is browser closed) */
 	public $timeout = 0;
 
-	/** @var DataGrid\Renderers\IRenderer */
+	/** @var \DataGrid\Renderers\IRenderer */
 	protected $renderer;
 
-	/** @var DataGrid\DataSources\IDataSource */
+	/** @var \DataGrid\DataSources\IDataSource */
 	protected $dataSource;
 
 	/** @var Nette\Utils\Paginator */
@@ -79,7 +79,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	/** @var string */
 	protected $receivedSignal;
 
-	/** @var DataGrid\Columns\ActionColumn */
+	/** @var \DataGrid\Columns\ActionColumn */
 	protected $currentActionColumn;
 
 	/** @var bool  was method render() called? */
@@ -112,7 +112,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 
 	/**
 	 * Getter / property method.
-	 * @return DataGrid\DataSources\IDataSource
+	 * @return \DataGrid\DataSources\IDataSource
 	 */
 	public function getDataSource()
 	{
@@ -124,7 +124,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * Setter / property method.
 	 * Binds data source to data grid.
 	 * @param  DataGrid\DataSources\IDataSource
-	 * @return DataGrid\DataGrid
+	 * @return \DataGrid\DataGrid
 	 */
 	public function setDataSource(DataSources\IDataSource $dataSource)
 	{
@@ -738,7 +738,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 
 	/**
 	 * Returns data grid renderer.
-	 * @return DataGrid\Renderers\IRenderer
+	 * @return \DataGrid\Renderers\IRenderer
 	 */
 	public function getRenderer()
 	{
@@ -1009,7 +1009,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  int     maximum number of dislayed characters
-	 * @return DataGrid\Columns\TextColumn
+	 * @return \DataGrid\Columns\TextColumn
 	 */
 	public function addColumn($name, $caption = NULL, $maxLength = NULL)
 	{
@@ -1022,7 +1022,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  int     number of digits after the decimal point
-	 * @return DataGrid\Columns\NumericColumn
+	 * @return \DataGrid\Columns\NumericColumn
 	 */
 	public function addNumericColumn($name, $caption = NULL, $precision = 2)
 	{
@@ -1035,7 +1035,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  string  date format
-	 * @return DataGrid\Columns\DateColumn
+	 * @return \DataGrid\Columns\DateColumn
 	 */
 	public function addDateColumn($name, $caption = NULL, $format = '%x')
 	{
@@ -1047,7 +1047,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * Adds column of boolean values (represented by checkboxes).
 	 * @param  string  control name
 	 * @param  string  column label
-	 * @return DataGrid\Columns\CheckboxColumn
+	 * @return \DataGrid\Columns\CheckboxColumn
 	 */
 	public function addCheckboxColumn($name, $caption = NULL)
 	{
@@ -1059,7 +1059,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * Adds column of graphical images.
 	 * @param  string  control name
 	 * @param  string  column label
-	 * @return DataGrid\Columns\ImageColumn
+	 * @return \DataGrid\Columns\ImageColumn
 	 */
 	public function addImageColumn($name, $caption = NULL)
 	{
@@ -1076,7 +1076,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  string  destination or signal to handler which do the move rutine
 	 * @param  array   textual labels for generated links
 	 * @param  bool    use ajax? (add class DataGridColumn::$ajaxClass into generated link)
-	 * @return DataGrid\Columns\PositionColumn
+	 * @return \DataGrid\Columns\PositionColumn
 	 */
 	public function addPositionColumn($name, $caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
 	{
@@ -1089,7 +1089,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  bool
-	 * @return DataGrid\Columns\ActionColumn
+	 * @return \DataGrid\Columns\ActionColumn
 	 */
 	public function addActionColumn($name, $caption = NULL, $setAsCurrent = TRUE)
 	{
@@ -1120,7 +1120,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
 	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter
 	 * 				   otherwise variable DataGrid\DataGrid::$keyName will be used and must be defined)
-	 * @return DataGrid\Action
+	 * @return \DataGrid\Action
 	 */
 	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $key = Action::WITH_KEY)
 	{
@@ -1201,7 +1201,6 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 
 
 	/**
-	 * @return Nette\Http\SessionNamespace
 	 */
 	protected function getStateSession()
 	{
