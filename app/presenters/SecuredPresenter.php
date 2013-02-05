@@ -1,5 +1,5 @@
 <?php
-
+namespace Maps\Presenter;
 use Nette\Security\User;
 
 /**
@@ -25,10 +25,10 @@ abstract class SecuredPresenter extends BasePresenter {
                 $this->flashMessage('Nemáte potřebná oprávnění.', self::FLASH_ERROR);
                 $this->redirect(':Front:News:latest');
             }*/
-            if (!$user->isAllowed($this->getName(), $this->getAction())) {
+        /*    if (!$user->isAllowed($this->getName(), $this->getAction())) {
                 $this->flashMessage('Přístup odepřen!', 'error');
                 $this->redirect('Dashboard:');
-            }
+            }*/
         }
     }
 

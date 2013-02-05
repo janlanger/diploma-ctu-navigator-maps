@@ -1,12 +1,7 @@
 <?php
+namespace Maps\Model\ACL;
 use Nette\Caching\Cache;
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 1.2.13
- * Time: 12:14
- * To change this template use File | Settings | File Templates.
- */
+
 class Authorizator extends \Nette\Security\Permission {
     private function __construct(ACLRepository $service) {
 
@@ -40,7 +35,7 @@ class Authorizator extends \Nette\Security\Permission {
      * @param Cache $cache
      * @return Authorizator
      */
-    public static function getInstance(ACLRepository $service, \Nette\Caching\IStorage $storage) {
+    public static function getInstance(Service $service, \Nette\Caching\IStorage $storage) {
         $cache = new Cache($storage, 'Acl');
         if(true /*!$cache['acl']*/) {
             $instance=new self($service);

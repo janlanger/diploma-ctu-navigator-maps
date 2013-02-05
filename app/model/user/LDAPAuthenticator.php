@@ -1,5 +1,5 @@
 <?php
-
+namespace Maps\Model\User;
 use Nette\Security\Identity;
 
 /**
@@ -13,7 +13,7 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
 {
     private $url;
     private $service;
-    function __construct($serverUrl, UserRepository $service) {
+    function __construct($serverUrl, Service $service) {
         $this->url = $serverUrl;
         $this->service = $service;
     }

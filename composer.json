@@ -4,6 +4,9 @@
         "php" : ">=5.3",
         "nette/nette": "2.0.*",
         "kdyby/curl": "@dev",
-        "kdyby/bootstrap-form-renderer": "1.1.*"
+        "kdyby/bootstrap-form-renderer": "1.1.*",
+        "doctrine/orm": "2.*",
+        "nella/doctrine": "dev-master",
+        "nella/console": "dev-master"
     }
 }

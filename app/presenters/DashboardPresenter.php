@@ -1,5 +1,5 @@
 <?php
-
+namespace Maps\Presenter;
 /**
  * Dashboard presenter.
  */

@@ -1,8 +1,8 @@
 <?php
 
-namespace SeriesCMS\Components\Forms;
+namespace Maps\Components\Forms;
 
-use SeriesCMS\Model\BaseEntity;
+use Maps\Model\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 

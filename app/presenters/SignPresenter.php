@@ -1,5 +1,5 @@
 <?php
-
+namespace Maps\Presenter;
 use Nette\Application\UI;
 use Components\Forms\Form;
 

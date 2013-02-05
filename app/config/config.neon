@@ -8,7 +8,14 @@ common:
     parameters:
         ldap:
             url: "ldap://ldap.fit.cvut.cz/ou=People,o=fit.cvut.cz"
-
+        database:
+            driver: mysqli
+            dbname: navigator
+            host: localhost
+            user: root
+            password:
+            charset: utf8
+            collation: utf8_czech_ci
 
 
     php:
@@ -18,27 +25,35 @@ common:
         application:
             errorPresenter: Error
 
-        database:
-            dsn: 'mysql:host=localhost;dbname=navigator'
-            user: root
-            password:
 
         session:
             expiration: 14 days
+        services:
+            presenterFactory:
+                factory: Maps\Core\ServiceFactories::createPresenterFactory(%appDir%)
 
 
     services:
-        authenticator: LDAPAuthenticator(parameters.ldap.url)
+        authenticator: Maps\Model\User\LDAPAuthenticator(parameters.ldap.url)
         authorizator:
-            factory: Authorizator::getInstance
-        routerFactory: RouterFactory
-        router: @routerFactory::createRouter
+            factory: Maps\Model\ACL\Authorizator::getInstance
 
-        ACLRepository: ACLRepository
-        UserRepository: UserRepository
-        BuildingRepository: BuildingRepository
+        ACLService: Maps\Model\ACL\Service
+        UserService: Maps\Model\User\Service
 
-
+    doctrine:
+        connection: %database%
+        entityManagers:
+            default:
+                entityDir: %appDir%/model
+                proxyDir: %tempDir%
+                proxyNamespace: Maps\Model\Proxies
+                connection: default
+                proxyAutogenerate: true
+                repositoryClass: Maps\Model\Dao
+        useSimleAnnotation: true
+        console:
+            entityManager: default
     factories:
 
 

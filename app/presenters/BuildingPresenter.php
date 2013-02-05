@@ -1,11 +1,12 @@
 <?php
+namespace Maps\Presenter;
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
- * Date: 4.2.13
- * Time: 17:27
+ * Date: 5.2.13
+ * Time: 12:43
  * To change this template use File | Settings | File Templates.
  */
-class UserRepository extends Repository {
+class BuildingPresenter extends SecuredPresenter {
 
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Components\Forms;
+namespace Maps\Components\Forms;
 use Nette\Application\UI\Form AS AppForm;
 use Nette\Forms\Form as NForm;
 use Kdyby\Extension\Forms\BootstrapRenderer\BootstrapRenderer;
