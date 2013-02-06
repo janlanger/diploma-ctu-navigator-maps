@@ -1,0 +1,13 @@
+nette:
+    services:
+        presenterFactory:
+            factory: Maps\Core\ServiceFactories::createPresenterFactory(%appDir%)
+services:
+    authenticator: Maps\Model\User\LDAPAuthenticator(parameters.ldap.url)
+    em: @doctrine.entityManager
+    authorizator:
+        factory: Maps\Model\ACL\Authorizator::getInstance
+
+    ACLService: Maps\Model\ACL\Service
+    UserService: Maps\Model\User\Service
+    presenterTree: Kdyby\PresenterTree("Maps\\Presenter\\")

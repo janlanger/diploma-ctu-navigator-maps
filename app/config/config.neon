@@ -5,6 +5,8 @@
 # http://nette.org/security-warning
 #
 common:
+    includes:
+        - services.neon
     parameters:
         ldap:
             url: "ldap://ldap.fit.cvut.cz/ou=People,o=fit.cvut.cz"
@@ -25,23 +27,11 @@ common:
         application:
             errorPresenter: Error
 
-
         session:
             expiration: 14 days
-        services:
-            presenterFactory:
-                factory: Maps\Core\ServiceFactories::createPresenterFactory(%appDir%)
 
 
-    services:
-        authenticator: Maps\Model\User\LDAPAuthenticator(parameters.ldap.url)
-        em: @doctrine.entityManager
-        authorizator:
-            factory: Maps\Model\ACL\Authorizator::getInstance
 
-        ACLService: Maps\Model\ACL\Service
-        UserService: Maps\Model\User\Service
-        presenterTree: Kdyby\PresenterTree("Maps\\Presenter\\")
 
     doctrine:
         connection: %database%
@@ -57,7 +47,6 @@ common:
         useSimleAnnotation: true
         console:
             entityManager: default
-    factories:
 
 
 production < common:

@@ -10,3 +10,4 @@ _thumbs
 /temp
 /www/images/articles/_thumbs
 /www/rss.xml
+/app/config/config.local.neon
