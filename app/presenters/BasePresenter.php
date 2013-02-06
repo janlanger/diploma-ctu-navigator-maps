@@ -19,5 +19,24 @@ abstract class BasePresenter extends Presenter {
         return parent::formatTemplateFiles();
     }
 
+    /**
+     * @param $entity string entity FQ name or known alias
+     * @return \Maps\Model\Dao entity repository
+     */
+    protected function getRepository($entity) {
+        $aliasMap = [
+            "user" => "Maps\\Model\\User\\User",
+            "building" => "Maps\\Model\\Building\\Building",
+            "aclRole" => "Maps\\Model\\ACL\\Role",
+            "aclPrivilege" => "Maps\\Model\\ACL\\Privilege",
+            "aclResource" => "Maps\\Model\\ACL\\Resource",
+            "acl" => "Maps\\Model\\ACL\\ACL",
+        ];
+        if(isset($aliasMap[strtolower($entity)])) {
+            return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);
+        }
+        return $this->getContext()->em->getRepository($entity);
+    }
+
 
 }
