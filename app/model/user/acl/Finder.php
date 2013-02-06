@@ -107,7 +107,7 @@ class Finder extends BaseFinder {
     }
     
     public function getPrivilege($name, $createIfNotExists) {
-        $qb = $this->service->getEntityManager()->getRepository('SeriesCMS\\Model\\Acl\\Privilege')->createQueryBuilder('p');
+        $qb = $this->service->getEntityManager()->getRepository('Maps\\Model\\Acl\\Privilege')->createQueryBuilder('p');
         $qb->select('p')->where('p.name = :name')->setParameter('name', $name);
         try {
             return $qb->getQuery()->getSingleResult();
@@ -122,7 +122,7 @@ class Finder extends BaseFinder {
     }
     
     public function getResource($name, $createIfNotExists) {
-        $qb = $this->service->getEntityManager()->getRepository('SeriesCMS\\Model\\Acl\\Resource')->createQueryBuilder('r');
+        $qb = $this->service->getEntityManager()->getRepository('Maps\\Model\\Acl\\Resource')->createQueryBuilder('r');
         $qb->select('r')->where('r.name = :name')->setParameter('name', $name);
         try {
             return $qb->getQuery()->getSingleResult();

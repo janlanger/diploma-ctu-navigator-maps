@@ -19,6 +19,8 @@
 
 
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+
         <script type="text/javascript" src="/js/admin.js"></script>
         <script type="text/javascript" src="/js/netteForms.js"></script>
         <script type="text/javascript" src="/js/jquery.nette.js"></script>
@@ -47,11 +49,18 @@
                         </a>
                         <a class="brand" n:href=":Admin:Dashboard:default">Správa mapových podkladů - ČVUT Navigátor</a>
                         <div class="nav-collapse">
-                            <ul class="nav" id="menu">
+                            <ul class="nav" id="menu" role="navigation">
                                 <li><a n:href="Building:">Budovy</a></li>
-                                <li><a n:href="User:">Uživatelé</a></li>
+                                <li class="dropdown">
+                                    <a id="dropMenu1" href="#" class="dropdown-toggle" role="button" data-toggle="dropdown">Uživatelé <b class="caret"></b></a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropMenu1">
+                                        <li><a n:href="User:">Uživatelské účty</a></li>
+                                        <li><a n:href="ACL:">Přístupová práva</a></li>
+                                    </ul>
+                                </li>
 
                             </ul>
+
                             <ul n:if="$user->loggedIn" class="nav  pull-right">
                                 <li><a n:href=":Sign:out">Odhlásit</a></li>
                             </ul>
@@ -74,6 +83,9 @@
                     </div> *}
                    {* <div class="span9">*}
                         <h1 n:ifset="#pageTitle">{include #pageTitle}</h1>
+                        <ul n:ifset="#secondaryNav" class="nav nav-pills">
+                            {include #secondaryNav}
+                        </ul>
                         <div class="flashes" n:inner-foreach="$flashes as $flash">
                             <div class="flash {$flash->type} alert alert-{$flash->type}">{$flash->message}</div>
                         </div>
