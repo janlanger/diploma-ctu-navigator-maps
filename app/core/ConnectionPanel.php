@@ -8,7 +8,7 @@
  * please view the file LICENSE.txt that was distributed with this source code.
  */
 
-namespace Nella\Doctrine\Diagnostics;
+namespace Maps\Model\Persistence;
 
 use Nette\Diagnostics\Debugger,
 	Nette\Utils\Strings,
@@ -22,7 +22,7 @@ use Nette\Diagnostics\Debugger,
  * @author	Patrik Votoček
  * @author	Michael Moravec
  */
-class ConnectioPanel extends \Nette\Object implements \Nette\Diagnostics\IBarPanel, \Doctrine\DBAL\Logging\SQLLogger
+class ConnectionPanel extends \Nette\Object implements \Nette\Diagnostics\IBarPanel, \Doctrine\DBAL\Logging\SQLLogger
 {
 	const SQL = 0,
 		PARAMS = 1,

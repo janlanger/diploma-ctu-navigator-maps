@@ -52,6 +52,7 @@ common:
                 proxyNamespace: Maps\Model\Proxies
                 connection: default
                 proxyAutogenerate: true
+        debugger: Maps\Model\Persistence\ConnectionPanel
         repositoryClass: Maps\Model\Dao
         useSimleAnnotation: true
         console:
