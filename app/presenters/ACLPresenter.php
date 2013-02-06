@@ -54,7 +54,7 @@ class ACLPresenter extends SecuredPresenter {
         if($id == null || !is_numeric($id)) {
             throw new \Nette\Application\BadRequestException('Missing or invalid parameter format.');
         }
-        $roleEnt = $this->getContext()->AclService->find($id);
+        $roleEnt = $this->getContext()->ACLService->find($id);
         if($roleEnt == NULL) {
             throw new \Nette\Application\BadRequestException('Role ID '.$id.' not found.');
         }
@@ -65,9 +65,8 @@ class ACLPresenter extends SecuredPresenter {
         $presenterActionMap = array();
         ksort($p);
         foreach ($p as $presente) {
-            if ($presente->getPresenterReflection()->isSubclassOf("SeriesCMS\\Presenter\\AdminModule\\SecuredPresenter") ||
-                    $presente->getPresenterReflection()->isSubclassOf("SeriesCMS\\Presenter\\FrontModule\\MemberPresenter")) {
-                $pName = $presente->getModule() . ":" . $presente->getName();
+            if ($presente->getPresenterReflection()->isSubclassOf("Maps\\Presenter\\SecuredPresenter")) {
+                $pName = ($presente->getModule()!=null?$presente->getModule().":":""). $presente->getName();
                 $pActions = ($presente->getActions());
 
                 $presenters[] = $pName;
@@ -135,7 +134,7 @@ class ACLPresenter extends SecuredPresenter {
         }
         $form->addSubmit('ok', 'Odeslat');
 
-        $role = $this->getContext()->AclService->getRules($id);
+        $role = $this->getContext()->ACLService->getRules($id);
         foreach ($role as $item) {
            
                 $p = str_replace(':', "_", $item['resource']);
@@ -166,12 +165,9 @@ class ACLPresenter extends SecuredPresenter {
                 }
             }
         }
-        if($this->getContext()->AclService->updateRolePrivilege($this->getParam('id'), $toInsert)) {
+        if($this->getContext()->ACLService->updateRolePrivilege($this->getParam('id'), $toInsert)) {
             $this->flashMessage('Práva byla úspěšně upravena.', self::FLASH_SUCCESS);
-            
-            $logger = $this->getContext()->logService;
-            $entity = $this->getContext()->AclService->find($this->getParam('id'));
-            $logger->log(null, null, $entity->getName() . ' [' . ($entity->getId()? : '') . ']');
+
             $this->redirect('default');
         } else {
             $this->flashMessage('Při úpravě oprávnění došlo k neočekávané chybě.', self::FLASH_ERROR);

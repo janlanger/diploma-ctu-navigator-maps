@@ -15,4 +15,9 @@ abstract class BasePresenter extends Presenter {
         new \DebugPanel\PresenterLinkPanel($this);
     }
 
+    public function formatTemplateFiles() {
+        return parent::formatTemplateFiles();
+    }
+
+
 }

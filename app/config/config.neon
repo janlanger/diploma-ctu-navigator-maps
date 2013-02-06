@@ -41,6 +41,7 @@ common:
 
         ACLService: Maps\Model\ACL\Service
         UserService: Maps\Model\User\Service
+        presenterTree: Kdyby\PresenterTree("Maps\\Presenter\\")
 
     doctrine:
         connection: %database%

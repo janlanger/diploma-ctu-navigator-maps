@@ -1,7 +1,14 @@
 {block #pageTitle}Oprávnění role "{$role}"{/block}
+
 {block #js}
-<script type="text/javascript" src="/js/forms/Box3S.js"></script>
+<script type="text/javascript" src="/js/Box3S.js"></script>
 {/block}
+
+{block #secondaryNav}
+    <li><a n:href="ACL:">Přehled</a></li>
+    <li><a n:href="ACL:add">Přidat roli</a></li>
+{/block}
+
 {block content}
 <p>Mějte na paměti, že role dědí oprávnění od svých předků. V tomto formuláři exitují tři stavy:
 <ul>

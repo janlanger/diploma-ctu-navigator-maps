@@ -29,6 +29,7 @@ $configurator->addConfig(__DIR__ . '/config/config.local.neon', $configurator::N
 
 
 $container = $configurator->createContainer();
+$container->addService('robotLoader', $robot); //needed for presenter tree
 
 
 Nella\Panels\CallbackPanel::register(array(
