@@ -1,0 +1,31 @@
+{block #pageTitle}Detail - {$building->name}{/block}
+{block content}
+
+<div class="row">
+
+    <div class="span6">
+        <div class="well">
+            <p class="lead">{$building->address}</p>
+            <ul>
+                <li><strong>Podlaží:</strong> {$building->floorCount}</li>
+                <li><strong>Prefix místností:</strong> {$building->roomPrefix}</li>
+                <li><strong>KOS API - data místností: </strong>xy záznamů</li>
+            </ul>
+            <div class="pull-left">
+                <a n:href="kosApi?id={$building->id}" class="btn btn-warning">Načíst data z KOS API</a>
+            </div>
+            <div class="pull-right">
+                <a n:href="edit?id={$building->id}" class="btn btn-primary">Upravit</a>
+                <a n:href="delete!?id={$building->id}" class="btn btn-danger" data-confirm="Opravdu chcete tuto budovu úplně odstranit?">Odstranit</a>
+            </div>
+            <br style="clear: both">
+        </div>
+    </div>
+    <div class="span6">
+        <div class="well">
+            {control googleMap, "size"=>["500px", "300px"]}
+        </div>
+    </div>
+</div>
+<hr>
+<h2>Mapové plány</h2>

@@ -18,6 +18,8 @@ common:
             password:
             charset: utf8
             collation: utf8_czech_ci
+        google:
+            apiKey: AIzaSyBWSy0-N3OFo6e_T10K3zOzHjXXGBuD1Z4
 
 
     php:

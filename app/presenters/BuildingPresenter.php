@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Presenter;
+use Maps\Model\Building\BuildingFormProcessor;
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -9,4 +10,55 @@ namespace Maps\Presenter;
  */
 class BuildingPresenter extends SecuredPresenter {
 
+    public function actionDetail($id) {
+        $this->template->building = $this->getRepository("building")->find($id);
+    }
+
+    public function actionEdit($id) {
+        $this['form']->bindEntity($this->getRepository('building')->find($id));
+    }
+
+    private function googleMapBase($name) {
+        $map = new \Maps\Components\GoogleMaps($this, $name);
+        $map->setApikey($this->getContext()->parameters['google']['apiKey']);
+        return $map;
+    }
+
+    /**
+     * @return \Maps\Components\GoogleMaps
+     */
+    protected function createComponentGoogleMap($name) {
+       $map = $this->googleMapBase($name);
+
+        /** @var $entity \Maps\Model\Building\Building */
+        $entity = $this->getRepository("building")->find($this->getParameter('id'));
+        if($entity->getGpsCoordinates() != null) {
+            $map->setCenter($entity->getGpsCoordinates());
+            $map->addPoint($entity->getGpsCoordinates());
+        }
+    }
+
+    protected function createComponentGoogleMapGeocoder($name) {
+        $map = $this->googleMapBase($name);
+        $map->enableGeodecoder($this['form']['address'],$this['form']['gpsCoordinates']);
+    }
+
+    public function createComponentForm($name) {
+        $form = new \Maps\Components\Forms\EntityForm($this, $name);
+        $form->setEntityService(new BuildingFormProcessor($this->getRepository('building')));
+
+        $form->addText('name','Název')
+            ->setRequired();
+        $form->addText('address','Adresa')
+            ->setRequired();
+        $form->addText('floorCount','Počet podlaží')
+            ->addRule(\Maps\Components\Forms\Form::NUMERIC)
+            ->setRequired();
+        $form->addText('roomPrefix','Prefix místností', null, 10)
+            ->setRequired();
+        $form->addText('gpsCoordinates', "GPS souřadnice")
+            ->setRequired();
+        $form->addSubmit('send','Odeslat');
+        $form->setRedirect("detail?id=".$this->getParameter('id'));
+    }
 }
