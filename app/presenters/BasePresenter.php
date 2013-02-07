@@ -27,10 +27,12 @@ abstract class BasePresenter extends Presenter {
         $aliasMap = [
             "user" => "Maps\\Model\\User\\User",
             "building" => "Maps\\Model\\Building\\Building",
-            "aclRole" => "Maps\\Model\\ACL\\Role",
-            "aclPrivilege" => "Maps\\Model\\ACL\\Privilege",
-            "aclResource" => "Maps\\Model\\ACL\\Resource",
+            "aclrole" => "Maps\\Model\\ACL\\Role",
+            "aclprivilege" => "Maps\\Model\\ACL\\Privilege",
+            "aclresource" => "Maps\\Model\\ACL\\Resource",
             "acl" => "Maps\\Model\\ACL\\ACL",
+            "room" => "Maps\\Model\\KosApi\\Room",
+            "kosapilog" => "Maps\\Model\\KosApi\\KosApiLog",
         ];
         if(isset($aliasMap[strtolower($entity)])) {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);

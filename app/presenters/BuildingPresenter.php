@@ -18,6 +18,17 @@ class BuildingPresenter extends SecuredPresenter {
         $this['form']->bindEntity($this->getRepository('building')->find($id));
     }
 
+    public function actionKosApi($id) {
+        $this->template->building = $this->getRepository('building')->find($id);
+        $this->template->rooms = $this->getRepository('room')->findBy(['building'=>$id]);
+        $q = new \Maps\Model\KosApi\LastCommunicationQuery();
+        $log = $q->fetch($this->getRepository('kosapiLog'), \Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
+        if(!empty($log)) {
+            $this->template->log = $log;
+        }
+    }
+
     private function googleMapBase($name) {
         $map = new \Maps\Components\GoogleMaps($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);

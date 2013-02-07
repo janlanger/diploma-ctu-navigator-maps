@@ -1,0 +1,13 @@
+{block #pageTitle}Komunikace s KOS API{/block}
+
+{block #content}
+<h2>{$building->name}</h2>
+<h3>{$building->address}</h3>
+<ul>
+    <li><strong>Prefix: </strong>{$building->roomPrefix}</li>
+    <li><strong>Načtených místností: </strong>{count($rooms)}</li>
+    <li><strong>Poslední komunikace s KOS API: </strong>{ifset $log}{$log->timestamp,"j.n.Y H:i"}{else}N/A{/ifset}</li>
+</ul>
+<a n:href="loadRooms!?id=$building->id" class="btn btn-primary">Načíst data z KOS API</a>
+
+<hr>
