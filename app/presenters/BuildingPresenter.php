@@ -1,6 +1,8 @@
 <?php
 namespace Maps\Presenter;
 use Maps\Model\Building\BuildingFormProcessor;
+use DataGrid\DataSources\Doctrine\QueryBuilder;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -27,6 +29,30 @@ class BuildingPresenter extends SecuredPresenter {
         if(!empty($log)) {
             $this->template->log = $log;
         }
+    }
+
+    public function createComponentBuildingsGrid($name) {
+        $grid = new \DataGrid\DataGrid($this, $name);
+        $query = new \Maps\Model\BaseDatagridQuery();
+        $ds = new QueryBuilder($query->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\Building\Building')));
+        $ds->setMapping([
+            'id'=>'b.id',
+            'name'=>'b.name',
+            'address'=>'b.address',
+        ]);
+
+        $grid->setDataSource($ds);
+
+        $grid->addColumn("id","ID#");
+        $grid->addColumn("name","Budova")->addFilter();
+        $grid->addColumn("address","Adresa")->addFilter();
+
+        $grid['id']->addDefaultSorting('asc');
+        $grid->keyName = "id";
+        $grid->addActionColumn("a","Akce");
+        $grid->addAction("Detail", "Building:detail");
+
+
     }
 
     private function googleMapBase($name) {
