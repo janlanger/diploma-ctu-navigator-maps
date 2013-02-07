@@ -22,7 +22,7 @@ $robot = $configurator->createRobotLoader()
 	->register();
 Nella\Console\Config\Extension::register($configurator);
 Nella\Doctrine\Config\Extension::register($configurator);
-\Kdyby\Extension\Forms\BootstrapRenderer\DI\RendererExtension::register($configurator);
+\Kdyby\BootstrapFormRenderer\DI\RendererExtension::register($configurator);
 // Create Dependency Injection container from config.neon file
 $configurator->addConfig(__DIR__ . '/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config/config.local.neon', $configurator::NONE); // none section

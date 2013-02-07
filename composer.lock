@@ -1,5 +1,5 @@
 {
-    "hash": "25ef9bfa4e0d53e8a041371c2e759f5a",
+    "hash": "95ede83735162818d34b6aa757330714",
     "packages": [
         {
             "name": "doctrine/common",
@@ -205,30 +205,29 @@
         },
         {
             "name": "kdyby/bootstrap-form-renderer",
-            "version": "v1.1.0",
-            "target-dir": "Kdyby/Extension/Forms/BootstrapRenderer",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Kdyby/BootstrapFormRenderer",
-                "reference": "v1.1.0"
+                "reference": "v2.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Kdyby/BootstrapFormRenderer/archive/v1.1.0.zip",
-                "reference": "v1.1.0",
+                "url": "https://github.com/Kdyby/BootstrapFormRenderer/archive/v2.0.0.zip",
+                "reference": "v2.0.0",
                 "shasum": ""
             },
             "require": {
                 "nette/nette": "2.0.*"
             },
-            "conflict": {
-                "kdyby/framework": "self.version"
+            "require-dev": {
+                "nette/tester": "@dev"
             },
-            "time": "2012-12-21 14:50:22",
+            "time": "2013-01-20 12:11:39",
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "Kdyby\\Extension\\Forms\\BootstrapRenderer": ""
+                    "Kdyby\\BootstrapFormRenderer\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
