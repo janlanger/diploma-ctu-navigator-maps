@@ -24,6 +24,17 @@ class BuildingPresenter extends SecuredPresenter {
         $this['form']->bindEntity($this->getRepository('building')->find($id));
     }
 
+    public function handleDelete($id) {
+        try {
+            $entity = $this->getRepository('building')->find($id);
+            $this->getRepository('building')->delete($entity);
+            $this->flashMessage("Záznam byl úspěšně smazán", self::FLASH_SUCCESS);
+        } catch (\Exception $e) {
+            $this->flashMessage('Záznam nebyl smazán. ' . $e->getMessage(), self::FLASH_ERROR);
+        }
+        $this->redirect('default');
+    }
+
     public function actionKosApi($id) {
         $this->template->building = $this->getRepository('building')->find($id);
         $this->template->rooms = $this->getRepository('room')->findBy(['building'=>$id]);
@@ -55,9 +66,9 @@ class BuildingPresenter extends SecuredPresenter {
         $grid->keyName = "id";
         $grid->addActionColumn("a","Akce");
         $grid->addAction("Detail", "Building:detail");
-
-
     }
+
+
 
     private function googleMapBase($name) {
         $map = new \Maps\Components\GoogleMaps($this, $name);
