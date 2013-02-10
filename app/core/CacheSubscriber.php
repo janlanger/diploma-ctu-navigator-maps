@@ -13,7 +13,15 @@ use Nette\Caching\Cache;
  */
 class CacheSubscriber implements \Doctrine\Common\EventSubscriber
 {
-	public function getSubscribedEvents()
+    /** @var \Nette\Caching\IStorage */
+    private $cacheStorage;
+
+
+    public function __construct(\Nette\Caching\IStorage $storage) {
+        $this->cacheStorage = $storage;
+    }
+
+    public function getSubscribedEvents()
 	{
 		return array(Events::onFlush);
 	}
@@ -41,7 +49,8 @@ class CacheSubscriber implements \Doctrine\Common\EventSubscriber
 			$tags[] = get_class($entity);
 			$tags = array_merge($entity->getCacheKeys(),$tags);
 		}
-		Environment::getCache()->clean(array(
+        $cache = new Cache($this->cacheStorage);
+		$cache->clean(array(
 			Cache::TAGS => array_unique($tags)
 		));
 	}

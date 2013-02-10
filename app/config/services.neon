@@ -11,3 +11,6 @@ services:
     ACLService: Maps\Model\ACL\Service
     UserService: Maps\Model\User\Service
     presenterTree: Kdyby\PresenterTree("Maps\\Presenter\\")
+    doctrine_event_cache_subscriber:
+        class: Maps\Core\CacheSubscriber
+        tags: [doctrineEvent]
