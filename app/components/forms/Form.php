@@ -1,6 +1,7 @@
 <?php
 namespace Maps\Components\Forms;
 use Nette\Application\UI\Form AS AppForm;
+use Maps\Presenter\BasePresenter;
 use Kdyby\BootstrapFormRenderer\BootstrapRenderer;
 use Nette\Forms\Form as NForm;
 
@@ -45,7 +46,7 @@ class Form extends AppForm {
 
     public function addError($message) {
         if(trim($message) != "")
-            $this->getPresenter()->flashMessage($message, \BasePresenter::FLASH_ERROR);
+            $this->getPresenter()->flashMessage($message, BasePresenter::FLASH_ERROR);
         $this->valid = FALSE;
     }
 
