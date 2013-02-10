@@ -9,12 +9,16 @@ use Nette\Security\Identity;
  * Time: 11:38
  * To change this template use File | Settings | File Templates.
  */
-class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthenticator
-{
+class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthenticator {
     private $url;
     private $service;
-    function __construct($serverUrl, Service $service) {
-        $this->url = $serverUrl;
+    private $port;
+    private $dn;
+
+    function __construct($ldapConfig, Service $service) {
+        $this->url = $ldapConfig['server'];
+        $this->dn = $ldapConfig['dn'];
+        $this->port = $ldapConfig['port'];
         $this->service = $service;
     }
 
@@ -26,32 +30,61 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
      * @return IIdentity
      * @throws AuthenticationException
      */
-    function authenticate(array $credentials)
-    {
-       // return new \Nette\Security\Identity(1,['admin'],['name'=>'Jan Langer','mail'=>'langeja1@fit.cvut.cz']);
-
+    function authenticate(array $credentials) {
+        // return new \Nette\Security\Identity(1,['admin'],['name'=>'Jan Langer','mail'=>'langeja1@fit.cvut.cz']);
 
 
         list($username, $password) = $credentials;
 
         // auth check via LDAP...
-        /*  $username = $credentials[self::USERNAME];
-          $password = $credentials[self::PASSWORD];
-          $connection = ldap_connect($this->url);
-          $bind = ldap_bind($connection, $username, $password);*/
-
-        //TODO create new user in DB if not exists
-
-        $row = $this->service->getUserByLogin($username);
+        $username = $credentials[self::USERNAME];
+        $password = $credentials[self::PASSWORD];
 
 
+        $connection = ldap_connect($this->url, $this->port);
+        ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($connection, LDAP_OPT_REFERRALS, 0);
 
+        $bind = @ldap_bind($connection, "uid=" . $username . "," . $this->dn, $password);
+
+        if ($bind) {
+            $resource = ldap_search($connection, $this->dn, "uid=" . $username);
+            $entry = ldap_get_entries($connection, $resource);
+            $userInfo = $entry[0];
+        } else {
+            throw new \Nette\Security\AuthenticationException("Uživatel nenalezen.", self::IDENTITY_NOT_FOUND);
+        }
+        ldap_unbind($connection);
+
+
+        if ($userInfo != null) {
+            // he was authenticated
+            //try finding user in db
+            $row = $this->service->getUserByLogin($username);
+            if ($row == null)
+                //not in database - create him
+                $row = $this->registerUser($username, $userInfo);
+        } else {
+            throw new \Nette\InvalidStateException("Unknown LDAP error.");
+        }
 
         return new Identity($row->id, $row->role, [
-            "name"=>$row->name,
-            "username"=>$row->username,
-            "mail"=>$row->mail,
-            "role"=>$row->role,
+            "name" => $row->name,
+            "username" => $row->username,
+            "mail" => $row->mail,
+            "role" => $row->role,
         ]);
+    }
+
+
+    private function registerUser($username, $info) {
+        $user = $this->service->createBlank();
+        $user->username = $username;
+        $user->name = $info['cn'][0];
+        $user->mail = $info['mail'][0];
+        $user->role = 'registered';
+
+        $this->service->save($user);
+        return $user;
     }
 }

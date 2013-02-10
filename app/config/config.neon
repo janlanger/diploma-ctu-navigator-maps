@@ -9,7 +9,9 @@ common:
         - services.neon
     parameters:
         ldap:
-            url: "ldap://ldap.fit.cvut.cz/ou=People,o=fit.cvut.cz"
+            server: "ldap.fit.cvut.cz"
+            port: 389
+            dn: "ou=People,o=fit.cvut.cz"
         database:
             driver: mysqli
             dbname: navigator

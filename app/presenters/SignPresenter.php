@@ -13,18 +13,19 @@ class SignPresenter extends BasePresenter
 
 	/**
 	 * Sign-in form factory.
-	 * @return Nette\Application\UI\Form
+	 * @return \Nette\Application\UI\Form
 	 */
 	protected function createComponentSignInForm()
 	{
 		$form = new Form;
 		$form->addText('username', 'Login:');
 
-		$form->addPassword('password', 'Heslo:');
+		$form->addPassword('password', 'Heslo:')->setOption("description","Ověřování proti fakultnímu LDAP.");
 
 		$form->addCheckbox('remember', 'Zůstat přihlášen');
 
 		$form->addSubmit('send', 'Přihlásit');
+
 
 		// call method signInFormSucceeded() on success
 		$form->onSuccess[] = $this->signInFormSucceeded;
@@ -49,7 +50,7 @@ class SignPresenter extends BasePresenter
                             $this->getApplication()->restoreRequest($this->backlink);
                         }
                         $this->redirect("Dashboard:");
-		} catch (Nette\Security\AuthenticationException $e) {
+		} catch (\Nette\Security\AuthenticationException $e) {
 			$form->addError($e->getMessage());
 			return;
 		}

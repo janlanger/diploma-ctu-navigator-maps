@@ -3,7 +3,7 @@ nette:
         presenterFactory:
             factory: Maps\Core\ServiceFactories::createPresenterFactory(%appDir%)
 services:
-    authenticator: Maps\Model\User\LDAPAuthenticator(parameters.ldap.url)
+    authenticator: Maps\Model\User\LDAPAuthenticator(%ldap%)
     em: @doctrine.entityManager
     authorizator:
         factory: Maps\Model\ACL\Authorizator::getInstance
