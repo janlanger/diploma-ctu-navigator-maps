@@ -16,6 +16,10 @@ class BuildingPresenter extends SecuredPresenter {
         $this->template->building = $this->getRepository("building")->find($id);
     }
 
+    public function actionAdd() {
+        $this['form']->bindEntity($this->getRepository("building")->createNew());
+    }
+
     public function actionEdit($id) {
         $this['form']->bindEntity($this->getRepository('building')->find($id));
     }
@@ -96,6 +100,11 @@ class BuildingPresenter extends SecuredPresenter {
         $form->addText('gpsCoordinates', "GPS souřadnice")
             ->setRequired();
         $form->addSubmit('send','Odeslat');
-        $form->setRedirect("detail?id=".$this->getParameter('id'));
+        $id = $this->getParameter('id');
+        if($id == null) {
+            $form->setRedirect("default");
+        } else {
+            $form->setRedirect("detail?id=".$id);
+        }
     }
 }
