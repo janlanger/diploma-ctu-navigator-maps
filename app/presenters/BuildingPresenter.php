@@ -71,13 +71,13 @@ class BuildingPresenter extends SecuredPresenter {
 
 
     private function googleMapBase($name) {
-        $map = new \Maps\Components\GoogleMaps($this, $name);
+        $map = new \Maps\Components\GoogleMaps\BasicMap($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
         return $map;
     }
 
     /**
-     * @return \Maps\Components\GoogleMaps
+     * @return \Maps\Components\GoogleMaps\BasicMap
      */
     protected function createComponentGoogleMap($name) {
        $map = $this->googleMapBase($name);

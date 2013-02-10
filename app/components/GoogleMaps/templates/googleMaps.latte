@@ -4,11 +4,16 @@
     var markers = []
     function initialize() {
         var mapOptions = {
-            {if !empty($center)}
+            {if $zoomLevel != null}
+                zoom: {$zoomLevel},
+            {elseif !empty($center)} {* back compatibility *}
                 zoom: 16,
-                center: new google.maps.LatLng({$center['lat']},{$center['long']}),
             {else}
                 zoom: 8,
+            {/if}
+            {if !empty($center)}
+                center: new google.maps.LatLng({$center['lat']},{$center['long']}),
+            {else}
                 center: new google.maps.LatLng("50.076091","14.436035"),
             {/if}
             mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -75,7 +80,7 @@
     function loadScript() {
         var script = document.createElement("script");
         script.type = "text/javascript";
-        script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apikey}+"&sensor=false&callback=initialize";
+        script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apiKey}+"&sensor=false&callback=initialize";
         document.body.appendChild(script);
     }
 
