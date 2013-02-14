@@ -3,7 +3,32 @@
 <div id="tip-line"></div>
 
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-<div id="lines-list"></div>
+<hr>
+<form>
+    <div style="margin-top: 20px;">
+        <div id="points-list" class="span6" style="border-right: #eee 1px solid">
+            <h3>Body</h3>
+        </div>
+        <div class="span6">
+            <h3>Cesty</h3>
+            <div id="lines-list"></div>
+        </div>
+        <hr>
+        &nbsp;
+    </div>
+
+
+    <div class="list-row" id="point-sample" style="display: none;">
+        <span><strong></strong></span>
+    <select style="width: 140px;">
+        <option value="intersection" data-image="/images/red_dot_big.png">Bod</option>
+        <option value="entrance" data-image="/images/markers/numeric/blueE.png">Vstup</option>
+        <option value="stairs" data-image="/images/markers/numeric/blueS.png">Schodiště</option>
+        <option value="elevator" data-image="/images/markers/numeric/blueV.png">Výtah</option>
+    </select>
+    </div>
+</form>
+
 <script type="text/javascript" src="/js/polylineEditor.js"></script>
 <script type="text/javascript">
 
@@ -53,6 +78,4 @@
     }
 
     window.onload = loadScript;
-
-
 </script>
