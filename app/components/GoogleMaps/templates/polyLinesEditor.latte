@@ -77,14 +77,24 @@
 
     var polyOptions = {
         strokeColor:'#FF0000',
-        strokeOpacity:0.8,
+        strokeOpacity:0.7,
         strokeWeight:2
     }
 
     var tempPolyOptions = {
-        strokeColor:'#00DD00',
-        strokeOpacity:0.8,
-        strokeWeight:2,
+        strokeOpacity:0,
+        strokeColor: '#ff0000',
+
+        icons: [{
+            icon: {
+                path: 'M 0,-1 0,1',
+                strokeOpacity: 0.5,
+                strokeWeight: 2,
+                scale: 4
+            },
+            offset: '0',
+            repeat: '20px'
+        }],
         clickable: false
     }
 
