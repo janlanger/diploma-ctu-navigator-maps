@@ -75,10 +75,6 @@ function changeState(newState) {
 
 function changeAdditionState(newState) {
     additionState = newState;
-    $("#addition-con").removeClass("btn-info");
-    $("#addition-new").removeClass("btn-info");
-
-    $("#addition-"+newState).addClass("btn-info");
 }
 
 function changeMarkerType(type) {
