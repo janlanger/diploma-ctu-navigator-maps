@@ -1,51 +1,92 @@
-var EDITOR_ADD = 0;
-var EDITOR_MOVE = 1;
+var EDITOR_ADD = 'add';
+var EDITOR_MOVE = 'move';
+var EDITOR_DETAIL = 'detail';
 
 var editorState = EDITOR_ADD;
 
-var STATE_ACTIVE = 0;
-var STATE_INCACTIVE = 1;
+var markerType = 'intersection';
+var markerImages = {
+    intersection: "/images/red_dot.png",
+    elevator: '/images/elevator.png',
+    entrance: '/images/exit.png',
+    passage: '/images/passage.png',
+    stairs: '/images/stairs.png'
+};
+
+var STATE_ACTIVE = 'con';
+var STATE_INCACTIVE = 'new';
 var map = null;
 var markers = [];
-var markersImgae = [];
+
 var lines = [];
 var activePL;
+var tempPL;
 var additionState = STATE_INCACTIVE;
+
 
 //*********************
 // State switching ****
 
 $(document).ready(function () {
     $("#switcher-add").click(function () {
-        changeState(EDITOR_ADD)
+        changeState(EDITOR_ADD);
     });
     $("#switcher-move").click(function () {
-        changeState(EDITOR_MOVE)
+        changeState(EDITOR_MOVE);
     })
+    $("#switcher-detail").click(function() {
+        changeState(EDITOR_DETAIL);
+    })
+    $("a[id^='marker-']").click(function() {
+        changeMarkerType(this.id.substring(7));
+    })
+    changeMarkerType('intersection');
 });
 
 function changeState(newState) {
-    editorState = newState;
-    additionState = STATE_INCACTIVE;
+    changeAdditionState(STATE_INCACTIVE);
     var draggable = true;
-    if (newState == EDITOR_ADD) {
-        $("#switcher-move").removeClass("btn-info");
-        $("#switcher-add").addClass("btn-info");
-        //disable marker draggablity
-        draggable = false;
-        $("#tip-line").html("<b>Přidávání bodů</b>: levým kliknutím přidáváte body, jsou automaticky spojeny s předchozím. Pravým kliknutím přerušíte řadu bodů.");
-    }
-    if (newState == EDITOR_MOVE) {
-        $("#switcher-add").removeClass("btn-info");
-        $("#switcher-move").addClass("btn-info");
-        $("#tip-line").html("<b>Úprava bodů</b>: Tažením můžete upravit pozici bodů na mapě. Připojené cesty se upraví automaticky.");
-    }
+    var help = [];
+    help['add']="<b>Přidávání bodů</b>: levým kliknutím přidáváte body, jsou automaticky spojeny s předchozím. Pravým kliknutím přerušíte řadu bodů.";
+    help['move'] ="<b>Úprava bodů</b>: Tažením můžete upravit pozici bodů na mapě. Připojené cesty se upraví automaticky.";
+    help['detail'] = "<b>Úprava detailů</b>: Kliknutím na jednotlivé body upravíte jejich typ a detaily.";
+
+    editorState = newState;
+    $("#switcher-move").removeClass("btn-primary");
+    $("#switcher-add").removeClass("btn-primary");
+    $("#switcher-detail").removeClass("btn-primary");
+    $("#switcher-"+newState).addClass("btn-primary");
+    $("#tip-line").html(help[newState]);
+
+    $("div[id^='toolbar-']").hide();
+    $("#toolbar-"+newState).show();
 
     for(var i=0; i<markers.length; i++) {
-        markers[i].setDraggable(draggable);
+        markers[i].setDraggable(newState == EDITOR_MOVE);
+    }
+    if(editorState == EDITOR_ADD) {
+        map.setOptions({draggableCursor:'crosshair'});
+        changeMarkerType('intersection');
+    }
+    else {
+        map.setOptions({draggableCursor:'hand'});
     }
 }
 
+function changeAdditionState(newState) {
+    additionState = newState;
+    $("#addition-con").removeClass("btn-info");
+    $("#addition-new").removeClass("btn-info");
+
+    $("#addition-"+newState).addClass("btn-info");
+}
+
+function changeMarkerType(type) {
+    $("a[id^='marker-']").removeClass('btn-primary');
+    $("#marker-"+type).addClass("btn-primary");
+
+    markerType = type;
+}
 /* *********************
 *** MAP EVENTS ********/
 
@@ -61,7 +102,7 @@ function mapClick(event) {
             addMarker(event.latLng, false);
             createPolyLine(event.latLng);
 
-            additionState = STATE_ACTIVE;
+            changeAdditionState(STATE_ACTIVE);
         }
     }
 }
@@ -70,7 +111,22 @@ function mapRightClick(event) {
     if (editorState == EDITOR_ADD) {
         if (additionState == STATE_ACTIVE) {
             activePL = null;
-            additionState = STATE_INCACTIVE;
+            tempPL.setPath([]);
+            tempPL = null;
+            changeAdditionState(STATE_INCACTIVE);
+        }
+    }
+}
+
+function mapMouseMove(event) {
+    if(editorState == EDITOR_ADD && additionState == STATE_ACTIVE) {
+        if(tempPL != undefined) {
+            if(tempPL.getPath().length == 1) {
+                tempPL.getPath().push(event.latLng);
+            }
+            else {
+                tempPL.getPath().setAt(1, event.latLng);
+            }
         }
     }
 }
@@ -85,8 +141,14 @@ function markerClick(event) {
         }
         if (additionState == STATE_INCACTIVE) {
             createPolyLine(event.latLng);
-            additionState = STATE_ACTIVE;
+            changeAdditionState(STATE_ACTIVE);
         }
+    }
+
+    if (editorState == EDITOR_DETAIL) {
+        var infoWindow = new google.maps.InfoWindow();
+        infoWindow.setContent(getInfoWindowContent(this, infoWindow));
+        infoWindow.open(map, this)
     }
 }
 
@@ -149,7 +211,7 @@ function lineClicked(event) {
             finishPolyline(position);
         }
         if(additionState == STATE_INCACTIVE) {
-            additionState = STATE_ACTIVE;
+            changeAdditionState(STATE_ACTIVE);
         }
         var index = lines.indexOf(this);
 
@@ -167,7 +229,10 @@ function lineClicked(event) {
 function createPolyLine(startPosition) {
     activePL = new google.maps.Polyline(polyOptions);
     activePL.setMap(map);
-    activePL.getPath().push(startPosition)
+    activePL.getPath().push(startPosition);
+    tempPL = new google.maps.Polyline(tempPolyOptions);
+    tempPL.setMap(map);
+    tempPL.getPath().push(startPosition);
 }
 
 function finishPolyline(endPosition) {
@@ -181,6 +246,8 @@ function finishPolyline(endPosition) {
         }
     }
     activePL = null;
+    tempPL.setPath([]);
+    tempPL = null;
 }
 
 
@@ -189,16 +256,18 @@ function addMarker(position, draggable) {
         map:map,
         draggable:draggable,
         position:position,
-        icon:'/images/red_dot.png',
-        title: "#"+(markers.length +1)
+        icon: markerImages[markerType],
+        title: "#"+(markers.length +1),
+        appType: markerType
     });
 
     google.maps.event.addListener(x, 'click', markerClick);
     google.maps.event.addListener(x, 'rightclick', markerRightClick);
     google.maps.event.addListener(x, 'dragstart', markerDragStart);
     google.maps.event.addListener(x, 'dragend',markerDragEnd);
+
     markers.push(x);
-    markersImgae.push('/images/red_dot.png');
+
     updatePointsList(markers.length-1,x)
     return x
 }
@@ -234,7 +303,7 @@ function updatePointsList(index, item) {
             itemId = this.id.substring(15);
             value = this.value;
             var image = $(this).children("[value="+value+"]").attr("data-image");
-            markersImgae[itemId] = image;
+            //markersImage[itemId] = image;
             markers[itemId].setIcon(image);
         });
         select.msDropdown();
@@ -262,20 +331,36 @@ function updateLinesList() {
 
 function registerEvents(item) {
     handle = function(id, lineChange, markerChange) {
-        var id = id;
         var itemId = id.substr(6);
         var type = id.substr(0,5);
         if(type == "lines") {
             lines[itemId].setOptions({strokeColor:lineChange});
         }
         if(type == "point") {
-            markers[itemId].setIcon(markerChange == null?markersImgae[itemId]:markerChange);
+            markers[itemId].setIcon(markerChange == null?markerImages[markers[itemId].appType]:markerChange);
         }
     };
     item.mouseover(function() {
         handle(this.id, '#00ff00','/images/green_dot.png');
-    })
+    });
     item.mouseout(function() {
         handle(this.id, '#ff0000',null);
     })
+}
+/* ****************************
+***** INFO WINDOW HANDLE **** */
+function getInfoWindowContent(marker, window) {
+    var markerType = marker.appType;
+    var html = $("#innerForm").clone();
+    $("select", html).val(markerType);
+    $("input[type=submit]", html).click(function() {
+        if(marker.appType != $("select", html).val()) {
+            marker.appType = $("select", html).val();
+            marker.setIcon(markerImages[marker.appType]);
+        }
+        window.close()
+    });
+
+    html.attr('style',"");
+    return html[0];
 }

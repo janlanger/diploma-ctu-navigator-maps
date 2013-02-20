@@ -1,9 +1,60 @@
-<a href="#" class="btn btn-active" id="switcher-add" title="Umístění bodů"><i class="icon-pencil"></i></a>
-<a href="#" class="btn " id="switcher-move" title="Úprava sítě"><i class="icon-move"></i></a>
+<div class="btn-group pull-left">
+    <a href="#" class="btn" id="switcher-add" title="Umístění bodů">Vkládání</a>
+    <a href="#" class="btn" id="switcher-move" title="Úprava sítě">Přesouvání</a>
+    <a href="#" class="btn" id="switcher-detail" title="Úprava sítě">Detaily</a>
+</div>
+<div id="toolbar-add" class="pull-right">
+    <div class="btn-group" style="margin-right: 20px;">
+        <a href="#" class="btn" id="addition-con">Navazuje</a>
+        <a href="#" class="btn" id="addition-new">Začátek</a>
+    </div>
+    <div class="btn-group">
+        <a href="#" class="btn" id="marker-intersection" title="Křižovatka"><img src="/images/red_dot.png"></a>
+        <a href="#" class="btn" id="marker-entrance" title="Vchod"><img src="/images/exit.png"></a>
+        <a href="#" class="btn" id="marker-stairs" title="Schodiště"><img src="/images/stairs.png"></a>
+        <a href="#" class="btn" id="marker-elevator" title="Výtah"><img src="/images/elevator.png"></a>
+        <a href="#" class="btn" id="marker-passage" title="Průchod"><img src="/images/passage.png"></a>
+    </div>
+
+</div>
+<div id="toolbar-detail" class="pull-right btn-group">
+    <a href="#" class="btn" id="marker-lecture">Učebna</a>
+    <a href="#" class="btn" id="marker-auditorium">Posluchárna</a>
+    <a href="#" class="btn" id="marker-office">Kancelář</a>
+    <a href="#" class="btn" id="marker-study">Studovna</a>
+    <a href="#" class="btn" id="marker-cafeteria">Kantýna</a>
+    <a href="#" class="btn" id="marker-restroom">Toalety</a>
+    <a href="#" class="btn" id="marker-cloakroom">Šatna</a>
+
+</div>
+<br clear="all">
 <div id="tip-line"></div>
 
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
 <hr>
+<div id="innerForm" style="display: none;">
+    <select name="type" id="selector">
+        <option value="intersection">Křižovatka</option>
+        <option value="entrance">Vstup</option>
+        <option value="elevator">Výtah</option>
+        <option value="stairs">Schodiště</option>
+        <option value="passage">Průchod (do jiné budovy)</option>
+        <option value="lecture">Učebna</option>
+        <option value="auditorium">Posluchárna</option>
+        <option value="office">Kancelář</option>
+        <option value="study">Studovna</option>
+        <option value="cafeteria">Kantýna</option>
+        <option value="restroom">Toalety</option>
+        <option value="cloakroom">Šatna</option>
+
+    </select><br>
+    <input name="name" type="text" placeholder="Název/číslo"><br>
+    <input name="fromFloor" type="text" placeholder="Z podlaží (nejnižší)"><br>
+    <input name="toFloor" type="text" placeholder="Do podlaží"><br>
+    <select name="toBuilding"><option>Do budovy</option></select><br>
+    <input name="toBuilding" type="submit" class="btn btn-primary" value="Uložit">
+    <input type="button" class="btn btn-small btn-danger pull-right" value="Odstranit bod">
+</div>
 <form>
     <div style="margin-top: 20px;">
         <div id="points-list" class="span6" style="border-right: #eee 1px solid">
@@ -38,6 +89,15 @@
         strokeWeight:2
     }
 
+    var tempPolyOptions = {
+        strokeColor:'#00DD00',
+        strokeOpacity:0.8,
+        strokeWeight:2,
+        clickable: false
+    }
+
+
+
     function initialize() {
         var mapOptions = {
         {if $zoomLevel != null}
@@ -51,7 +111,8 @@
             center:new google.maps.LatLng("50.076091", "14.436035"), // prague
         {/if}
             mapTypeId:google.maps.MapTypeId.ROADMAP,
-            disableDoubleClickZoom:true
+            disableDoubleClickZoom:true,
+            draggableCursor: 'crosshair'
 
         }
         map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
@@ -66,6 +127,7 @@
 
         google.maps.event.addListener(map, 'click', mapClick);
         google.maps.event.addListener(map, 'rightclick', mapRightClick);
+        google.maps.event.addListener(map, 'mousemove', mapMouseMove);
     }
 
     function loadScript() {
