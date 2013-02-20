@@ -1,5 +1,4 @@
 var EDITOR_ADD = 'add';
-var EDITOR_MOVE = 'move';
 var EDITOR_DETAIL = 'detail';
 
 var editorState = EDITOR_ADD;
@@ -31,9 +30,6 @@ $(document).ready(function () {
     $("#switcher-add").click(function () {
         changeState(EDITOR_ADD);
     });
-    $("#switcher-move").click(function () {
-        changeState(EDITOR_MOVE);
-    })
     $("#switcher-detail").click(function() {
         changeState(EDITOR_DETAIL);
     })
@@ -48,8 +44,7 @@ function changeState(newState) {
     var draggable = true;
     var help = [];
     help['add']="<b>Přidávání bodů</b>: levým kliknutím přidáváte body, jsou automaticky spojeny s předchozím. Pravým kliknutím přerušíte řadu bodů.";
-    help['move'] ="<b>Úprava bodů</b>: Tažením můžete upravit pozici bodů na mapě. Připojené cesty se upraví automaticky.";
-    help['detail'] = "<b>Úprava detailů</b>: Kliknutím na jednotlivé body upravíte jejich typ a detaily.";
+    help['detail'] = "<b>Úprava detailů</b>: Kliknutím na jednotlivé body upravíte jejich typ a detaily, tažením upravíte jejich pozici.";
 
     editorState = newState;
     $("#switcher-move").removeClass("btn-primary");
@@ -62,7 +57,7 @@ function changeState(newState) {
     $("#toolbar-"+newState).show();
 
     for(var i=0; i<markers.length; i++) {
-        markers[i].setDraggable(newState == EDITOR_MOVE);
+        markers[i].setDraggable(newState == EDITOR_DETAIL);
     }
     if(editorState == EDITOR_ADD) {
         map.setOptions({draggableCursor:'crosshair'});
@@ -160,7 +155,7 @@ var movedMarker = [];
 var moveStart = null;
 function markerDragStart(event) {
 
-    if(editorState == EDITOR_MOVE) {
+    if(editorState == EDITOR_DETAIL) {
         position = this.position;
         moveStart = position;
         for (var i = 0; i < lines.length; i++) {
@@ -176,7 +171,7 @@ function markerDragStart(event) {
 }
 
 function markerDragEnd(event) {
-    if(editorState == EDITOR_MOVE) {
+    if(editorState == EDITOR_DETAIL) {
         newPosition = this.position;
         for(var i=0; i<movedMarker.length; i++) {
             if (movedMarker[i] == undefined) continue;
