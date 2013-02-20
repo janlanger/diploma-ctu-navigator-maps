@@ -72,7 +72,7 @@
     </div>
 </form>
 
-<script type="text/javascript" src="/js/polylineEditor.js"></script>
+
 <script type="text/javascript">
 
     var polyOptions = {
@@ -138,8 +138,8 @@
         script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apiKey}+
         "&sensor=false&callback=initialize";
         document.body.appendChild(script);
-        changeState(EDITOR_ADD)
     }
 
     window.onload = loadScript;
 </script>
+<script type="text/javascript" src="/js/polylineEditor.js"></script>

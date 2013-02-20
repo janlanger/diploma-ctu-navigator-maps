@@ -4,13 +4,6 @@ var EDITOR_DETAIL = 'detail';
 var editorState = EDITOR_ADD;
 
 var markerType = 'intersection';
-var markerImages = {
-    intersection: "/images/red_dot.png",
-    elevator: '/images/elevator.png',
-    entrance: '/images/exit.png',
-    passage: '/images/passage.png',
-    stairs: '/images/stairs.png'
-};
 
 var STATE_ACTIVE = 'con';
 var STATE_INCACTIVE = 'new';
@@ -36,6 +29,7 @@ $(document).ready(function () {
     $("a[id^='marker-']").click(function() {
         changeMarkerType(this.id.substring(7));
     })
+    changeState(EDITOR_ADD);
     changeMarkerType('intersection');
 });
 
@@ -80,6 +74,17 @@ function changeMarkerType(type) {
 }
 /* *********************
 *** MAP EVENTS ********/
+
+function getMarkerIcon(type) {
+    var markerImages = {
+        intersection: {url:"/images/red_dot.png",anchor: new google.maps.Point(4,4)},
+        elevator: {url: '/images/elevator.png', anchor: new google.maps.Point(7,8)},
+        entrance: {url: '/images/exit.png', anchor: new google.maps.Point(7,8)},
+        passage: {url: '/images/passage.png', anchor: new google.maps.Point(7,8)},
+        stairs: {url: '/images/stairs.png', anchor: new google.maps.Point(7,8)}
+    };
+    return markerImages[type];
+}
 
 function mapClick(event) {
     if (editorState == EDITOR_ADD) {
@@ -247,7 +252,7 @@ function addMarker(position, draggable) {
         map:map,
         draggable:draggable,
         position:position,
-        icon: markerImages[markerType],
+        icon: getMarkerIcon(markerType),
         title: "#"+(markers.length +1),
         appType: markerType
     });
@@ -328,7 +333,7 @@ function registerEvents(item) {
             lines[itemId].setOptions({strokeColor:lineChange});
         }
         if(type == "point") {
-            markers[itemId].setIcon(markerChange == null?markerImages[markers[itemId].appType]:markerChange);
+            markers[itemId].setIcon(markerChange == null?getMarkerIcon(markers[itemId].appType):markerChange);
         }
     };
     item.mouseover(function() {
@@ -347,7 +352,7 @@ function getInfoWindowContent(marker, window) {
     $("input[type=submit]", html).click(function() {
         if(marker.appType != $("select", html).val()) {
             marker.appType = $("select", html).val();
-            marker.setIcon(markerImages[marker.appType]);
+            marker.setIcon(getMarkerIcon(marker.appType));
         }
         window.close()
     });
