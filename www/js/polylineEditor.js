@@ -54,7 +54,8 @@ function changeState(newState) {
         markers[i].setDraggable(newState == EDITOR_DETAIL);
     }
     if(editorState == EDITOR_ADD) {
-        map.setOptions({draggableCursor:'crosshair'});
+        if(map != null)
+            map.setOptions({draggableCursor:'crosshair'});
         changeMarkerType('intersection');
     }
     else {
@@ -64,6 +65,10 @@ function changeState(newState) {
 
 function changeAdditionState(newState) {
     additionState = newState;
+    if(newState == STATE_INCACTIVE && tempPL != null) {
+        tempPL.setPath([]);
+        tempPL = null;
+    }
 }
 
 function changeMarkerType(type) {
