@@ -21,4 +21,34 @@ class PolyLinesEditor extends BaseMapControl {
 
         $template->render();
     }
+
+    public function createComponentForm($name) {
+        $form = new \Maps\Components\Forms\Form($this, $name);
+
+        $form->addSelect('type','Typ',[
+            'intersection' => 'Křižovatka',
+            'entrance' => 'Vstup',
+            'elevator' => 'Výtah',
+            'stairs' => 'Schodiště',
+            'passage' => 'Průchod (do jiné budovy)',
+            'lecture' => 'Učebna',
+            'auditorium' => 'Posluchárna',
+            'office' => 'Kancelář',
+            'study' => 'Studovna',
+            'cafeteria' => 'Kantýna',
+            'restroom-men' => 'WC muži',
+            'restroom-woman' => 'WC ženy',
+            'cloakroom' => 'Šatna',
+        ])
+            ->setPrompt('-- Typ --');
+        $form->addText('name','Název');
+        $form->addText('room','Číslo místnosti'); //TODO: suggest input
+        $form->addText('fromFloor','Z podlaží (nejnižší)'); //TODO: select ze známých pater
+        $form->addText('toFloor','Do podlaží');
+
+        $form->addSelect('toBuilding','Do budovy')
+            ->setPrompt('-- Do budovy --'); //TODO: číselník budov
+        $form->addButton('save','Uložit');
+        $form->addButton('delete','Odstranit bod');
+    }
 }

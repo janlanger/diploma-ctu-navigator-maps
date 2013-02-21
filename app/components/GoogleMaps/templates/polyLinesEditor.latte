@@ -25,27 +25,16 @@
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
 <hr>
 <div id="innerForm" style="display: none;">
-    <select name="type" id="selector">
-        <option value="intersection">Křižovatka</option>
-        <option value="entrance">Vstup</option>
-        <option value="elevator">Výtah</option>
-        <option value="stairs">Schodiště</option>
-        <option value="passage">Průchod (do jiné budovy)</option>
-        <option value="lecture">Učebna</option>
-        <option value="auditorium">Posluchárna</option>
-        <option value="office">Kancelář</option>
-        <option value="study">Studovna</option>
-        <option value="cafeteria">Kantýna</option>
-        <option value="restroom">Toalety</option>
-        <option value="cloakroom">Šatna</option>
-
-    </select><br>
-    <input name="name" type="text" placeholder="Název/číslo"><br>
-    <input name="fromFloor" type="text" placeholder="Z podlaží (nejnižší)"><br>
-    <input name="toFloor" type="text" placeholder="Do podlaží"><br>
-    <select name="toBuilding"><option>Do budovy</option></select><br>
-    <input name="toBuilding" type="submit" class="btn btn-primary" value="Uložit">
-    <input type="button" class="btn btn-small btn-danger pull-right" value="Odstranit bod">
+    {form form}
+        <div style="margin-bottom: 5px; margin-top: 10px;">{input type}</div>
+        <div style="margin-bottom: 5px">{input name, 'placeholder'=>'Název'}</div>
+        <div style="margin-bottom: 5px">{input room, 'placeholder'=>'Číslo místnosti'}</div>
+        <div style="margin-bottom: 5px">{input fromFloor, 'placeholder'=>'Z podlaží (nejnižší)'}</div>
+        <div style="margin-bottom: 5px">{input toFloor, 'placeholder'=>'Do podlaží'}</div>
+        <div style="margin-bottom: 5px">{input toBuilding}</div>
+        {input save, 'class'=>'btn btn-primary'}
+        {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
+    {/form}
 </div>
 
 
