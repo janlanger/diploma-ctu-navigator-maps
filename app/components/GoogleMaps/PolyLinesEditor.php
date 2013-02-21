@@ -11,6 +11,17 @@ use Maps\Components\Forms\Form;
  */
 class PolyLinesEditor extends BaseMapControl {
 
+    private $formField;
+    private $submit;
+
+    public function bindedFormField(\Nette\Forms\IControl $control) {
+        $this->formField = $control;
+    }
+
+    public function setSubmitButton(\Nette\Forms\IControl $control) {
+        $this->submit = $control;
+    }
+
 
     public function render() {
 
@@ -19,6 +30,8 @@ class PolyLinesEditor extends BaseMapControl {
         $template->setFile(__DIR__.'/templates/polyLinesEditor.latte');
 
         $this->setMapSize($template, func_get_args());
+        $template->textField = $this->formField;
+        $template->submit = $this->submit;
 
         $template->render();
     }

@@ -105,6 +105,32 @@
         document.body.appendChild(script);
     }
 
-    $(window).load(loadScript);
+    $(window).load(function() {
+        loadScript();
+        $("#"+{$submit->control->id}).click(function(event) {
+            var field = $("#"+{$textField->control->id});
+            var markerFields = [];
+            for(var i=0; i<markers.length; i++) {
+                var x = {
+                    id: i,
+                    type: markers[i].appType,
+                    position: markers[i].position.lat() + "," + markers[i].position.lng()
+                };
+                if(markers[i].appValues != null) {
+                    $.extend(x,markers[i].appValues);
+                }
+                markerFields.push(x);
+            }
+            var lineFields = [];
+            for(var i=0; i<lines.length; i++) {
+                lineFields.push({
+                    startNode: getMarkerIndexInPosition(lines[i].getPath().getAt(0)),
+                    endNode: getMarkerIndexInPosition(lines[i].getPath().getAt(1))
+                });
+            }
+            field.val(JSON.stringify({ nodes: markerFields, paths: lineFields}));
+        });
+    });
+
 </script>
 <script type="text/javascript" src="/js/polylineEditor.js"></script>

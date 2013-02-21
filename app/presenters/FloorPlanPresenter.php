@@ -19,5 +19,19 @@ class FloorPlanPresenter extends SecuredPresenter{
         $entity = $this->getRepository('building')->find($id);
         $map->setCenter($entity->getGpsCoordinates());
         $map->setZoomLevel(20);
+        $map->bindedFormField($this['pointForm']['definition']);
+        $map->setSubmitButton($this['pointForm']['send']);
+    }
+
+    public function createComponentPointForm($name) {
+        $form = new \Maps\Components\Forms\Form($this, $name);
+        $form->addHidden('building',$this->getParameter('building'));
+        $form->addTextArea('definition');
+        $form->addSubmit('send','Uložit');
+        $form->onSuccess[] = function(\Maps\Components\Forms\Form $form) {
+            $values = $form->getValues();
+            dump(json_decode($values['definition']));
+            exit;
+        };
     }
 }
