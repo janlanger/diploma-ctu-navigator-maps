@@ -283,23 +283,65 @@ function getMarkerIndexInPosition(position) {
 function initAndOpenInfoWindow(marker, window) {
     var markerType = marker.appType;
     var html = $("#innerForm form").clone();
-    $("div[id^=form]:lt(3)", html).each(function() {
+    //infobox size
+    $("div[id^=form-]", html).hide();
+    $("div[id^=form-]:lt(3)", html).show();
+    //events registration
+    var typeSelect = $("select:first", html);
+    typeSelect.change(function(event) {
+        //hide everything
+        $("div[id^=form-]", html).hide();
+        $("#form-type", html).show();
+        switch(this.value) {
+            case 'elevator':
+                $("#form-fromFloor", html).show();
+            case 'stairs':
+                $("#form-toFloor", html).show();
+                break;
+            case 'passage':
+                $("#form-toFloor", html).show();
+                $("#form-toBuilding", html).show();
+                break;
+            case 'lecture':
+            case 'auditorium':
+            case 'office':
+            case 'study':
+                $("#form-room", html).show();
+            case 'cafeteria':
+            case 'entrance':
+                $("#form-name", html).show();
+                break;
+        }
+    });
 
-        $(this).css("display","");
-    })
-    $("select", html).val(markerType);
-    $("input[type=submit]", html).click(function() {
+    $("input[name=save]", html).click(function() {
         if(marker.appType != $("select", html).val()) {
             marker.appType = $("select", html).val();
             marker.setIcon(getMarkerIcon(marker.appType));
         }
+        marker.appValues = {
+            name: $("input[name='name']",html).val(),
+            room: $("input[name='room']",html).val(),
+            fromFloor: $("input[name='fromFloor']",html).val(),
+            toFloor: $("input[name='toFloor']",html).val(),
+            toBuilding: $("input[name='toBuilding']",html).val()
+        };
         window.close()
     });
     html.removeAttr('id');
     html.attr('style',"");
+    $("select", html).val(markerType);
+
+    if(marker.appValues != null) {
+        $("input[name='name']",html).val(marker.appValues.name);
+        $("input[name='room']",html).val(marker.appValues.room);
+        $("input[name='fromFloor']",html).val(marker.appValues.fromFloor);
+        $("input[name='toFloor']",html).val(marker.appValues.toFloor);
+        $("input[name='toBuilding']",html).val(marker.appValues.toBuilding);
+    }
     window.setContent(html[0]);
     google.maps.event.addListener(window, 'domready', function() {
-        Nette.initForm(html[0]);
+        typeSelect.trigger('change');
     });
     window.open(map, marker);
 
