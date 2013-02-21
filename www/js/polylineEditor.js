@@ -148,8 +148,7 @@ function markerClick(event) {
 
     if (editorState == EDITOR_DETAIL) {
         var infoWindow = new google.maps.InfoWindow();
-        infoWindow.setContent(getInfoWindowContent(this, infoWindow));
-        infoWindow.open(map, this)
+        initAndOpenInfoWindow(this, infoWindow);
     }
 }
 
@@ -281,9 +280,13 @@ function getMarkerIndexInPosition(position) {
 
 /* ****************************
 ***** INFO WINDOW HANDLE **** */
-function getInfoWindowContent(marker, window) {
+function initAndOpenInfoWindow(marker, window) {
     var markerType = marker.appType;
-    var html = $("#innerForm").clone();
+    var html = $("#innerForm form").clone();
+    $("div[id^=form]:lt(3)", html).each(function() {
+
+        $(this).css("display","");
+    })
     $("select", html).val(markerType);
     $("input[type=submit]", html).click(function() {
         if(marker.appType != $("select", html).val()) {
@@ -292,7 +295,12 @@ function getInfoWindowContent(marker, window) {
         }
         window.close()
     });
-
+    html.removeAttr('id');
     html.attr('style',"");
-    return html[0];
+    window.setContent(html[0]);
+    google.maps.event.addListener(window, 'domready', function() {
+        Nette.initForm(html[0]);
+    });
+    window.open(map, marker);
+
 }

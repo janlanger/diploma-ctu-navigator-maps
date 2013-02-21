@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Components\GoogleMaps;
+use Maps\Components\Forms\Form;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -40,7 +41,18 @@ class PolyLinesEditor extends BaseMapControl {
             'restroom-woman' => 'WC ženy',
             'cloakroom' => 'Šatna',
         ])
-            ->setPrompt('-- Typ --');
+            ->setPrompt('-- Typ --')
+            ->addCondition(~Form::IS_IN, ['','intersection','elevator','stairs','passage','restroom-men','restroom-woman','cloakroom'])
+                ->toggle('form-name')
+            ->addCondition(Form::IS_IN, ['lecture','auditorium','office','study'])
+                ->toggle('form-room')
+            ->addCondition(Form::IS_IN, ['elevator'])
+                ->toggle('form-fromFloor')
+            ->addCondition(Form::IS_IN, ['elevator', 'stairs', 'passage'])
+                ->toggle('form-toFloor')
+            ->addCondition(Form::IS_IN, ['passage'])
+                ->toggle('form-toBuilding');
+
         $form->addText('name','Název');
         $form->addText('room','Číslo místnosti'); //TODO: suggest input
         $form->addText('fromFloor','Z podlaží (nejnižší)'); //TODO: select ze známých pater
@@ -50,5 +62,7 @@ class PolyLinesEditor extends BaseMapControl {
             ->setPrompt('-- Do budovy --'); //TODO: číselník budov
         $form->addButton('save','Uložit');
         $form->addButton('delete','Odstranit bod');
+
+
     }
 }
