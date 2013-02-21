@@ -194,8 +194,7 @@ function markerDragEnd(event) {
                 line.getPath().setAt(1, newPosition);
             }
         }
-        index = markers.indexOf(this)
-        updatePointsList(index, this)
+        index = markers.indexOf(this);
     }
     movedMarker = [];
 }
@@ -243,7 +242,6 @@ function finishPolyline(endPosition) {
             lines.push(activePL);
 
             google.maps.event.addListener(activePL,'click',lineClicked);
-            updateLinesList()
         }
     }
     activePL = null;
@@ -268,8 +266,6 @@ function addMarker(position, draggable) {
     google.maps.event.addListener(x, 'dragend',markerDragEnd);
 
     markers.push(x);
-
-    updatePointsList(markers.length-1,x)
     return x
 }
 
@@ -283,71 +279,6 @@ function getMarkerIndexInPosition(position) {
 
 /* **** UI HANDLE **** */
 
-function updatePointsList(index, item) {
-    var parent = $("#points-list");
-    if($("#points-list #point-"+index).length > 0) {
-    //    var inner = $("#points-list #point-"+index);
-    //    inner.text(item.position)
-    }
-    else {
-        var newEl = $("#point-sample").clone()
-        newEl.attr('style','')
-        newEl.attr('id','point-'+index)
-        newEl.find("strong").text("#"+(index+1))
-        var select = newEl.find("select");
-        select.attr('id','point-selector-'+index)
-
-        parent.append(newEl);
-        var select = $("#point-selector-"+index);
-
-        select.change(function() {
-            itemId = this.id.substring(15);
-            value = this.value;
-            var image = $(this).children("[value="+value+"]").attr("data-image");
-            //markersImage[itemId] = image;
-            markers[itemId].setIcon(image);
-        });
-        select.msDropdown();
-        registerEvents(newEl)
-    }
-}
-
-function updateLinesList() {
-    var el = $("#lines-list");
-    el.html("");
-    for(var i=0; i<lines.length; i++) {
-        var newOne = $("<div></div>");
-        newOne.addClass('list-row');
-
-        line = lines[i]
-        path = line.getPath()
-        var indexA = getMarkerIndexInPosition(path.getAt(0));
-        var indexB = getMarkerIndexInPosition(path.getAt(1));
-        newOne.attr('id','lines-'+i);
-        newOne.html("<strong>#"+(indexA+1)+" -> #"+(indexB+1)+"</strong>");
-        el.append(newOne);
-        registerEvents(newOne)
-    }
-}
-
-function registerEvents(item) {
-    handle = function(id, lineChange, markerChange) {
-        var itemId = id.substr(6);
-        var type = id.substr(0,5);
-        if(type == "lines") {
-            lines[itemId].setOptions({strokeColor:lineChange});
-        }
-        if(type == "point") {
-            markers[itemId].setIcon(markerChange == null?getMarkerIcon(markers[itemId].appType):markerChange);
-        }
-    };
-    item.mouseover(function() {
-        handle(this.id, '#00ff00','/images/green_dot.png');
-    });
-    item.mouseout(function() {
-        handle(this.id, '#ff0000',null);
-    })
-}
 /* ****************************
 ***** INFO WINDOW HANDLE **** */
 function getInfoWindowContent(marker, window) {
