@@ -8,7 +8,7 @@ namespace Maps\Presenter;
  * Time: 17:52
  * To change this template use File | Settings | File Templates.
  */
-class FloorPlanPresenter extends SecuredPresenter{
+class PlanPresenter extends SecuredPresenter{
 
     protected function createComponentMap($name) {
         $map = new \Maps\Components\GoogleMaps\PolyLinesEditor($this, $name);
