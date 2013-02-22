@@ -1,6 +1,6 @@
 <?php
 
-namespace SeriesCMS\Components\Forms;
+namespace Maps\Components\Forms;
 
 use Nette\Environment;
 use Nette\Utils\Html;

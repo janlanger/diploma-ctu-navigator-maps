@@ -51,6 +51,24 @@ class BaseFormProcessor extends \Nette\Object {
     public function getDao() {
         return $this->dao;
     }
+    
+    protected function handleUpload(\Nette\Http\FileUpload $file, $dir, $filename) {
+        if($file->isOk()) {
+            $ext = pathinfo($file->getName(), PATHINFO_EXTENSION);
+            $i=0;
+            while(!file_exists($dir.'/'.$filename.'-'.$i.'.'.$ext)) {
+                $i++;
+            }
+            $path = $dir.'/'.$filename.'-'.$i.'.'.$ext;
+            if($file->move($path)) {
+                chmod($path, 0666);
+                return basename($path);
+            }
+        } elseif($file->getError() != UPLOAD_ERR_NO_FILE) {
+            throw new \Nette\InvalidStateException("Unexpected error.");
+        }
+        return null;
+    }
 
 
 
