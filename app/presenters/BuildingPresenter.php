@@ -124,6 +124,7 @@ class BuildingPresenter extends SecuredPresenter {
         $q = new \Maps\Model\BaseDatagridQuery();
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('plan')));
         $datasource->setMapping([
+            'id' => 'b.id',
             'floor_number' => 'b.floor_number',
             'name' => 'b.name',
             'version' => 'b.version',
@@ -133,13 +134,13 @@ class BuildingPresenter extends SecuredPresenter {
         $grid->addColumn('floor_number', 'Podlaží');
         $grid->addColumn('name', 'Jméno');
         $grid->addColumn('version', 'Verze');
-        $grid->addCheckboxColumn('actual_version','Pouze poslední');
+    //    $grid->addCheckboxColumn('actual_version','Pouze poslední');
         
         $grid->addActionColumn('a', 'Akce');
-        $grid->addAction('Základní data', 'Floor:edit');
+        $grid->addAction('Základní data', 'Plan:edit');
 
-        $grid->addAction('Plán', 'Floor:plan');
-        $grid->addAction('Metadata', 'Floor:metadata');
+        $grid->addAction('Plán', 'Plan:plan');
+        $grid->addAction('Metadata', 'Plan:metadata');
         
         $grid->keyName = 'id';
         $grid['floor_number']->addDefaultSorting('asc');
