@@ -13,18 +13,24 @@ class PlanPresenter extends SecuredPresenter{
     
     public function actionAdd($id) {
         $this->template->building = $this->getRepository('building')->find($id);
+        $entity = $this->getRepository('plan')->createNew();
+        $entity->setBuilding($this->template->building);
         
-        $this['form']->bindEntity($this->getRepository('plan')->createNew());
+        $this['form']->bindEntity($entity);
+    }
+    
+    public function actionMetadata($id) {
+        $this->template->plan = $plan = $this->getRepository('plan')->find($id);
+        $this->template->building = dump($plan->building);
+        
+        
     }
 
     protected function createComponentMap($name) {
         $map = new \Maps\Components\GoogleMaps\PolyLinesEditor($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
-        $id = $this->getParameter('building');
 
-        /** @var $entity \Maps\Model\Building\Building */
-        $entity = $this->getRepository('building')->find($id);
-        $map->setCenter($entity->getGpsCoordinates());
+        $map->setCenter($this->template->building->getGpsCoordinates());
         $map->setZoomLevel(20);
         $map->bindedFormField($this['pointForm']['definition']);
         $map->setSubmitButton($this['pointForm']['send']);
@@ -52,7 +58,7 @@ class PlanPresenter extends SecuredPresenter{
                 ->setOption('description','Kolikáté je toto patro nad úrovní ulice.');
         $form->addText('name', 'Popisek podlaží');
         $form->addUpload('floorPlan', 'Mapový podklad');
-        $form->addHidden('building',$this->getParameter('id'));
+        $form->addHidden('building');
         
         $form->addSubmit('ok','Uložit');
         $form->setRedirect('Building:detail?id='.$this->getParameter('id'));

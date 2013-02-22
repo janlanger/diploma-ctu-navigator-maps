@@ -121,7 +121,7 @@ class BuildingPresenter extends SecuredPresenter {
     
     public function createComponentPlansGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $q = new \Maps\Model\BaseDatagridQuery();
+        $q = new \Maps\Model\FloorPlan\PlanDatagridQuery($this->getParameter('id'));
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('plan')));
         $datasource->setMapping([
             'id' => 'b.id',
