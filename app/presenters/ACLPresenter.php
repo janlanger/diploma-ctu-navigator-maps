@@ -141,7 +141,9 @@ class ACLPresenter extends SecuredPresenter {
                 if ($item['privilege'] == NULL) {
                     $item['privilege'] = 'all';
                 }
-                $form[$p . '__' . $item['privilege']]->setDefaultValue($item['allowed'] == 1?1:-1);
+                if(isset($form[$p . '__' . $item['privilege']])) {
+                    $form[$p . '__' . $item['privilege']]->setDefaultValue($item['allowed'] == 1?1:-1);
+                }
             
         }
         $form->addHidden('id',$id);
