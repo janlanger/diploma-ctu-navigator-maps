@@ -31,8 +31,8 @@ abstract class BasePresenter extends Presenter {
             "aclprivilege" => "Maps\\Model\\ACL\\Privilege",
             "aclresource" => "Maps\\Model\\ACL\\Resource",
             "acl" => "Maps\\Model\\ACL\\ACL",
-            "room" => "Maps\\Model\\KosApi\\Room",
-            "kosapilog" => "Maps\\Model\\KosApi\\KosApiLog",
+            "plan" => "Maps\\Model\\FloorPlan\\FloorPlan",
+            "plannode" => "Maps\\Model\\FloorPlan\\Node"
         ];
         if(isset($aliasMap[strtolower($entity)])) {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);
