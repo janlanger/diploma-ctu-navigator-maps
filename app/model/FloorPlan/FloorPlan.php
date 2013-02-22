@@ -31,6 +31,16 @@ class FloorPlan extends BaseEntity {
     /** @Column(type="string", length=200, nullable=true) */
     private $tiles;
     
+    /**
+     * @OneToMany(targetEntity="Node", mappedBy="floor_plan", cascade={"persist"}, orphanRemoval=true)
+     */
+    private $nodes = [];
+    
+    /**
+     * @OneToMany(targetEntity="Path", mappedBy="floor", cascade={"persist"}, orphanRemoval=true)
+     */
+    private $paths = [];
+    
     public function getVersion() {
         return $this->version;
     }
@@ -78,8 +88,15 @@ class FloorPlan extends BaseEntity {
     public function setTiles($tiles) {
         $this->tiles = $tiles;
     }
+    
+    public function getNodes() {
+        return $this->nodes;
+    }
 
-
+    public function getPaths() {
+        return $this->paths;
+    }
+    
 }
 
 ?>

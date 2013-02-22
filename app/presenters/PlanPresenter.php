@@ -21,9 +21,9 @@ class PlanPresenter extends SecuredPresenter{
     
     public function actionMetadata($id) {
         $this->template->plan = $plan = $this->getRepository('plan')->find($id);
-        $this->template->building = dump($plan->building);
+        $this->template->building = $plan->building;
         
-        
+        $this['pointForm']['definition']->setDefaultValue($this->encodePointData($plan));
     }
 
     protected function createComponentMap($name) {
@@ -41,6 +41,9 @@ class PlanPresenter extends SecuredPresenter{
         $form->addHidden('building',$this->getParameter('building'));
         $form->addTextArea('definition');
         $form->addSubmit('send','Uložit');
+        
+        
+        
         $form->onSuccess[] = function(\Maps\Components\Forms\Form $form) {
             $values = $form->getValues();
             dump(json_decode($values['definition']));
@@ -62,5 +65,11 @@ class PlanPresenter extends SecuredPresenter{
         
         $form->addSubmit('ok','Uložit');
         $form->setRedirect('Building:detail?id='.$this->getParameter('id'));
+    }
+    
+    public function encodePointData(\Maps\Model\FloorPlan\FloorPlan $entity) {
+        $nodes = $entity->nodes;
+        $paths = $entity->paths;
+        return json_encode(['nodes'=>$nodes,'paths'=>$paths]);
     }
 }

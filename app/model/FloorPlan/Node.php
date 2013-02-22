@@ -12,7 +12,7 @@ use Maps\Model\BaseEntity;
  */
 class Node extends BaseEntity {
     /**
-     * @ManyToOne(targetEntity="Maps\Model\FloorPlan\FloorPlan")
+     * @ManyToOne(targetEntity="Maps\Model\FloorPlan\FloorPlan", inversedBy="nodes")
      * @JoinColumn(name="floorplan_id", referencedColumnName="id")
      */
     private $floor_plan;
