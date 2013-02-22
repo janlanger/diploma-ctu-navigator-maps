@@ -29,4 +29,6 @@
 </div>
 <hr>
 <h2>Mapové plány</h2>
-<a class="btn" n:href="FloorPlan:?building={$building->id}">Plán test</a>
+<a class="btn btn-primary" n:href="Plan:add?id={$building->id}">Založit nový</a>
+
+{control plansGrid}

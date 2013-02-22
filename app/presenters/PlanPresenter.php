@@ -1,6 +1,7 @@
 <?php
 namespace Maps\Presenter;
-
+use Maps\Components\Forms\EntityForm;
+use Maps\Components\Forms\Form;
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -9,6 +10,12 @@ namespace Maps\Presenter;
  * To change this template use File | Settings | File Templates.
  */
 class PlanPresenter extends SecuredPresenter{
+    
+    public function actionAdd($id) {
+        $this->template->building = $this->getRepository('building')->find($id);
+        
+        $this['form']->bindEntity($this->getRepository('plan')->createNew());
+    }
 
     protected function createComponentMap($name) {
         $map = new \Maps\Components\GoogleMaps\PolyLinesEditor($this, $name);
@@ -33,5 +40,21 @@ class PlanPresenter extends SecuredPresenter{
             dump(json_decode($values['definition']));
             exit;
         };
+    }
+    
+    public function createComponentForm($name) {
+        $form = new EntityForm($this, $name);
+        
+        $form->setEntityService(new \Maps\Model\FloorPlan\PlanFormProcessor($this->getRepository('plan')));
+        $form->addText('floorNumber', 'Číslo podlaží')
+                ->setRequired()
+                ->addRule(Form::NUMERIC)
+                ->setOption('description','Kolikáté je toto patro nad úrovní ulice.');
+        $form->addText('name', 'Popisek podlaží');
+        $form->addUpload('floorPlan', 'Mapový podklad');
+        $form->addHidden('building',$this->getParameter('id'));
+        
+        $form->addSubmit('ok','Uložit');
+        $form->setRedirect('Building:detail?id='.$this->getParameter('id'));
     }
 }
