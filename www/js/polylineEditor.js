@@ -169,10 +169,10 @@ function markerDragStart(event) {
         moveStart = position;
         for (var i = 0; i < lines.length; i++) {
             path = lines[i].getPath();
-            if (path.getAt(0) == position) {
+            if (path.getAt(0).equals(position)) {
                 movedMarker[i] = lines[i];
             }
-            if (path.getAt(1) == position) {
+            if (path.getAt(1).equals(position)) {
                 movedMarker[i] = lines[i];
             }
         }
@@ -186,10 +186,10 @@ function markerDragEnd(event) {
             if (movedMarker[i] == undefined) continue;
 
             line = lines[i];
-            if(line.getPath().getAt(0) == moveStart) {
+            if(line.getPath().getAt(0).equals(moveStart)) {
                 line.getPath().setAt(0, newPosition);
             }
-            if(line.getPath().getAt(1) == moveStart) {
+            if(line.getPath().getAt(1).equals(moveStart)) {
                 line.getPath().setAt(1, newPosition);
             }
         }
@@ -237,7 +237,7 @@ function createPolyLine(startPosition) {
 
 function finishPolyline(endPosition) {
     if(activePL != undefined) {
-        if(activePL.getPath().getAt(0) != endPosition) {
+        if(!activePL.getPath().getAt(0).equals(endPosition)) {
             activePL.getPath().push(endPosition);
             lines.push(activePL);
 
