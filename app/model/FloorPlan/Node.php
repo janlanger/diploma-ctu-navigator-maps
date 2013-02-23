@@ -93,6 +93,9 @@ class Node extends BaseEntity implements \JsonSerializable {
     }
 
     public function setFromFloor($from_floor) {
+        if($from_floor == "") {
+            $from_floor = null;
+        }
         $this->from_floor = $from_floor;
         return $this;
     }
@@ -102,6 +105,9 @@ class Node extends BaseEntity implements \JsonSerializable {
     }
 
     public function setToFloor($to_floor) {
+        if($to_floor == "") {
+            $to_floor = null;
+        }
         $this->to_floor = $to_floor;
         return $this;
     }
