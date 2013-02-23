@@ -11,6 +11,7 @@ use Nette;
 use Nette\ObjectMixin;
 use Maps\Model\Persistence\QueryObjectBase;
 use Maps\Model\Persistence\QueryBuilder;
+use Maps\Model\Persistence\ResultSet;
 
 
 /**
@@ -37,11 +38,18 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 		}
 
 		if ($values) {
-			$this->getEntityValuesMapper()->load($entity, $values);
+			$this->loadValues($entity, $values);
 		}
 
 		return $entity;
 	}
+        
+        private function loadValues($entity, $values) {
+            foreach($values as $key => $value) {
+                $method = "set".ucfirst($key);
+                $entity->$method($value);
+            }
+        }
 
 
 
