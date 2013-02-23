@@ -32,7 +32,8 @@ abstract class BasePresenter extends Presenter {
             "aclresource" => "Maps\\Model\\ACL\\Resource",
             "acl" => "Maps\\Model\\ACL\\ACL",
             "plan" => "Maps\\Model\\FloorPlan\\FloorPlan",
-            "plannode" => "Maps\\Model\\FloorPlan\\Node"
+            "plannode" => "Maps\\Model\\FloorPlan\\Node",
+            "planpath" => "Maps\\Model\\FloorPlan\\Path"
         ];
         if(isset($aliasMap[strtolower($entity)])) {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);

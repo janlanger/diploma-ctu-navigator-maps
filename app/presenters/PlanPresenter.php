@@ -19,7 +19,7 @@ class PlanPresenter extends SecuredPresenter{
         $this['form']->bindEntity($entity);
     }
     
-    public function actionMetadata($id) {
+    public function renderMetadata($id) {
         $this->template->plan = $plan = $this->getRepository('plan')->find($id);
         $this->template->building = $plan->building;
         
@@ -44,11 +44,11 @@ class PlanPresenter extends SecuredPresenter{
         
         
         
-        $form->onSuccess[] = function(\Maps\Components\Forms\Form $form) {
-            $values = $form->getValues();
-            dump(json_decode($values['definition']));
-            exit;
-        };
+        $form->onSuccess[] = callback(new \Maps\Model\FloorPlan\MetadataFormProcessor(
+                $this->getRepository('plannode'),
+                $this->getRepository('planpath'),
+                $this->getRepository('plan')->find($this->getParameter('id'))
+                ), "handle");
     }
     
     public function createComponentForm($name) {
@@ -68,8 +68,8 @@ class PlanPresenter extends SecuredPresenter{
     }
     
     public function encodePointData(\Maps\Model\FloorPlan\FloorPlan $entity) {
-        $nodes = $entity->nodes;
+        $nodes = $entity->nodes->toArray(); //this is needed to lower #of queries
         $paths = $entity->paths;
-        return json_encode(['nodes'=>$nodes,'paths'=>$paths]);
+        return json_encode(['paths'=>$paths->toArray()]);
     }
 }

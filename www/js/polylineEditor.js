@@ -227,6 +227,7 @@ function lineClicked(event) {
  *** OBJECT CREATION ******/
 function createPolyLine(startPosition) {
     activePL = new google.maps.Polyline(polyOptions);
+    activePL.appState = 'new';
     activePL.setMap(map);
     activePL.getPath().push(startPosition);
     tempPL = new google.maps.Polyline(tempPolyOptions);
@@ -249,14 +250,21 @@ function finishPolyline(endPosition) {
 }
 
 
-function addMarker(position, draggable) {
+function addMarker(position, draggable, options) {
+    var type = markerType;
+    if(options) {
+        type = options.type;
+        options.type = undefined;
+    }
     var x = new google.maps.Marker({
         map:map,
         draggable:draggable,
         position:position,
-        icon: getMarkerIcon(markerType),
+        icon: getMarkerIcon(type),
         title: "#"+(markers.length +1),
-        appType: markerType
+        appType: type,
+        appState: 'new',
+        appValues: options
     });
 
     google.maps.event.addListener(x, 'click', markerClick);
@@ -270,10 +278,19 @@ function addMarker(position, draggable) {
 
 function getMarkerIndexInPosition(position) {
     for(var i=0; i<markers.length; i++) {
-        if(markers[i].position == position) {
+        if(markers[i].position.equals(position)) {
             return i;
         }
     }
+}
+
+function getMarkerInPosition(position) {
+    for(var i=0; i<markers.length; i++) {
+        if(markers[i].position.equals(position)) {
+            return markers[i];
+        }
+    }
+    return null;
 }
 
 /* **** UI HANDLE **** */

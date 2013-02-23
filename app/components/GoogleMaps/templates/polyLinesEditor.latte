@@ -95,6 +95,29 @@
         google.maps.event.addListener(map, 'click', mapClick);
         google.maps.event.addListener(map, 'rightclick', mapRightClick);
         google.maps.event.addListener(map, 'mousemove', mapMouseMove);
+        google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
+            var definition = JSON.parse($("#"+{$textField->control->id}).val());
+            for(var i = 0; i< definition.paths.length; i++) {
+                var path = definition.paths[i];
+                if(!path.startNode || !path.endNode) {
+                    continue;
+                }
+                var nodes = [path.startNode, path.endNode];
+                var m = [];
+                for (var j=0; j<nodes.length; j++) {
+                    var position = nodes[j].position.split(",");
+                    var p = new google.maps.LatLng(position[0],position[1]);
+                    if(getMarkerInPosition(p) == null) {
+                        options = nodes[j];
+                        options.position = undefined;
+                       addMarker(p, false, options);
+                    }
+                    m.push(p);
+                }
+                createPolyLine(m[0]);
+                finishPolyline(m[1]);
+            }
+        });
     }
 
     function loadScript() {
@@ -103,10 +126,12 @@
         script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apiKey}+
         "&sensor=false&callback=initialize";
         document.body.appendChild(script);
+        
     }
 
     $(window).load(function() {
         loadScript();
+        
         $("#"+{$submit->control->id}).click(function(event) {
             var field = $("#"+{$textField->control->id});
             var markerFields = [];
@@ -114,6 +139,7 @@
                 var x = {
                     id: i,
                     type: markers[i].appType,
+                    state: markers[i].appState,
                     position: markers[i].position.lat() + "," + markers[i].position.lng()
                 };
                 if(markers[i].appValues != null) {
@@ -124,11 +150,12 @@
             var lineFields = [];
             for(var i=0; i<lines.length; i++) {
                 lineFields.push({
-                    startNode: getMarkerIndexInPosition(lines[i].getPath().getAt(0)),
-                    endNode: getMarkerIndexInPosition(lines[i].getPath().getAt(1))
+                    startNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(0))],
+                    endNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(1))],
+                    state: lines[i].appState
                 });
             }
-            field.val(JSON.stringify({ nodes: markerFields, paths: lineFields}));
+            field.val(JSON.stringify({ paths: lineFields}));
         });
     });
 
