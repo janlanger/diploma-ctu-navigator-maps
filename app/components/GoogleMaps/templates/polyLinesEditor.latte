@@ -4,11 +4,11 @@
 </div>
 <div id="toolbar-add" class="pull-right">
     <div class="btn-group">
-        <a href="#" class="btn" id="marker-intersection" title="Křižovatka"><img src="/images/red_dot.png"></a>
-        <a href="#" class="btn" id="marker-entrance" title="Vchod"><img src="/images/exit.png"></a>
-        <a href="#" class="btn" id="marker-stairs" title="Schodiště"><img src="/images/stairs.png"></a>
-        <a href="#" class="btn" id="marker-elevator" title="Výtah"><img src="/images/elevator.png"></a>
-        <a href="#" class="btn" id="marker-passage" title="Průchod"><img src="/images/passage.png"></a>
+        <a href="#" class="btn" id="marker-intersection" title="Křižovatka"><img src="{$baseUri}/images/red_dot.png"></a>
+        <a href="#" class="btn" id="marker-entrance" title="Vchod"><img src="{$baseUri}/images/exit.png"></a>
+        <a href="#" class="btn" id="marker-stairs" title="Schodiště"><img src="{$baseUri}/images/stairs.png"></a>
+        <a href="#" class="btn" id="marker-elevator" title="Výtah"><img src="{$baseUri}/images/elevator.png"></a>
+        <a href="#" class="btn" id="marker-passage" title="Průchod"><img src="{$baseUri}/images/passage.png"></a>
         <a href="#" class="btn" id="marker-lecture">Učebna</a>
         <a href="#" class="btn" id="marker-auditorium">Posluchárna</a>
         <a href="#" class="btn" id="marker-office">Kancelář</a>
@@ -39,7 +39,7 @@
 
 
 <script type="text/javascript">
-
+    var baseUri ={$baseUri};
     var polyOptions = {
         strokeColor:'#FF0000',
         strokeOpacity:0.7,
