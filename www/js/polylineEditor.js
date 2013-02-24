@@ -82,11 +82,11 @@ function changeMarkerType(type) {
 
 function getMarkerIcon(type) {
     var markerImages = {
-        intersection: {url:"/images/red_dot.png",anchor: new google.maps.Point(4,4)},
-        elevator: {url: '/images/elevator.png', anchor: new google.maps.Point(7,8)},
-        entrance: {url: '/images/exit.png', anchor: new google.maps.Point(7,8)},
-        passage: {url: '/images/passage.png', anchor: new google.maps.Point(7,8)},
-        stairs: {url: '/images/stairs.png', anchor: new google.maps.Point(7,8)}
+        intersection: {url:baseUri+"/images/red_dot.png",anchor: new google.maps.Point(4,4)},
+        elevator: {url: baseUri+'/images/elevator.png', anchor: new google.maps.Point(7,8)},
+        entrance: {url: baseUri+'/images/exit.png', anchor: new google.maps.Point(7,8)},
+        passage: {url: baseUri+'/images/passage.png', anchor: new google.maps.Point(7,8)},
+        stairs: {url: baseUri+'/images/stairs.png', anchor: new google.maps.Point(7,8)}
     };
     return markerImages[type];
 }
