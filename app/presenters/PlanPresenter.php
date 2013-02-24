@@ -44,11 +44,15 @@ class PlanPresenter extends SecuredPresenter{
         
         
         
-        $form->onSuccess[] = callback(new \Maps\Model\FloorPlan\MetadataFormProcessor(
+        $form->onSuccess[] = function(Form $form) {
+            $x = new \Maps\Model\FloorPlan\MetadataFormProcessor(
                 $this->getRepository('plannode'),
                 $this->getRepository('planpath'),
                 $this->getRepository('plan')->find($this->getParameter('id'))
-                ), "handle");
+            );
+            $x->handle($form);
+            $this->redirect("this");
+        };
     }
     
     public function createComponentForm($name) {
