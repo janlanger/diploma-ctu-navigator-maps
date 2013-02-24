@@ -82,7 +82,7 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
         $user->username = $username;
         $user->name = $info['cn'][0];
         $user->mail = $info['mail'][0];
-        $user->role = 'registered';
+        $user->role = 'admin';
 
         $this->service->save($user);
         return $user;
