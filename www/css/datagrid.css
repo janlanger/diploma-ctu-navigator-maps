@@ -70,10 +70,10 @@ table.datagrid span.positioner a span {
     padding-left: 0px !important;
 }
 table.datagrid span.positioner a span.up {
-    background: url('/images/datagrid/asc.gif') no-repeat right center;
+    background: url('../images/datagrid/asc.gif') no-repeat right center;
 }
 table.datagrid span.positioner a span.down {
-    background: url('/images/datagrid/desc.gif') no-repeat right center;
+    background: url('../images/datagrid/desc.gif') no-repeat right center;
 }
 table.datagrid span.positioner a span.down:hover, table.datagrid span.positioner a span.up:hover {
     opacity: 1;
@@ -144,7 +144,7 @@ table.datagrid .paginator .button-disabled {
     color: #c0c0c0;
 }
 table.datagrid input.datepicker {
-    background: white url('/images/datagrid/calendar.gif') no-repeat right !important;
+    background: white url('../images/datagrid/calendar.gif') no-repeat right !important;
 }
 table.datagrid input {
     margin-bottom: 3px;
