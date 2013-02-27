@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 use Maps\Model\Persistence\QueryObjectBase;
 
 /*

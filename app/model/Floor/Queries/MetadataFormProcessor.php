@@ -1,6 +1,6 @@
 <?php
 
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
@@ -46,10 +46,10 @@ class MetadataFormProcessor {
             $this->dbNodes = $this->allNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor_plan" => $this->floor]), 'id');
             $this->dbPaths = $this->allPaths = $this->pathRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
             if($this->dbNodes == null) {
-                $this->allNodes = [];
+                $this->allNodes = $this->dbNodes = [];
             }
             if($this->dbPaths == null) {
-                $this->allPaths = [];
+                $this->allPaths = $this->dbPaths = [];
             }
             
 

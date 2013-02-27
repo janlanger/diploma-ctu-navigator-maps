@@ -13,10 +13,18 @@ class FloorPresenter extends SecuredPresenter{
     
     public function actionAdd($id) {
         $this->template->building = $this->getRepository('building')->find($id);
-        $entity = $this->getRepository('plan')->createNew();
+        $entity = $this->getRepository('floor')->createNew();
         $entity->setBuilding($this->template->building);
         
         $this['form']->bindEntity($entity);
+    }
+
+    public function actionEdit($id) {
+        $entity = $this->getRepository('floor')->find($id);
+        $this->template->building = $entity->building;
+
+        $this['form']->bindEntity($entity);
+
     }
 
 
@@ -24,13 +32,12 @@ class FloorPresenter extends SecuredPresenter{
     public function createComponentForm($name) {
         $form = new EntityForm($this, $name);
         
-        $form->setEntityService(new \Maps\Model\FloorPlan\PlanFormProcessor($this->getRepository('plan')));
+        $form->setEntityService(new \Maps\Model\Floor\PlanFormProcessor($this->getRepository('floor')));
         $form->addText('floorNumber', 'Číslo podlaží')
                 ->setRequired()
                 ->addRule(Form::NUMERIC)
                 ->setOption('description','Kolikáté je toto patro nad úrovní ulice.');
         $form->addText('name', 'Popisek podlaží');
-        $form->addUpload('floorPlan', 'Mapový podklad');
         $form->addHidden('building');
         
         $form->addSubmit('ok','Uložit');

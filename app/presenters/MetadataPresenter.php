@@ -10,12 +10,12 @@
 namespace Maps\Presenter;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\PolyLinesEditor;
-use Maps\Model\FloorPlan\FloorPlan;
+use Maps\Model\Floor\Floor;
 
 class MetadataPresenter extends SecuredPresenter{
 
     public function renderDefault($id) {
-        $this->template->plan = $plan = $this->getRepository('plan')->find($id);
+        $this->template->plan = $plan = $this->getRepository('floor')->find($id);
         $this->template->building = $plan->building;
 
         $this['pointForm']['definition']->setDefaultValue($this->encodePointData($plan));
@@ -30,10 +30,10 @@ class MetadataPresenter extends SecuredPresenter{
 
 
         $form->onSuccess[] = function(Form $form) {
-            $x = new \Maps\Model\FloorPlan\MetadataFormProcessor(
+            $x = new \Maps\Model\Floor\MetadataFormProcessor(
                 $this->getRepository('plannode'),
                 $this->getRepository('planpath'),
-                $this->getRepository('plan')->find($this->getParameter('id'))
+                $this->getRepository('floor')->find($this->getParameter('id'))
             );
             $x->handle($form);
             $this->redirect("this");
@@ -52,7 +52,7 @@ class MetadataPresenter extends SecuredPresenter{
 
 
 
-    public function encodePointData(FloorPlan $entity) {
+    public function encodePointData(Floor $entity) {
         $nodes = $entity->nodes->toArray(); //this is needed to lower #of queries
         $paths = $entity->paths;
         return json_encode(['paths'=>$paths->toArray()]);

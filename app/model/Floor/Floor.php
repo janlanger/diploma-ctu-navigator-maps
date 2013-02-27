@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 use Maps\Model\BaseEntity;
 
 /*
@@ -11,7 +11,7 @@ use Maps\Model\BaseEntity;
  * @Entity
  * @Table(name="floor_plans")
  */
-class FloorPlan extends BaseEntity {
+class Floor extends BaseEntity {
     /**
      * @Column(type="integer", nullable=false)
      */

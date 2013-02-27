@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 use Maps\Model\BaseEntity;
 /*
  * To change this template, choose Tools | Templates
@@ -25,7 +25,7 @@ class Path extends BaseEntity implements \JsonSerializable {
      */
     private $endNode;
     /**
-     * @ManyToOne(targetEntity="FloorPlan", inversedBy="paths")
+     * @ManyToOne(targetEntity="Floor", inversedBy="paths")
      */
     private $floor;
     

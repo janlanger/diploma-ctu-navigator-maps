@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 use Maps\Model\BaseEntity;
 /*
  * To change this template, choose Tools | Templates
@@ -12,7 +12,7 @@ use Maps\Model\BaseEntity;
  */
 class Node extends BaseEntity implements \JsonSerializable {
     /**
-     * @ManyToOne(targetEntity="Maps\Model\FloorPlan\FloorPlan", inversedBy="nodes")
+     * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", inversedBy="nodes")
      * @JoinColumn(name="floorplan_id", referencedColumnName="id")
      */
     private $floor_plan;

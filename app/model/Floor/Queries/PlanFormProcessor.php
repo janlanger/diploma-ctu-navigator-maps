@@ -1,5 +1,5 @@
 <?php
-namespace Maps\Model\FloorPlan;
+namespace Maps\Model\Floor;
 use Maps\Model\Persistence\BaseFormProcessor;
 /*
  * To change this template, choose Tools | Templates
@@ -15,11 +15,13 @@ class PlanFormProcessor extends BaseFormProcessor {
     
     
     protected function setData($entity, $values) {
+        if(isset($form['floorPlan'])) {
         $file = $this->handleUpload($values['floorPlan'], WWW_DIR.'/data/plans', $this->getPlanFileName($entity, $values));
         if($file == null) {
             unset($values['floorPlan']);
         } else {
             $values['floorPlan'] = $file;
+        }
         }
         $values['building'] = $this->getEntityRepository('Maps\Model\Building\Building')->find($values['building']);
         parent::setData($entity, $values);
