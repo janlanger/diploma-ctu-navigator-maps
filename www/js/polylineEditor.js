@@ -196,6 +196,7 @@ function markerDragEnd(event) {
             }
         }
         index = markers.indexOf(this);
+
     }
     movedMarker = [];
 }
@@ -269,7 +270,6 @@ function addMarker(position, draggable, options) {
         icon: getMarkerIcon(type),
         title: "#"+(markers.length +1),
         appType: type,
-        appState: 'new',
         appValues: options
     });
 

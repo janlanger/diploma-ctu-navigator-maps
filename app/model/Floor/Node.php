@@ -123,6 +123,7 @@ class Node extends BaseEntity implements \JsonSerializable {
 
     public function jsonSerialize() {
         return [
+            'id' => $this->id,
             'position' => $this->gps_coordinates,
             'name' => $this->name,
             'type' => $this->type,

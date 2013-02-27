@@ -53,8 +53,22 @@ class MetadataPresenter extends SecuredPresenter{
 
 
     public function encodePointData(Floor $entity) {
-        $nodes = $entity->nodes->toArray(); //this is needed to lower #of queries
-        $paths = $entity->paths;
-        return json_encode(['paths'=>$paths->toArray()]);
+        $nodes = $entity->nodes->toArray();
+        $paths = $entity->paths->toArray();
+
+        $findNodeId = function($dbId) use ($nodes) {
+            foreach($nodes as $index => $node) {
+                if($node->id == $dbId->id) {
+                    return $index;
+                }
+            }
+        };
+
+        foreach($paths as $path) {
+            $path->startNode = $findNodeId($path->startNode);
+            $path->endNode = $findNodeId($path->endNode);
+        }
+
+        return json_encode(['nodes' => $nodes, 'paths'=>$paths]);
     }
 }

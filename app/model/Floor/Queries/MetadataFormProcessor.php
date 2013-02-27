@@ -22,10 +22,10 @@ class MetadataFormProcessor {
     private $floor;
     private $dbNodes;
     private $dbPaths;
-    private $allNodes = [];
-    private $allPaths = [];
-
-    private $sentNodes = [];
+    private $nodesAdd = [];
+    private $nodesDelete = [];
+    private $pathsAdd = [];
+    private $pathsDelete = [];
 
     function __construct(Dao $nodeRepository, Dao $pathRepository, $floor) {
         $this->nodeRepository = $nodeRepository;
@@ -41,38 +41,111 @@ class MetadataFormProcessor {
             $values = $form->getValues();
 
             $definition = json_decode($values['definition']);
-            $paths = $definition->paths;
 
-            $this->dbNodes = $this->allNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor_plan" => $this->floor]), 'id');
-            $this->dbPaths = $this->allPaths = $this->pathRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
+            $sentPaths = $definition->paths;
+            $sentNodes = $definition->nodes;
+
+            $this->dbNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor_plan" => $this->floor]), 'id');
+            $this->dbPaths = $this->pathRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
             if($this->dbNodes == null) {
-                $this->allNodes = $this->dbNodes = [];
+                $this->dbNodes = [];
             }
             if($this->dbPaths == null) {
-                $this->allPaths = $this->dbPaths = [];
+                $this->dbPaths = [];
             }
+
+            $this->processNodes($sentNodes);
+            $this->processPaths($sentPaths, $sentNodes);
+
             
 
-            $addNodes = $this->walkNodes($definition);
-            $addPath = $this->walkPaths($definition);
-
-            $deleteNodes = $this->findToDelete($definition);
-            
-
-            if(!empty($addNodes)) {
-                $this->nodeRepository->add($addNodes);
+            if(!empty($this->nodesAdd)) {
+                $this->nodeRepository->add($this->nodesAdd);
             }
-            if(!empty($addPath)) {
-                $this->pathRepository->add($addPath);
+            if(!empty($this->pathsAdd)) {
+                $this->pathRepository->add($this->pathsAdd);
             }
 
-            $this->nodeRepository->delete($deleteNodes, Dao::NO_FLUSH);
+            if(!empty($this->nodesDelete)) {
+                $this->nodeRepository->delete($this->nodesDelete, Dao::NO_FLUSH);
+            }
+
+            if(!empty($this->pathsDelete)) {
+                $this->pathRepository->delete($this->pathsDelete, Dao::NO_FLUSH);
+            }
 
             $this->nodeRepository->getEntityManager()->flush();
             
             
         } catch (\InvalidArgumentException $e) {
             
+        }
+    }
+
+    private function processNodes($nodes) {
+        $unprocessedNodes = array_flip(array_keys($this->dbNodes));
+        foreach($nodes as $node) {
+            if(!isset($node->id) || !isset($this->dbNodes[$node->id])) {
+                if($node == null) continue;
+                $this->nodesAdd[] = $this->nodeRepository->createNew(null, array(
+                    'floorPlan' => $this->floor,
+                    'gpsCoordinates' => $node->position,
+                    'type' => $node->type,
+                    'name' => (isset($node->name) ? $node->name : null),
+                    'room' => (isset($node->room) ? $node->room : null),
+                    'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : null,
+                    'toFloor' => isset($node->toFloor) ? $node->toFloor : null,
+                    'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : null,
+                ));
+                $node->addedId = count($this->nodesAdd) -1;
+            } else {
+                $entity = $this->dbNodes[$node->id];
+
+                foreach($node as $key=>$value) {
+                    if(in_array($key, ['id','state'])) continue;
+                    $method = "set".ucfirst($key);
+                    if($value == "") $value = null;
+                    $entity->$method($value);
+                }
+                unset($unprocessedNodes[$node->id]);
+            }
+        }
+
+        foreach($unprocessedNodes as $id =>$foo) {
+            $this->nodesDelete[] = $this->dbNodes[$id];
+        }
+    }
+
+    private function processPaths($paths, $nodes) {
+        $unprocessedPaths = array_flip(array_keys($this->dbPaths));
+        foreach($paths as $path) {
+            $updated = false;
+            if(isset($nodes[$path->startNode]->id) && isset($nodes[$path->endNode]->id)) {
+                //oba maji id - jsou z db - zkus najit zaklade id bodu
+                $entity = $this->findPathWithNodes($nodes[$path->startNode]->id, $nodes[$path->endNode]->id);
+                if($entity != null) {
+                    $entity->length = $path->length;
+                    $updated = true;
+                    if($entity->id != null)
+                        unset($unprocessedPaths[$entity->id]);
+                }
+            }
+            if(!$updated) {
+                $begin = $this->getNodeWithPathId($path->startNode, $nodes);
+                $end = $this->getNodeWithPathId($path->endNode, $nodes);
+                if($begin == null || $end == null) {
+                    continue; // not ended with markers on both sides
+                }
+                $this->pathsAdd[] = $this->pathRepository->createNew(null, [
+                    "startNode" => $begin,
+                    "endNode" => $end,
+                    "length" => $path->length,
+                    "floor" => $this->floor,
+                ]);
+            }
+        }
+        foreach($unprocessedPaths as $id => $foo) {
+            $this->pathsDelete[] = $this->dbPaths[$id];
         }
     }
 
@@ -119,12 +192,18 @@ class MetadataFormProcessor {
                 continue;
             }
             if(!$this->pathExistsBetween($path->startNode->position, $path->endNode->position)) {
-                $this->allPaths[] = $toAdd[] = $this->pathRepository->createNew(null, [
+                $e = $this->pathRepository->createNew(null, [
                     'startNode' => $this->getNodeInPosition($path->startNode->position),
                     'endNode' => $this->getNodeInPosition($path->endNode->position),
                     'floor' => $this->floor,
                 ]);
+                $this->allPaths[] = $e;
+                $toAdd[] = $e;
+                $this->sentPaths[] = $e;
+            } else {
+                $this->sentPaths[] = $this->getPathBetween($path->startNode->position, $path->endNode->position);
             }
+
         }
         return $toAdd;
     }
@@ -142,6 +221,19 @@ class MetadataFormProcessor {
         return $toDelete;
     }
 
+    public function findPathsToDelete() {
+        $toDelete = [];
+        foreach($this->dbPaths as $dbPath) {
+            foreach($this->sentPaths as $sent) {
+                if($dbPath->start == $sent->position) {
+                    continue 2;
+                }
+            }
+            $toDelete[] = $dbPath;
+        }
+        return $toDelete;
+    }
+
     private function getNodeInPosition($position) {
         foreach ($this->allNodes as $node) {
             if ($node->getGpsCoordinates() == $position) {
@@ -154,8 +246,26 @@ class MetadataFormProcessor {
     private function nodeOnPositionExists($position) {
         return $this->getNodeInPosition($position) !== null;
     }
+
+    private function findPathWithNodes($f, $s) {
+        foreach($this->dbPaths as $id => $path) {
+            if(($f == $path->startNode->id && $s == $path->endNode->id) ||
+                ($s == $path->startNode->id && $f == $path->endNode->id)) {
+                return $path;
+            }
+        }
+
+        foreach($this->pathsAdd as $path) {
+            if(($f == $path->startNode->id && $s == $path->endNode->id) ||
+                ($s == $path->startNode->id && $f == $path->endNode->id)) {
+                return $path;
+            }
+        }
+        return null;
+    }
     
     private function getPathBetween($one, $two) {
+
         foreach($this->allPaths as $path) {
             if(($path->startNode->getGpsCoordinates() == $one && $path->endNode->getGpsCoordinates() == $two) || 
                     ($path->startNode->getGpsCoordinates() == $two && $path->endNode->getGpsCoordinates() == $one)) {
@@ -167,6 +277,11 @@ class MetadataFormProcessor {
     
     private function pathExistsBetween($one, $two) {
         return $this->getPathBetween($one, $two) !== null;
+    }
+
+    private function getNodeWithPathId($nodeId, $nodes)
+    {
+        return (isset($nodes[$nodeId]->addedId)? $this->nodesAdd[$nodes[$nodeId]->addedId]:$this->dbNodes[$nodes[$nodeId]->id]);
     }
 
 }

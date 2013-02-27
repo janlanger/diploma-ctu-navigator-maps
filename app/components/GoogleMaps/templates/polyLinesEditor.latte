@@ -97,19 +97,20 @@
         google.maps.event.addListener(map, 'mousemove', mapMouseMove);
         google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
             var definition = JSON.parse($("#"+{$textField->control->id}).val());
+            var nodes = definition.nodes;
             for(var i = 0; i< definition.paths.length; i++) {
                 var path = definition.paths[i];
-                if(!path.startNode || !path.endNode) {
+                if(path.startNode == null || path.endNode == null) {
                     continue;
                 }
-                var nodes = [path.startNode, path.endNode];
+                var n = [nodes[path.startNode], nodes[path.endNode]];
                 var m = [];
-                for (var j=0; j<nodes.length; j++) {
-                    var position = nodes[j].position.split(",");
+                for (var j=0; j<n.length; j++) {
+                    var position = n[j].position.split(",");
                     var p = new google.maps.LatLng(position[0],position[1]);
                     if(getMarkerInPosition(p) == null) {
-                        options = nodes[j];
-                        options.position = undefined;
+                        options = n[j];
+                        //options.position = undefined;
                        addMarker(p, false, options);
                     }
                     m.push(p);
@@ -123,7 +124,7 @@
     function loadScript() {
         var script = document.createElement("script");
         script.type = "text/javascript";
-        script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apiKey}+
+        script.src = "http://maps.googleapis.com/maps/api/js?libraries=geometry&amp;key="+{$apiKey}+
         "&sensor=false&callback=initialize";
         document.body.appendChild(script);
         
@@ -133,35 +134,36 @@
         loadScript();
         
         $("#"+{$submit->control->id}).click(function(event) {
-          //  event.preventDefault();
+            //event.preventDefault();
             var field = $("#"+{$textField->control->id});
             var markerFields = [];
             for(var i=0; i<markers.length; i++) {
                 if(markers[i] == null) continue;
                 var x = {
-                    id: i,
                     type: markers[i].appType,
-                    state: markers[i].appState,
-                    position: markers[i].position.lat() + "," + markers[i].position.lng()
+                    position: markers[i].getPosition().lat() + "," + markers[i].getPosition().lng()
                 };
                 if(markers[i].appValues != null) {
-                    $.extend(x,markers[i].appValues);
+                    markers[i].appValues.position = undefined;
+                    markers[i].appValues.type = undefined;
+
+                    $.extend(x, markers[i].appValues,x);
                 }
-                markerFields.push(x);
+                markerFields[i] = x;
             }
             var lineFields = [];
             for(var i=0; i<lines.length; i++) {
                 if(!lines[i]) continue;
                 lineFields.push({
-                    startNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(0))],
-                    endNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(1))],
-                    state: lines[i].appState
+                    startNode: getMarkerIndexInPosition(lines[i].getPath().getAt(0)),
+                    endNode: getMarkerIndexInPosition(lines[i].getPath().getAt(1)),
+                    length: google.maps.geometry.spherical.computeLength(lines[i].getPath())
                 });
             }
-            field.val(JSON.stringify({ paths: lineFields}));
+            field.val(JSON.stringify({ nodes: markerFields, paths: lineFields}));
 
         });
-        $("#"+{$textField->control->id}).parents("div.control-group").hide();
+       // $("#"+{$textField->control->id}).parents("div.control-group").hide();
     });
 
 </script>

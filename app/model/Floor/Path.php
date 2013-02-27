@@ -28,7 +28,12 @@ class Path extends BaseEntity implements \JsonSerializable {
      * @ManyToOne(targetEntity="Floor", inversedBy="paths")
      */
     private $floor;
-    
+
+
+    /** @Column(type="decimal") */
+    private $length;
+
+
     public function getStartNode() {
         return $this->startNode;
     }
@@ -61,6 +66,17 @@ class Path extends BaseEntity implements \JsonSerializable {
             'startNode' => $this->startNode,
             'endNode' => $this->endNode,
         ];
+    }
+
+
+    public function setLength($length)
+    {
+        $this->length = $length;
+    }
+
+    public function getLength()
+    {
+        return $this->length;
     }
 
 
