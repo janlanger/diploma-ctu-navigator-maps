@@ -51,6 +51,7 @@ function changeState(newState) {
     $("#toolbar-"+newState).show();
 
     for(var i=0; i<markers.length; i++) {
+        if(!markers[i]) continue;
         markers[i].setDraggable(newState == EDITOR_DETAIL);
     }
     if(editorState == EDITOR_ADD) {
@@ -168,6 +169,7 @@ function markerDragStart(event) {
         position = this.position;
         moveStart = position;
         for (var i = 0; i < lines.length; i++) {
+            if(!lines[i]) continue;
             path = lines[i].getPath();
             if (path.getAt(0).equals(position)) {
                 movedMarker[i] = lines[i];
@@ -278,7 +280,7 @@ function addMarker(position, draggable, options) {
 
 function getMarkerIndexInPosition(position) {
     for(var i=0; i<markers.length; i++) {
-        if(markers[i].position.equals(position)) {
+        if(markers[i] && markers[i].position.equals(position)) {
             return i;
         }
     }
@@ -286,7 +288,7 @@ function getMarkerIndexInPosition(position) {
 
 function getMarkerInPosition(position) {
     for(var i=0; i<markers.length; i++) {
-        if(markers[i].position.equals(position)) {
+        if(markers[i] && markers[i].position.equals(position)) {
             return markers[i];
         }
     }
@@ -344,6 +346,27 @@ function initAndOpenInfoWindow(marker, window) {
             toBuilding: $("input[name='toBuilding']",html).val()
         };
         window.close()
+    });
+    $("input[name=delete]", html).click(function() {
+        index = getMarkerIndexInPosition(marker.position);
+        marker.setMap(null);
+        var position = marker.position;
+
+        for(var i=0; i<lines.length; i++) {
+            if(!lines[i]) continue;
+            var l = lines[i];
+            if(!l) continue;
+            var path = l.getPath();
+
+            if(path.getAt(0).equals(position) || path.getAt(1).equals(position)) {
+                path.pop();
+                path.pop;
+                delete lines[i];
+            }
+        }
+
+        delete markers[index];
+        window.close();
     });
     html.removeAttr('id');
     html.attr('style',"");

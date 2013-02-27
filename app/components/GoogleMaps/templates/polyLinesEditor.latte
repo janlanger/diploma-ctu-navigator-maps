@@ -23,7 +23,7 @@
 <div id="tip-line"></div>
 
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-<hr>
+
 <div id="innerForm" style="display: none;">
     {form form}
         <div id="form-type" style="margin-bottom: 5px; margin-top: 10px;">{input type}</div>
@@ -133,9 +133,11 @@
         loadScript();
         
         $("#"+{$submit->control->id}).click(function(event) {
+          //  event.preventDefault();
             var field = $("#"+{$textField->control->id});
             var markerFields = [];
             for(var i=0; i<markers.length; i++) {
+                if(markers[i] == null) continue;
                 var x = {
                     id: i,
                     type: markers[i].appType,
@@ -149,6 +151,7 @@
             }
             var lineFields = [];
             for(var i=0; i<lines.length; i++) {
+                if(!lines[i]) continue;
                 lineFields.push({
                     startNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(0))],
                     endNode: markerFields[getMarkerIndexInPosition(lines[i].getPath().getAt(1))],
@@ -156,7 +159,9 @@
                 });
             }
             field.val(JSON.stringify({ paths: lineFields}));
+
         });
+        $("#"+{$textField->control->id}).parents("div.control-group").hide();
     });
 
 </script>
