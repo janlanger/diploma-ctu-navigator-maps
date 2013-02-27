@@ -222,6 +222,10 @@ function lineClicked(event) {
         createPolyLine(position);
 
     }
+    if(editorState == EDITOR_DETAIL) {
+        position = event.latLng;
+        initAndOpenLineIW(position, this);
+    }
 }
 
 
@@ -385,4 +389,26 @@ function initAndOpenInfoWindow(marker, window) {
     });
     window.open(map, marker);
 
+}
+
+function initAndOpenLineIW(position, line) {
+    infoWindow = new google.maps.InfoWindow();
+
+    var content = $("<input>");
+    content.val("Odstranit cestu");
+    content.attr("type","button");
+    content.attr("class","btn btn-small btn-danger");
+    content.click(function(event) {
+        var index = lines.indexOf(line);
+        var path = line.getPath();
+        path.pop();
+        path.pop();
+        delete lines[index];
+        infoWindow.close();
+    });
+    var x = $("<div></div>");
+    x.append(content);
+    infoWindow.setContent(x[0]);
+    infoWindow.setPosition( position);
+    infoWindow.open(map);
 }
