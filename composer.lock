@@ -18,7 +18,6 @@
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2012-09-19 22:55:18",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -68,7 +67,8 @@
                 "eventmanager",
                 "persistence",
                 "spl"
-            ]
+            ],
+            "time": "2012-09-19 22:55:18"
         },
         {
             "name": "doctrine/dbal",
@@ -88,7 +88,6 @@
                 "doctrine/common": "2.3.*",
                 "php": ">=5.3.2"
             },
-            "time": "2013-01-07 20:03:43",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -131,7 +130,8 @@
                 "dbal",
                 "persistence",
                 "queryobject"
-            ]
+            ],
+            "time": "2013-01-07 20:03:43"
         },
         {
             "name": "doctrine/orm",
@@ -156,7 +156,6 @@
             "suggest": {
                 "symfony/yaml": "If you want to use YAML Metadata Mapping Driver"
             },
-            "time": "2013-01-07 20:05:04",
             "bin": [
                 "bin/doctrine",
                 "bin/doctrine.php"
@@ -201,7 +200,8 @@
             "keywords": [
                 "database",
                 "orm"
-            ]
+            ],
+            "time": "2013-01-07 20:05:04"
         },
         {
             "name": "kdyby/bootstrap-form-renderer",
@@ -223,7 +223,6 @@
             "require-dev": {
                 "nette/tester": "@dev"
             },
-            "time": "2013-01-20 12:11:39",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -249,20 +248,21 @@
                 "bootstrap",
                 "kdyby",
                 "nette"
-            ]
+            ],
+            "time": "2013-01-20 12:11:39"
         },
         {
             "name": "kdyby/curl",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Kdyby/Curl",
-                "reference": "90b8adcfff085df2eebf53b633fd81083b037ddc"
+                "url": "https://github.com/Kdyby/Curl.git",
+                "reference": "cdefd9157af825023ce34225441f73bcb86dc8f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/90b8adcfff085df2eebf53b633fd81083b037ddc",
-                "reference": "90b8adcfff085df2eebf53b633fd81083b037ddc",
+                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/cdefd9157af825023ce34225441f73bcb86dc8f9",
+                "reference": "cdefd9157af825023ce34225441f73bcb86dc8f9",
                 "shasum": ""
             },
             "require": {
@@ -272,7 +272,6 @@
             "require-dev": {
                 "nette/tester": "@dev"
             },
-            "time": "2013-01-30 16:16:40",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -300,7 +299,8 @@
                 "curl",
                 "http",
                 "nette"
-            ]
+            ],
+            "time": "2013-02-21 17:50:19"
         },
         {
             "name": "nella/console",
@@ -322,7 +322,6 @@
                 "php": ">=5.3.2",
                 "symfony/console": "2.*"
             },
-            "time": "2012-09-23 04:42:39",
             "type": "nette-addon",
             "autoload": {
                 "psr-0": {
@@ -354,7 +353,8 @@
                 "nella",
                 "nette",
                 "symfony"
-            ]
+            ],
+            "time": "2012-09-23 04:42:39"
         },
         {
             "name": "nella/doctrine",
@@ -381,7 +381,6 @@
                 "nella/console": "Need for console support",
                 "nella/gedmo": "Integrate Doctrine Gedmo extension to Nette Framework"
             },
-            "time": "2012-10-26 19:13:24",
             "type": "nette-addon",
             "autoload": {
                 "psr-0": {
@@ -414,7 +413,8 @@
                 "nella",
                 "nette",
                 "orm"
-            ]
+            ],
+            "time": "2012-10-26 19:13:24"
         },
         {
             "name": "nette/nette",
@@ -445,7 +445,6 @@
                 "ext-memcache": "*",
                 "ext-pdo": "*"
             },
-            "time": "2013-01-01 20:42:38",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -488,27 +487,27 @@
                 "mvc",
                 "neon",
                 "templating"
-            ]
+            ],
+            "time": "2013-01-01 20:42:38"
         },
         {
             "name": "symfony/console",
-            "version": "v2.1.7",
+            "version": "v2.1.8",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Console",
-                "reference": "v2.1.7"
+                "url": "https://github.com/symfony/Console.git",
+                "reference": "v2.1.8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/archive/v2.1.7.zip",
-                "reference": "v2.1.7",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/v2.1.8",
+                "reference": "v2.1.8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2013-01-17 15:20:05",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -530,7 +529,8 @@
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com"
+            "homepage": "http://symfony.com",
+            "time": "2013-01-17 15:20:05"
         }
     ],
     "packages-dev": null,
