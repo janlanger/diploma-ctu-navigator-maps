@@ -29,4 +29,9 @@ class Plan extends BaseEntity{
     private $revision = 1;
     /** @Column(type="boolean") */
     private $published = false;
+
+    /**
+     * @ManyToOne(targetEntity="Maps\Model\User\User")
+     */
+    private $user;
 }
