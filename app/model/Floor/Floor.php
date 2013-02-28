@@ -9,7 +9,7 @@ use Maps\Model\BaseEntity;
 
 /**
  * @Entity
- * @Table(name="floor_plans")
+ * @Table(name="floors")
  */
 class Floor extends BaseEntity {
     /**
@@ -25,12 +25,7 @@ class Floor extends BaseEntity {
      * @JoinColumn(name="building_id", referencedColumnName="id")
      */
     private $building;
-    
-    /** @Column(type="string", length=200, nullable=true) */
-    private $floor_plan;
-    /** @Column(type="string", length=200, nullable=true) */
-    private $tiles;
-    
+
     /**
      * @OneToMany(targetEntity="Node", mappedBy="floor_plan", cascade={"persist"}, orphanRemoval=true)
      */

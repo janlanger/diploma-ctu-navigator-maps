@@ -8,7 +8,7 @@ use Maps\Model\BaseEntity;
 
 /**
  * @Entity
- * @Table(name="floorplan_paths", 
+ * @Table(name="floor_paths",
  *  uniqueConstraints={
  *      @UniqueConstraint(columns={"startNode", "endNode"})
  *  })

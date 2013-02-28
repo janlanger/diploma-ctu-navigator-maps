@@ -8,14 +8,14 @@ use Maps\Model\BaseEntity;
 
 /**
  * @Entity
- * @Table(name="floorplan_nodes")
+ * @Table(name="floor_nodes")
  */
 class Node extends BaseEntity implements \JsonSerializable {
     /**
      * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", inversedBy="nodes")
-     * @JoinColumn(name="floorplan_id", referencedColumnName="id")
+     * @JoinColumn(name="floor_id", referencedColumnName="id")
      */
-    private $floor_plan;
+    private $floor;
     /** @Column(type="string", length=100, nullable=false) */
     private $gps_coordinates;
     /** @Column(type="string", length=50, nullable=true) */
@@ -34,12 +34,12 @@ class Node extends BaseEntity implements \JsonSerializable {
      */
     private $to_building;
     
-    public function getFloorPlan() {
-        return $this->floor_plan;
+    public function getFloor() {
+        return $this->floor;
     }
 
-    public function setFloorPlan($floor_plan) {
-        $this->floor_plan = $floor_plan;
+    public function setFloor($floor_plan) {
+        $this->floor = $floor_plan;
         return $this;
     }
 
