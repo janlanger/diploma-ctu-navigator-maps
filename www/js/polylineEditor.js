@@ -332,6 +332,7 @@ function initAndOpenInfoWindow(marker, window) {
                 $("#form-room", html).show();
             case 'cafeteria':
             case 'entrance':
+            case 'other':
                 $("#form-name", html).show();
                 break;
         }
