@@ -149,103 +149,6 @@ class MetadataFormProcessor {
         }
     }
 
-    private function walkNodes($definition) {
-        $toAdd = [];
-        foreach ($definition->paths as $id => $path) {
-            if(!isset($path->startNode) || !isset($path->endNode)) {
-                continue;
-            }
-            foreach ([$path->startNode, $path->endNode] as $node) {
-                if (!$this->nodeOnPositionExists($node->position)) {
-                    $x = $this->nodeRepository->createNew(null, [
-                        'floorPlan' => $this->floor,
-                        'gpsCoordinates' => $node->position,
-                        'type' => $node->type,
-                        'name' => (isset($node->name) ? $node->name : null),
-                        'room' => (isset($node->room) ? $node->room : null),
-                        'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : null,
-                        'toFloor' => isset($node->toFloor) ? $node->toFloor : null,
-                        'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : null,
-                    ]);
-                    $this->sentNodes[] = $x;
-                    $toAdd[$node->id] = $x;
-                    $this->allNodes[] = $x;
-                } else {
-                    $entity = $this->getNodeInPosition($node->position);
-
-                    foreach($node as $key=>$value) {
-                        if(in_array($key, ['id','state'])) continue;
-                        $method = "set".ucfirst($key);
-                        $entity->$method($value);
-                    }
-                    $this->sentNodes[] = $entity;
-                }
-            }
-        }
-        return $toAdd;
-    }
-    
-    private function walkPaths($definition) {
-        $toAdd = [];
-        foreach ($definition->paths as $id => $path) {
-            if(!isset($path->startNode) || !isset($path->endNode)) {
-                continue;
-            }
-            if(!$this->pathExistsBetween($path->startNode->position, $path->endNode->position)) {
-                $e = $this->pathRepository->createNew(null, [
-                    'startNode' => $this->getNodeInPosition($path->startNode->position),
-                    'endNode' => $this->getNodeInPosition($path->endNode->position),
-                    'floor' => $this->floor,
-                ]);
-                $this->allPaths[] = $e;
-                $toAdd[] = $e;
-                $this->sentPaths[] = $e;
-            } else {
-                $this->sentPaths[] = $this->getPathBetween($path->startNode->position, $path->endNode->position);
-            }
-
-        }
-        return $toAdd;
-    }
-
-    public function findToDelete() {
-        $toDelete = [];
-        foreach($this->dbNodes as $dbNode) {
-            foreach($this->sentNodes as $sent) {
-                if($dbNode->position == $sent->position) {
-                    continue 2;
-                }
-            }
-            $toDelete[] = $dbNode;
-        }
-        return $toDelete;
-    }
-
-    public function findPathsToDelete() {
-        $toDelete = [];
-        foreach($this->dbPaths as $dbPath) {
-            foreach($this->sentPaths as $sent) {
-                if($dbPath->start == $sent->position) {
-                    continue 2;
-                }
-            }
-            $toDelete[] = $dbPath;
-        }
-        return $toDelete;
-    }
-
-    private function getNodeInPosition($position) {
-        foreach ($this->allNodes as $node) {
-            if ($node->getGpsCoordinates() == $position) {
-                return $node;
-            }
-        }
-        return null;
-    }
-
-    private function nodeOnPositionExists($position) {
-        return $this->getNodeInPosition($position) !== null;
-    }
 
     private function findPathWithNodes($f, $s) {
         foreach($this->dbPaths as $id => $path) {
@@ -262,21 +165,6 @@ class MetadataFormProcessor {
             }
         }
         return null;
-    }
-    
-    private function getPathBetween($one, $two) {
-
-        foreach($this->allPaths as $path) {
-            if(($path->startNode->getGpsCoordinates() == $one && $path->endNode->getGpsCoordinates() == $two) || 
-                    ($path->startNode->getGpsCoordinates() == $two && $path->endNode->getGpsCoordinates() == $one)) {
-                return $path;
-            }
-        }
-        return null;
-    }
-    
-    private function pathExistsBetween($one, $two) {
-        return $this->getPathBetween($one, $two) !== null;
     }
 
     private function getNodeWithPathId($nodeId, $nodes)
