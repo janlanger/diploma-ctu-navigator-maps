@@ -1,6 +1,7 @@
 <?php
 namespace Maps\Model\Floor;
 use Maps\Model\Persistence\BaseFormProcessor;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -12,26 +13,28 @@ use Maps\Model\Persistence\BaseFormProcessor;
  * @author Sammy Guergachi <sguergachi at gmail.com>
  */
 class PlanFormProcessor extends BaseFormProcessor {
-    
-    
+
+
     protected function setData($entity, $values) {
-        if(isset($form['floorPlan'])) {
-        $file = $this->handleUpload($values['floorPlan'], WWW_DIR.'/data/plans', $this->getPlanFileName($entity, $values));
-        if($file == null) {
-            unset($values['floorPlan']);
-        } else {
-            $values['floorPlan'] = $file;
+        if (isset($values['plan'])) {
+            $file = $this->handleUpload($values['plan'], WWW_DIR . '/data/plans/raw', $this->getPlanFileName($entity, $values));
+            if ($file == null) {
+                unset($values['plan']);
+            }
+            else {
+                $values['plan'] = $file;
+            }
         }
-        }
-        $values['building'] = $this->getEntityRepository('Maps\Model\Building\Building')->find($values['building']);
+        unset($values['pageNumber']);
+
         parent::setData($entity, $values);
     }
-    
-    private function getPlanFileName(FloorPlan $entity, $values) {
-        return \Nette\Utils\Strings::webalize($values['building'].'-'.$values['floorNumber'].'-'.$values['name']);                
+
+    private function getPlanFileName(Plan $entity, $values) {
+        return \Nette\Utils\Strings::webalize($entity->floor->building->name . '-' . $entity->floor->floorNumber . '-' . $entity->floor->name);
     }
 
-    
+
 }
 
 ?>
