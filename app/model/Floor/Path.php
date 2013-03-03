@@ -30,7 +30,7 @@ class Path extends BaseEntity implements \JsonSerializable {
     private $floor;
 
 
-    /** @Column(type="decimal") */
+    /** @Column(type="float") */
     private $length;
 
 

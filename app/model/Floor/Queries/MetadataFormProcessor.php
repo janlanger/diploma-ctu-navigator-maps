@@ -45,7 +45,7 @@ class MetadataFormProcessor {
             $sentPaths = $definition->paths;
             $sentNodes = $definition->nodes;
 
-            $this->dbNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor_plan" => $this->floor]), 'id');
+            $this->dbNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
             $this->dbPaths = $this->pathRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
             if($this->dbNodes == null) {
                 $this->dbNodes = [];
@@ -88,7 +88,7 @@ class MetadataFormProcessor {
             if(!isset($node->id) || !isset($this->dbNodes[$node->id])) {
                 if($node == null) continue;
                 $this->nodesAdd[] = $this->nodeRepository->createNew(null, array(
-                    'floorPlan' => $this->floor,
+                    'floor' => $this->floor,
                     'gpsCoordinates' => $node->position,
                     'type' => $node->type,
                     'name' => (isset($node->name) ? $node->name : null),
