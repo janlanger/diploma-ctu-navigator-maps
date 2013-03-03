@@ -50,6 +50,8 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     protected function createTemplate($class = NULL) {
         $template = parent::createTemplate($class);
+
+        $template->registerHelperLoader("Maps\\Templates\\TemplateHelpers::loader");
         if($this->apiKey == null) {
             throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
         }
