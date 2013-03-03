@@ -2,6 +2,8 @@
 namespace Maps\Presenter;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
+use Maps\Model\Persistence\BaseFormProcessor;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -32,13 +34,13 @@ class FloorPresenter extends SecuredPresenter{
     public function createComponentForm($name) {
         $form = new EntityForm($this, $name);
         
-        $form->setEntityService(new \Maps\Model\Floor\PlanFormProcessor($this->getRepository('floor')));
+        $form->setEntityService(new BaseFormProcessor($this->getRepository('floor')));
         $form->addText('floorNumber', 'Číslo podlaží')
                 ->setRequired()
                 ->addRule(Form::NUMERIC)
                 ->setOption('description','Kolikáté je toto patro nad úrovní ulice.');
         $form->addText('name', 'Popisek podlaží');
-        $form->addHidden('building');
+        //$form->addHidden('building');
         
         $form->addSubmit('ok','Uložit');
         $form->setRedirect('Building:detail?id='.$this->getParameter('id'));

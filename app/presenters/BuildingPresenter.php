@@ -137,9 +137,10 @@ class BuildingPresenter extends SecuredPresenter {
     //    $grid->addCheckboxColumn('actual_version','Pouze poslední');
         
         $grid->addActionColumn('a', 'Akce');
+        $grid->keyName = 'id';
         $grid->addAction('Základní data', 'Floor:default');
 
-        $grid->addAction('Plán', 'Plan:default');
+        $grid->addAction('Plán', 'Plan:default')->key = 'floor';
         $grid->addAction('Metadata', 'Metadata:default');
         
         $grid->keyName = 'id';
