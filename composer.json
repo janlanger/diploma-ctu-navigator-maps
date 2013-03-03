@@ -7,7 +7,6 @@
         "kdyby/bootstrap-form-renderer": "2.*",
         "doctrine/orm": "2.*",
         "nella/doctrine": "dev-master",
-        "nella/console": "dev-master",
-        "imagine/Imagine": "0.4.*"
+        "nella/console": "dev-master"
     }
 }
