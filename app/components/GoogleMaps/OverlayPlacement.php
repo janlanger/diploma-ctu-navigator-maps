@@ -10,6 +10,8 @@
 namespace Maps\Components\GoogleMaps;
 
 
+use Maps\Components\Forms\Form;
+
 class OverlayPlacement extends BaseMapControl {
 
     private $overlayImage;
@@ -32,6 +34,19 @@ class OverlayPlacement extends BaseMapControl {
         $template->overlayImage = $this->overlayImage;
 
         $template->render();
+    }
+
+    public function createComponentForm($name) {
+        $form = new Form($this, $name);
+
+        $form->addText('a','A')
+            ->setHtmlId('topLeft');
+        $form->addText('b','B')
+            ->setHtmlId('bottomRight');
+        $form->addText('c','C')
+            ->setHtmlId('topRight');
+
+        $form->addSubmit('ok','Odeslat');
     }
 
 }

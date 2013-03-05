@@ -1,36 +1,55 @@
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
 
 <script type="text/javascript">
-    var map
-    var markers = []
-    window.onload = function() {
+    var map;
+    var markers = [];
+    var baseUri = {$baseUri};
+    window.onload = function () {
         var mapOptions = {
             {if $zoomLevel != null}
-                zoom: {$zoomLevel},
+            zoom: {$zoomLevel},
             {else}
-                zoom: 16,
+            zoom: 16,
             {/if}
-                center: new google.maps.LatLng({$center['lat']},{$center['long']}),
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            center: new google.maps.LatLng({$center['lat']}, {$center['long']}),
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+
+            streetViewControl: false,
+            mapTypeControlOptions: {
+                mapTypeIds: ["OSM", google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE]
+            }
         }
         map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-        var imageBounds = new google.maps.LatLngBounds(
-                new google.maps.LatLng(50.104485,14.388571),
-                new google.maps.LatLng(50.105380,14.390481)
-        );
-        var img = new Image();
-        img.src = {$overlayImage|image:'png',false,1000,null};
-        img.onload = setupOverlay.bind(this, img, map);
-    }
+        map.setTilt(0);
 
+        map.mapTypes.set("OSM", new google.maps.ImageMapType({
+            getTileUrl: function (coord, zoom) {
+                return "http://tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+            },
+            tileSize: new google.maps.Size(256, 256),
+            name: "OpenStreetMap",
+            maxZoom: 18
+        }));
+        //img.src = ;
+        google.maps.event.addListenerOnce(map, 'idle', function () {
+            var rect = map.getDiv().getBoundingClientRect();
+            var x = rect.left;
+            var y = rect.top;
+            var overlay = new Overlay({$overlayImage|image:'png',false,1000,null}, x, y);
+            overlay.setMap(map);
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+                    new OpacityWidget(overlay));
+            var editor = new OverlayEditor(overlay);
+        });
+    }
 
 
 </script>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/namespace.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/dot.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/mover.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/transformedimage.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/opacitycontrol.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/affineoverlay.js"></script>
-<script type="text/javascript" src="{$baseUri}/js/tiler/editor.js"></script>
+
+<script src="{$baseUri}/js/tiler/common.js"></script>
+<script src="{$baseUri}/js/tiler/widgets.js"></script>
+<script src="{$baseUri}/js/tiler/overlayeditor.js"></script>
+<script src="{$baseUri}/js/tiler/overlay.js"></script>
+
+{control form}
