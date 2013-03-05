@@ -88,16 +88,31 @@ SearchWidget.TYPE_ZOOM_MAPPING_ = {
  * @return {Element}
  */
 function OpacityWidget(overlay) {
-  var input = document.createElement('input');
-  input.type = 'range';
-  input.min = 0;
-  input.max = input.value = 100;
+    var div = $("<div></div>");
+    div.css('width','300px');
+    div.css('margin-top','8px');
+    var inner = $("<span></span>");
+    inner.text("Průhlednost:");
+    inner.css('vertical-align','text-bottom');
 
-  input.onchange = function() {
-    overlay.setOpacity(this.value / 100);
-  };
 
-  return input;
+    var div2 = $("<div></div>");
+    div2.css("width","180px");
+    div2.css('display','inline-block');
+    div2.css('margin-left','10px');
+    div2.slider({
+        range:false,
+        min:0,
+        max:100,
+        value: 100,
+        slide: function(event, ui) {
+            overlay.setOpacity(ui.value/100);
+        }
+    });
+    div.append(inner);
+    div.append(div2);
+
+  return div[0];
 }
 
 /**
