@@ -30,9 +30,15 @@ OverlayEditor.prototype = new google.maps.MVCObject;
  * @private
  */
 OverlayEditor.prototype.addGCPControl_ = function(anchor) {
+    var imgs = {
+        topLeft: 'green_MarkerA.png',
+        topRight: 'green_MarkerC.png',
+        bottomRight: 'green_MarkerB.png'
+    };
   var marker = new google.maps.Marker({
     optimized: false,
-    draggable: true
+    draggable: true,
+    icon: baseUri+'/images/gmaps-markers/'+imgs[anchor]
   });
   marker.bindTo('map', this);
 
@@ -42,6 +48,10 @@ OverlayEditor.prototype.addGCPControl_ = function(anchor) {
   var that = this;
   marker.on('position_changed', function() {
     google.maps.event.trigger(that, 'gcpmove');
+      var p = that.get(anchor).getPosition();
+    $("#"+anchor).val(p.lat()+","+ p.lng());
+//      $("#text-b").val(that.get("bottomRight").getPosition());
+//      $("#text-c").val(that.get("topRight").getPosition());
   });
 
   return marker;
@@ -56,7 +66,8 @@ OverlayEditor.prototype.addMover_ = function() {
   var oe = this;
 
   var marker = this.mover_ = new google.maps.Marker({
-    draggable: true
+    draggable: true,
+    icon: baseUri+'/images/gmaps-markers/paleblue_MarkerX.png'
   });
   marker.bindTo('map', this);
 
