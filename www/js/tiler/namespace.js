@@ -1,1 +1,0 @@
-var overlaytiler = window['overlaytiler'] = {};

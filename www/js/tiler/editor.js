@@ -1,121 +1,133 @@
-// Copyright 2011 Google
+// Copyright 2012 Google Inc. All Rights Reserved.
 
-/**
- * @license
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * JS for the editor page.
- *
- * @author Chris Broadfoot (cbro@google.com)
- */
-
-var PARAMS = parseParams();
-var SRCFILE = unescape(PARAMS.overlay);
-var OUTFILE = 'out.png';
-
-/*window.onload = function() {
-  var zoom = parseInt(PARAMS.z, 10);
-  var div = document.getElementById('map');
-  var map = new google.maps.Map(div, {
-    center: new google.maps.LatLng(PARAMS.lat, PARAMS.lng),
-    zoom: zoom,
-    mapTypeId: 'roadmap'
+window.addEventListener('load', function() {
+ /* var map = new google.maps.Map(document.querySelector('#map'), {
+    center: new google.maps.LatLng(0, 0),
+    zoom: 2,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
   });
+  addDragAndDrop(map);
+  addNavEvents(map);
 
-  var img = new Image();
-  img.src = SRCFILE;
-  img.onload = setupOverlay.bind(this, img, map);
-};*/
+  new SearchWidget(map, document.querySelector('#kd-search'));*/
+});
 
 /**
- * Adds an editable overlay to the map.
- * @param {Image} img
+ * Adds the events to the navbar
+ *
  * @param {google.maps.Map} map
  */
-function setupOverlay(img, map) {
-  // sometimes the image hasn't actually loaded
-  if (!img.height) {
-    setTimeout(setupOverlay.bind(this, img, map), 50);
-    return;
+function addNavEvents(map) {
+  var buttonBar = document.querySelector('#button-bar');
+  if (!buttonBar) return;
+
+  var buttons = buttonBar.getElementsByClassName('kd-button');
+
+  for (var i = 0, button; button = buttons[i]; i++) {
+    button.addEventListener('click', toggleButton.bind(button, map), false);
   }
-
-  var overlay = new overlaytiler.AffineOverlay(img);
-  overlay.setMap(map);
-
-  var opacity = new overlaytiler.OpacityControl(overlay);
-  map.controls[google.maps.ControlPosition.TOP_LEFT]
-      .push(opacity.getElement());
-
-
-  var gdalCommand = document.createElement('pre');
-  gdalCommand.id = 'gdal-command';
-  map.controls[google.maps.ControlPosition.RIGHT_BOTTOM]
-      .push(gdalCommand);
-
-  /**
-   * Displays generated GDAL commands.
-   */
-
-  var preZoomCoordinates = [];
-  var previousZoomLevel = -1;
-  google.maps.event.addListener(overlay, 'cshange', function () {
-    if(previousZoomLevel == -1) {
-        previousZoomLevel = map.getZoom();
-    }
-      else {
-        if(map.getZoom() != previousZoomLevel) {
-            //zoom occured - change bounds to previous
-       //     overlay.dots_[0].
-        }
-    }
-
-
-    var dots = overlay.getDotLatLngs();
-
-    // Generate GDAL command
-    var cmd = ['gdal_translate'];
-    cmd.push('\\\n');
-    cmd.push('-gcp 0 0', dots[0].lng(), dots[0].lat());
-    cmd.push('\\\n');
-    cmd.push('-gcp', img.width, '0', dots[1].lng(), dots[1].lat());
-    cmd.push('\\\n');
-    cmd.push('-gcp', img.width, img.height, dots[2].lng(), dots[2].lat());
-    cmd.push('\\\n');
-    cmd.push(basename(SRCFILE), OUTFILE);
-
-    cmd.push('\n\ngdal2tiles.py');
-    cmd.push('-s EPSG:4326');
-    cmd.push('-z 16-19');
-    cmd.push(OUTFILE, 'out');
-
-    gdalCommand.innerText = cmd.join(' ');
-  });
 }
 
-function parseParams() {
-  var result = {};
-  var params = window.location.search.substring(1).split('&');
-  for (var i = 0, param; param = params[i]; i++) {
-    var parts = param.split('=');
-    result[parts[0]] = parts[1];
-  }
-  return result;
+/**
+ * Toggles a button
+ *
+ * @this {Node}
+ * @param {google.maps.Map} map
+ */
+function toggleButton(map) {
+  // TODO(cbro): Toggle selected style to button (this).
+  toggleSideBar(map);
 }
 
-function basename(file) {
-  var parts = file.split('/');
-  return parts[parts.length - 1];
+/**
+ * Toggles the side bar
+ *
+ * @param {google.maps.Map} map
+ */
+function toggleSideBar(map) {
+  document.body.classList.toggle('side-open');
+}
+
+
+/**
+ * Adds drag and drop functionality to the map.
+ *
+ * @param {google.maps.Map} map
+ */
+function addDragAndDrop(map) {
+  var drop = document.querySelector('#map');
+
+  drop.addEventListener('dragenter', stopEvent, false);
+  drop.addEventListener('dragexit', stopEvent, false);
+  drop.addEventListener('dragover', stopEvent, false);
+
+  drop.addEventListener('drop', function(e) {
+    stopEvent(e);
+
+    var files = e.dataTransfer.files;
+    if (!files.length) {
+      window.alert('No file uploaded');
+      return;
+    }
+    var imageURL = (window.URL || window.webkitURL).createObjectURL(files[0]);
+
+    var rect = map.getDiv().getBoundingClientRect();
+    var x = e.pageX - rect.left;
+    var y = e.pageY - rect.top;
+    var overlay = new Overlay(imageURL, x, y);
+
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+        new OpacityWidget(overlay));
+
+    overlay.setMap(map);
+
+    var editor = new OverlayEditor(overlay);
+
+    uploadInBackground(files[0], map, overlay);
+  }, false);
+}
+
+/**
+ * Uploads given file to blob store.
+ *
+ * @param {File} file
+ * @param {google.maps.Map} map
+ * @param {Overlay} overlay
+ */
+function uploadInBackground(file, map, overlay) {
+  // FIXME(cbro): position this somewhere less ugly.
+  var progress = document.createElement('progress');
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+      progress);
+
+  var xhr = new XMLHttpRequest;
+  xhr.open('POST', document.querySelector('#upload-url').value, true);
+  xhr.onload = function(e) {
+    // TODO(cbro): more robust error handling.
+    if (xhr.statusText != 'OK') {
+      window.alert(xhr.statusText + ': ' + xhr.responseText);
+      return;
+    }
+    overlay.setKey(xhr.responseText);
+    console.log(overlay.getKey());
+    var processButton = new ProcessButton(overlay, function(token) {
+      new StatusBox(overlay, token);
+    });
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(processButton);
+    progress.parentNode.removeChild(progress);
+  };
+
+  xhr.upload.onprogress = function(e) {
+    if (e.loaded == e.total) {
+      // uploadHandler is still doing some work. Just be ambiguous.
+      progress.removeAttribute('value');
+    } else {
+      progress.value = e.loaded;
+      progress.max = e.total;
+    }
+  };
+
+  var form = new FormData;
+  form.append('overlay', file);
+  xhr.send(form);
 }
