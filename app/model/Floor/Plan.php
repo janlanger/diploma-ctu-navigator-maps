@@ -43,6 +43,13 @@ class Plan extends BaseEntity{
     /** @Column(type="datetime", nullable=true) */
     private $published_date;
 
+    /** @Column(type="string",length=100, nullable=true) */
+    private $reference_topLeft;
+    /** @Column(type="string",length=100, nullable=true) */
+    private $reference_topRight;
+    /** @Column(type="string",length=100, nullable=true) */
+    private $reference_bottomRight;
+
     public function __construct() {
         $this->added_date = new \DateTime();
     }
@@ -70,6 +77,32 @@ class Plan extends BaseEntity{
     public function getUser() {
         return $this->user;
     }
+
+    public function setReferenceBottomRight($reference_bottomRight) {
+        $this->reference_bottomRight = $reference_bottomRight;
+    }
+
+    public function getReferenceBottomRight() {
+        return $this->reference_bottomRight;
+    }
+
+    public function setReferenceTopLeft($reference_topLeft) {
+        $this->reference_topLeft = $reference_topLeft;
+    }
+
+    public function getReferenceTopLeft() {
+        return $this->reference_topLeft;
+    }
+
+    public function setReferenceTopRight($reference_topRight) {
+        $this->reference_topRight = $reference_topRight;
+    }
+
+    public function getReferenceTopRight() {
+        return $this->reference_topRight;
+    }
+
+
 
 
 

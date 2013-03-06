@@ -11,14 +11,19 @@ namespace Maps\Components\GoogleMaps;
 
 
 use Maps\Components\Forms\Form;
+use Maps\Model\Floor\GeoreferenceForm;
 
 class OverlayPlacement extends BaseMapControl {
 
     private $overlayImage;
 
+
+
+
     public function setOverlayImage($overlayImage) {
         $this->overlayImage = $overlayImage;
     }
+
 
     public function getOverlayImage() {
         return $this->overlayImage;
@@ -33,20 +38,10 @@ class OverlayPlacement extends BaseMapControl {
         $this->setMapSize($template, func_get_args());
         $template->overlayImage = $this->overlayImage;
 
+
         $template->render();
     }
 
-    public function createComponentForm($name) {
-        $form = new Form($this, $name);
 
-        $form->addText('a','A')
-            ->setHtmlId('topLeft');
-        $form->addText('b','B')
-            ->setHtmlId('bottomRight');
-        $form->addText('c','C')
-            ->setHtmlId('topRight');
-
-        $form->addSubmit('ok','Odeslat');
-    }
 
 }

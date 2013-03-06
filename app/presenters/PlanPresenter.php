@@ -17,6 +17,7 @@ use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\OverlayPlacement;
 use Maps\Model\Floor\PlanFormProcessor;
 use Maps\Model\Floor\PlanRevisionsQuery;
+use Maps\Model\Persistence\BaseFormProcessor;
 
 class PlanPresenter extends SecuredPresenter {
 
@@ -36,6 +37,10 @@ class PlanPresenter extends SecuredPresenter {
         $this->template->floor = $floor;
         $this->template->building = $floor->building;
         $this['formOne']->bindEntity($this->getRepository('plan')->createNew(null, ['floor'=>$floor, 'user'=>$this->getRepository('user')->find($this->getUser()->getId())]));
+    }
+
+    public function actionMap($id) {
+        $this['georeferenceForm']->bindEntity($this->getRepository('plan')->find($id));
     }
 
     public function renderMap($id) {
@@ -101,9 +106,23 @@ class PlanPresenter extends SecuredPresenter {
         $map->setZoomLevel(20);
 
         $map->setOverlayImage('data/plans/raw/'.$plan->plan);
+    }
+
+    public function createComponentGeoreferenceForm($name) {
+        $form = new EntityForm($this, $name);
 
 
+        $form->setEntityService(new BaseFormProcessor($this->getRepository('plan')));
 
+        $form->addText('referenceTopLeft','A')
+            ->setHtmlId('topLeft');
+        $form->addText('referenceBottomRight','B')
+            ->setHtmlId('bottomRight');
+        $form->addText('referenceTopRight','C')
+            ->setHtmlId('topRight');
+
+        $form->addSubmit('ok','Odeslat');
+        $form->setRedirect('this');
     }
 
 }
