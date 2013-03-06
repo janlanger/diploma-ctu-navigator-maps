@@ -66,7 +66,6 @@ var counter = 0;
 Overlay.prototype.setup_ = function() {
 
   if(this.setupRuned) return;
-    console.log(counter++);
   if (!this.added_) {
 
     window.setTimeout(this.setup_.bind(this), 100);
@@ -127,6 +126,7 @@ Overlay.prototype.onRemove = function() {
  * @private
  */
 Overlay.prototype.setInitialGCP_ = function(tl) {
+
   var proj = this.getProjection();
 
   // TODO(cbro): figure out something potentially more appropriate.

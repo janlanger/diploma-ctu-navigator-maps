@@ -19,6 +19,22 @@ function OverlayEditor(overlay) {
 
   this.addMover_();
   this.handleTranslate_();
+    var that = this;
+    initialPosition = function() {
+        if(overlay.get('topLeft') == null) {
+            setTimeout( initialPosition,50);
+            return;
+        }
+        ['topLeft','bottomRight','topRight'].forEach(function(anchor) {
+            var marker = that.get(anchor);
+            var position = $("#"+anchor).val().split(",");
+            if(position.length > 1) {
+                var p = new google.maps.LatLng(position[0],position[1]);
+                marker.setPosition(p);
+            }
+            marker.draggable = true;
+        })};
+    setTimeout(initialPosition,50);
 }
 OverlayEditor.prototype = new google.maps.MVCObject;
 
@@ -35,9 +51,10 @@ OverlayEditor.prototype.addGCPControl_ = function(anchor) {
         topRight: 'green_MarkerC.png',
         bottomRight: 'green_MarkerB.png'
     };
+
   var marker = new google.maps.Marker({
     optimized: false,
-    draggable: true,
+    draggable: false,
     icon: baseUri+'/images/gmaps-markers/'+imgs[anchor]
   });
   marker.bindTo('map', this);
@@ -48,8 +65,11 @@ OverlayEditor.prototype.addGCPControl_ = function(anchor) {
   var that = this;
   marker.on('position_changed', function() {
     google.maps.event.trigger(that, 'gcpmove');
-      var p = that.get(anchor).getPosition();
-    $("#"+anchor).val(p.lat()+","+ p.lng());
+    marker = that.get(anchor);
+    if(marker.draggable == true) {
+        var p = that.get(anchor).getPosition();
+        $("#"+anchor).val(p.lat()+","+ p.lng());
+    }
 //      $("#text-b").val(that.get("bottomRight").getPosition());
 //      $("#text-c").val(that.get("topRight").getPosition());
   });
