@@ -46,7 +46,12 @@ class TilesService extends Object {
         $file = $this->translateImage();
         $dir = $this->prepareDirectory();
         $this->generate($file, $dir);
-        //unlink($file)
+
+        //cleanup
+        foreach(Finder::findFiles(basename($file).'*')->in(WWW_DIR.'/../temp') as $f) {
+            unlink($f->getRealPath());
+        }
+        unlink($this->sourceFile);
     }
 
     private function translateImage() {
@@ -66,8 +71,13 @@ class TilesService extends Object {
 
         if(is_dir($fullPath)) {
             //delete contents
-            foreach(Finder::find('*')->from($fullPath) as $file) {
-                throw new NotImplementedException();
+            foreach(Finder::find('*')->from($fullPath)->childFirst() as $file) {
+                if($file->isDir()) {
+                    rmdir($file->getRealPath());
+                }
+                else {
+                    unlink($file->getRealPath());
+                }
             }
         } else {
             mkdir($fullPath,0666,true);

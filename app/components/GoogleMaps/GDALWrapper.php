@@ -53,7 +53,7 @@ class GDALWrapper extends Object {
     private function execute($command) {
         exec($command.' 2>&1', $out, $status);
 
-        dump( $out, $status);
-        echo $command;
+     //   dump( $out, $status);
+     //   echo $command;
     }
 }
