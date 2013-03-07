@@ -10,13 +10,17 @@
 namespace Maps\Model\Floor;
 
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Maps\Model\BaseEntity;
 
 /**
  * Class Plan
  * @package Maps\Model\Floor
  * @Entity
- * @Table(name="floor_plans")
+ * @Table(name="floor_plans",
+ * uniqueConstraints={
+ *      @UniqueConstraint(columns={"floor_id", "revision"})
+ *  })
  */
 
 class Plan extends BaseEntity{
@@ -102,9 +106,35 @@ class Plan extends BaseEntity{
         return $this->reference_topRight;
     }
 
+    public function setAddedDate($added_date) {
+        $this->added_date = $added_date;
+    }
 
+    public function getAddedDate() {
+        return $this->added_date;
+    }
 
+    public function setPublished($published) {
+        $this->published = $published;
+    }
 
+    public function getPublished() {
+        return $this->published;
+    }
 
+    public function setPublishedDate($published_date) {
+        $this->published_date = $published_date;
+    }
 
+    public function getPublishedDate() {
+        return $this->published_date;
+    }
+
+    public function setRevision($revision) {
+        $this->revision = $revision;
+    }
+
+    public function getRevision() {
+        return $this->revision;
+    }
 }
