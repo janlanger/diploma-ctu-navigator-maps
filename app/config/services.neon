@@ -17,3 +17,5 @@ services:
     doctrine_event_cache_subscriber:
         class: Maps\Core\CacheSubscriber
         tags: [doctrineEvent]
+
+    tiles: Maps\Model\Floor\TilesService('data/tiles',%wwwDir%)

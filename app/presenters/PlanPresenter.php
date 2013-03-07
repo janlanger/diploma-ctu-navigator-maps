@@ -49,6 +49,15 @@ class PlanPresenter extends SecuredPresenter {
         $this->template->building = $floor->building;
     }
 
+    public function handlePublish($id) {
+        //select plan
+        $plan = $this->getRepository('plan')->find($id);
+        //generate tiles
+        $this->getContext()->tiles->generateTiles($plan);
+        //update plan - set active
+
+    }
+
     public function createComponentGrid($name) {
         $q = new PlanRevisionsQuery($this->floor);
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('plan')));
@@ -71,6 +80,11 @@ class PlanPresenter extends SecuredPresenter {
         $grid->addColumn('user', 'Nahrál');
         $grid->addDateColumn('added', 'Nahráno');
         $grid->addDateColumn('published_date', 'Publikováno');
+
+        $grid->keyName = 'id';
+        $grid->addActionColumn('a','Akce');
+        $grid->addAction('Zobrazit', 'view');
+        $grid->addAction('Publikovat', 'publish!');
     }
 
     public function createComponentFormOne($name) {
@@ -122,7 +136,7 @@ class PlanPresenter extends SecuredPresenter {
             ->setHtmlId('topRight');
 
         $form->addSubmit('ok','Odeslat');
-        $form->setRedirect('this');
+        $form->setRedirect('default');
     }
 
 }
