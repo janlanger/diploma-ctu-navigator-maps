@@ -14,6 +14,7 @@ use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\NoResultException;
 use Maps\Model\Floor\Plan;
 
 class EntityEventsSubscriber implements  EventSubscriber {
@@ -24,13 +25,12 @@ class EntityEventsSubscriber implements  EventSubscriber {
             $q = $args->getEntityManager()->createQuery("SELECT p.revision FROM Maps\\Model\\Floor\\Plan p WHERE p.floor=:floor ORDER by p.revision DESC");
             $q->setMaxResults(1);
             $q->setParameter('floor',$entity->floor);
-            $lastRevision = $q->getSingleResult();
-            $newRev = 1;
-            if(is_array($lastRevision)) {
-                $newRev = $lastRevision['revision']+1;
+            try {
+                $lastRevision = $q->getSingleScalarResult();
+                $entity->revision =  $lastRevision+1;
+            } catch (NoResultException $e) {
+                $entity->setRevision(1);
             }
-            $entity->revision = $newRev;
-            $entity->revision = $newRev;
         }
     }
     /**
