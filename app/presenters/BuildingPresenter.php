@@ -138,11 +138,7 @@ class BuildingPresenter extends SecuredPresenter {
         
         $grid->addActionColumn('a', 'Akce');
         $grid->keyName = 'id';
-        $grid->addAction('Základní data', 'Floor:default');
-
-        $grid->addAction('Plán', 'Plan:default')->key = 'floor';
-        $grid->addAction('Metadata', 'Metadata:default');
-        
+        $grid->addAction('Detail', 'Floor:default');
         $grid->keyName = 'id';
         $grid['floor_number']->addDefaultSorting('asc');
     }
