@@ -15,6 +15,8 @@ use DataGrid\DataSources\Doctrine\QueryBuilder;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\OverlayPlacement;
+use Maps\Model\Floor\DeactivatePlansOfFloorQuery;
+use Maps\Model\Floor\Plan;
 use Maps\Model\Floor\PlanFormProcessor;
 use Maps\Model\Floor\PlanRevisionsQuery;
 use Maps\Model\Persistence\BaseFormProcessor;
@@ -50,12 +52,40 @@ class PlanPresenter extends SecuredPresenter {
     }
 
     public function handlePublish($id) {
-        //select plan
+        /** @var $plan Plan */
         $plan = $this->getRepository('plan')->find($id);
-        //generate tiles
-        $this->getContext()->tiles->generateTiles($plan);
-        //update plan - set active
+        if($plan->getReferenceTopLeft() == null || $plan->getReferenceTopRight() == null ||
+            $plan->getReferenceBottomRight() == null) {
+            $this->flashMessage('Tato verze ('.$plan->getRevision().') nemá nastaveny všechny referenční body, nelze ji publikovat.', self::FLASH_ERROR);
+            $this->redirect('this');
+        }
+        $plan->setInPublishQueue(true);
 
+        $this->getRepository('plan')->getEntityManager()->flush();
+
+        $this->flashMessage('Publikace plánu byla zařazena ke zpracování do dlaždic. Vygenerování dlaždic trvá cca 5 minut.', self::FLASH_SUCCESS);
+        $this->redirect('this');
+    }
+
+    public function handleRender() {
+        //load all plans in queue
+        $plans = $this->getRepository('plan')->findBy(['inPublishQueue'=>true, 'published'=>false]);
+        $repository = $this->getRepository('plan');
+
+        //each
+        foreach($plans as $plan) {
+            //unset actualy active plan
+            $q = new DeactivatePlansOfFloorQuery($plan->floor);
+            $q->getQuery($repository)->execute();
+            //set queued plan as active
+            $plan->setPublished(true);
+            $plan->setPublishedDate(new \DateTime());
+
+            //generate plan
+            $this->getContext()->tiles->generateTiles($plan);
+            $repository->getEntityManager()->flush();
+        }
+        $this->redirect('this');
     }
 
     public function createComponentGrid($name) {

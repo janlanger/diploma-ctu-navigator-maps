@@ -21,6 +21,7 @@ use Maps\Model\BaseEntity;
  * uniqueConstraints={
  *      @UniqueConstraint(columns={"floor_id", "revision"})
  *  })
+ *
  */
 
 class Plan extends BaseEntity{
@@ -34,6 +35,9 @@ class Plan extends BaseEntity{
     /** @Column(type="boolean") */
     private $published = false;
 
+    /** @Column(type="boolean") */
+    private $inPublishQueue = false;
+
     /**
      * @ManyToOne(targetEntity="Maps\Model\User\User")
      */
@@ -46,6 +50,8 @@ class Plan extends BaseEntity{
     private $added_date;
     /** @Column(type="datetime", nullable=true) */
     private $published_date;
+
+
 
     /** @Column(type="string",length=100, nullable=true) */
     private $reference_topLeft;
@@ -137,4 +143,16 @@ class Plan extends BaseEntity{
     public function getRevision() {
         return $this->revision;
     }
+
+    public function setInPublishQueue($inPublishQueue) {
+        $this->inPublishQueue = $inPublishQueue;
+    }
+
+    public function getInPublishQueue() {
+        return $this->inPublishQueue;
+    }
+
+
+
+
 }
