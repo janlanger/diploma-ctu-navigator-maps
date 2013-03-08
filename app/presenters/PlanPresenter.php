@@ -45,6 +45,24 @@ class PlanPresenter extends SecuredPresenter {
         $this['georeferenceForm']->bindEntity($this->getRepository('plan')->find($id));
     }
 
+    public function actionEdit($id) {
+        $this->setView('map');
+
+        $form = $this['georeferenceForm'];
+        if($form->isSubmitted()) {
+            $plan = $this->getRepository('plan')->find($id);
+            $form->bindEntity($this->getRepository('plan')
+                ->createNew(null, ['floor'=>$plan->floor,
+                    'user'=>$this->getRepository('user')->find($this->getUser()->getId()),
+                    'plan'=>$plan->plan
+                ]));
+        }
+        else {
+            $form->bindEntity($this->getRepository('plan')->find($id));
+        }
+        $this['georeferenceForm']['ok']->caption= 'Odeslat a uložit jako novu revizi';
+    }
+
     public function renderMap($id) {
         $floor = $this->getRepository('floor')->find($this->floor);
         $this->template->floor = $floor;
@@ -113,7 +131,7 @@ class PlanPresenter extends SecuredPresenter {
 
         $grid->keyName = 'id';
         $grid->addActionColumn('a','Akce');
-        $grid->addAction('Zobrazit', 'view');
+        $grid->addAction('Zobrazit', 'edit');
         $grid->addAction('Publikovat', 'publish!');
     }
 
