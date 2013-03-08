@@ -34,6 +34,10 @@ class TilesService extends Object {
         $this->wwwDir = $wwwDir;
     }
 
+    public function getTilesBasePath($plan) {
+        return $this->baseUrl.'/'.Strings::webalize($plan->floor->building->name).'/'.$plan->floor->floorNumber;
+    }
+
     public function generateTiles(Plan $plan) {
         if($plan->getReferenceTopLeft() == null ||
             $plan->getReferenceTopRight() == null ||
@@ -66,7 +70,7 @@ class TilesService extends Object {
     }
 
     private function prepareDirectory() {
-        $tilesDir = $this->baseUrl.'/'.Strings::webalize($this->plan->floor->building->name).'/'.$this->plan->floor->floorNumber;
+        $tilesDir = $this->getTilesBasePath($this->plan);
         $fullPath = $this->wwwDir.'/'.$tilesDir;
 
         if(is_dir($fullPath)) {
