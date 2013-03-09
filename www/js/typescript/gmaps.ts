@@ -15,9 +15,9 @@ module Mapping {
         private loaded = false;
 
         constructor(private mapElement:Element, private options) {
-            window.onload = ()=> {
+            $(window).load(()=> {
                 this.initialize()
-            };
+            });
 
         }
 

@@ -2,17 +2,21 @@
 
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
+<script type="text/javascript" src="{$baseUri}/js/typescript/geocoder.js"></script>
 <script type="text/javascript">
 
     var points = [];
 
     {foreach $points as $point}
-        points.push({ position: { lat:{$point['lat']}, lng: {$point['long']}}});
+        points.push({
+            position: { lat:{$point['position']['lat']}, lng: {$point['position']['long']}},
+            draggable: {$point['draggable']}
+        });
     {/foreach}
 
     var customLayers = [];
     {foreach $customLayers as $title => $path}
-    customLayers[{$title}] = {$path};
+        customLayers[{$title}] = {$path};
     {/foreach}
 
 
@@ -25,55 +29,7 @@
         customLayers: customLayers,
         points: points
     });
-
-    {*
-
-
-     }
-     {if $geodecoder}
-     // geodecoder state - only one marker can be added to the map and it is draggable and has callbacks to form fields
-
-     $("#gps-search").click(function() {
-         var address = $("#"+{$geodecoderAddress->control->id}).val()
-         var geocoder = new google.maps.Geocoder();
-         geocoder.geocode(
-                 { 'address':address,'region':'cz' }, function(results, status) {
-                     if(status == google.maps.GeocoderStatus.OK) {
-                         map.setCenter(results[0].geometry.location);
-                         map.setZoom(16);
-                         setMarkerPosition(results[0].geometry.location)
-                     } else {
-                         alert(status)
-                     }
-                 })
-     })
-     var marker
-     function setMarkerPosition(position) {
-         if (marker == undefined) {
-             marker = addMarker(position, true)
-
-             google.maps.event.addListener(marker, 'dragend', function(event) {
-                 updateGPSField(this.position);
-             })
-         } else{
-             marker.setPosition(position)
-         }
-         updateGPSField(position)
-     }
-     function updateGPSField(position) {
-         $("#"+{$geodecoderGPS->control->id}).val(position.lat()+","+position.lng())
-     }
-     //geodecoder ends
-     {/if}
-     function addMarker(position, draggable) {
-         var x =new google.maps.Marker({
-             map: map,
-             draggable: draggable,
-             position: position
-         })
-         markers.push = x
-         return x
-     }*}
-
+    {if $geodecoder}
+        var geo = new Mapping.GeoCoder(mapping, 'gps-search', {$geodecoderAddress->control->id}, {$geodecoderGPS->control->id});
+    {/if}
 </script>
-
