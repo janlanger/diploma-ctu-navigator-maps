@@ -1,101 +1,79 @@
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
+<script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
 <script type="text/javascript">
-    var map
-    var markers = []
-    function initialize() {
-        var mapOptions = {
-            {if $zoomLevel != null}
-                zoom: {$zoomLevel},
-            {elseif !empty($center)} {* back compatibility *}
-                zoom: 16,
-            {else}
-                zoom: 8,
-            {/if}
-            {if !empty($center)}
-                center: new google.maps.LatLng({$center['lat']},{$center['long']}),
-            {else}
-                center: new google.maps.LatLng("50.076091","14.436035"),
-            {/if}
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        }
-        map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-        {if !empty($points)}
-            {if $geodecoder}
-                setMarkerPosition(new google.maps.LatLng({$points[0]['lat']}, {$points[0]['long']}))
-            {else}
-                {foreach $points as $point}
-                    addMarker(new google.maps.LatLng({$point['lat']}, {$point['long']}), false)
-                {/foreach}
-            {/if}
 
-        {/if}
+    var points = [];
+
+    {foreach $points as $point}
+        points.push({ position: { lat:{$point['lat']}, lng: {$point['long']}}});
+    {/foreach}
+
+    var customLayers = [];
+    {foreach $customLayers as $title => $path}
+    customLayers[{$title}] = {$path};
+    {/foreach}
 
 
-    {if !empty($customLayers)}
-        {foreach $customLayers as $title => $path}
-            map.overlayMapTypes.push(new google.maps.ImageMapType({
-                getTileUrl: function (coord, zoom) {
-                return "/"+{$path} + "/" + zoom + "/" + coord.x + "/" + (Math.pow(2, zoom)-coord.y-1) + ".png";
-            },
-            tileSize: new google.maps.Size(256, 256)//,
-            //maxZoom: 21
-        }));
-        {/foreach}
-    {/if}
-    }
-    {if $geodecoder}
-    // geodecoder state - only one marker can be added to the map and it is draggable and has callbacks to form fields
+    var mapping = new Mapping.BasicMap(document.getElementById('map_canvas'), {
+        zoom: {$zoomLevel},
+        center: {
+            lat: {$center['lat']},
+            lng: {$center['long']}
+        },
+        customLayers: customLayers,
+        points: points
+    });
 
-    $("#gps-search").click(function() {
-        var address = $("#"+{$geodecoderAddress->control->id}).val()
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode(
-                { 'address':address,'region':'cz' }, function(results, status) {
-                    if(status == google.maps.GeocoderStatus.OK) {
-                        map.setCenter(results[0].geometry.location);
-                        map.setZoom(16);
-                        setMarkerPosition(results[0].geometry.location)
-                    } else {
-                        alert(status)
-                    }
-                })
-    })
-    var marker
-    function setMarkerPosition(position) {
-        if (marker == undefined) {
-            marker = addMarker(position, true)
-
-            google.maps.event.addListener(marker, 'dragend', function(event) {
-                updateGPSField(this.position);
-            })
-        } else{
-            marker.setPosition(position)
-        }
-        updateGPSField(position)
-    }
-    function updateGPSField(position) {
-        $("#"+{$geodecoderGPS->control->id}).val(position.lat()+","+position.lng())
-    }
-    //geodecoder ends
-    {/if}
-    function addMarker(position, draggable) {
-        var x =new google.maps.Marker({
-            map: map,
-            draggable: draggable,
-            position: position
-        })
-        markers.push = x
-        return x
-    }
+    {*
 
 
-    function loadScript() {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = "http://maps.googleapis.com/maps/api/js?key="+{$apiKey}+"&sensor=false&callback=initialize";
-        document.body.appendChild(script);
-    }
+     }
+     {if $geodecoder}
+     // geodecoder state - only one marker can be added to the map and it is draggable and has callbacks to form fields
 
-    window.onload = loadScript;
+     $("#gps-search").click(function() {
+         var address = $("#"+{$geodecoderAddress->control->id}).val()
+         var geocoder = new google.maps.Geocoder();
+         geocoder.geocode(
+                 { 'address':address,'region':'cz' }, function(results, status) {
+                     if(status == google.maps.GeocoderStatus.OK) {
+                         map.setCenter(results[0].geometry.location);
+                         map.setZoom(16);
+                         setMarkerPosition(results[0].geometry.location)
+                     } else {
+                         alert(status)
+                     }
+                 })
+     })
+     var marker
+     function setMarkerPosition(position) {
+         if (marker == undefined) {
+             marker = addMarker(position, true)
+
+             google.maps.event.addListener(marker, 'dragend', function(event) {
+                 updateGPSField(this.position);
+             })
+         } else{
+             marker.setPosition(position)
+         }
+         updateGPSField(position)
+     }
+     function updateGPSField(position) {
+         $("#"+{$geodecoderGPS->control->id}).val(position.lat()+","+position.lng())
+     }
+     //geodecoder ends
+     {/if}
+     function addMarker(position, draggable) {
+         var x =new google.maps.Marker({
+             map: map,
+             draggable: draggable,
+             position: position
+         })
+         markers.push = x
+         return x
+     }*}
 
 </script>
+
