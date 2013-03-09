@@ -73,6 +73,7 @@ class BuildingPresenter extends SecuredPresenter {
     private function googleMapBase($name) {
         $map = new \Maps\Components\GoogleMaps\BasicMap($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
+        $map->setZoomLevel(16);
         return $map;
     }
 
