@@ -21,7 +21,7 @@ class BasicMap extends BaseMapControl{
     public function enableGeodecoder(BaseControl $addressField, BaseControl $gpsField) {
         if(trim($gpsField->value) != "") {
             $this->setCenter($gpsField->value);
-            $this->addPoint($gpsField->value);
+            $this->addPoint($gpsField->value, true);
         }
         $this->geodecoderEnabled = true;
         $this->geodecoderAddress = $addressField;

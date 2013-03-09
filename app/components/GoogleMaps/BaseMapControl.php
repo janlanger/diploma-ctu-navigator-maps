@@ -38,8 +38,8 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         return $this->zoomLevel;
     }
 
-    public function addPoint($point) {
-        $this->points[]= $this->formatCoordinates($point);
+    public function addPoint($point, $draggable=false) {
+        $this->points[]= ['position' => $this->formatCoordinates($point),'draggable' => $draggable];
     }
 
     protected function formatCoordinates($point) {
