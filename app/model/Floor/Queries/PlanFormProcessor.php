@@ -16,16 +16,15 @@ class PlanFormProcessor extends BaseFormProcessor {
 
 
     protected function setData($entity, $values) {
-        if (isset($values['plan'])) {
-            $file = $this->handleUpload($values['plan'], WWW_DIR . '/data/plans/raw', $this->getPlanFileName($entity, $values));
+        if (isset($values['sourceFile'])) {
+            $file = $this->handleUpload($values['sourceFile'], WWW_DIR . '/data/plans/raw', $this->getPlanFileName($entity, $values));
             if ($file == null) {
-                unset($values['plan']);
+                unset($values['sourceFile']);
             }
             else {
-                $values['plan'] = $file;
+                $values['sourceFile'] = $file;
             }
         }
-        unset($values['pageNumber']);
 
         parent::setData($entity, $values);
     }

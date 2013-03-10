@@ -29,10 +29,13 @@ class TilesService extends Object {
     /** @var Plan */
     private $plan;
 
+    private $maxZoom=21;
+    private $minZoom=16;
+
     public function __construct($baseUrl, $wwwDir, $minZoom, $maxZoom) {
         $this->baseUrl = $baseUrl;
         $this->wwwDir = $wwwDir;
-        $this->mixZoom = $minZoom;
+        $this->minZoom = $minZoom;
         $this->maxZoom = $maxZoom;
     }
 
@@ -47,7 +50,7 @@ class TilesService extends Object {
             throw new InvalidStateException('All reference points are not set.');
         }
         $this->plan = $plan;
-        $this->sourceFile = $this->prepareFile(WWW_DIR.'/data/plans/raw/'.$plan->getPlan());
+        $this->sourceFile = $this->prepareFile(WWW_DIR.'/data/plans/raw/'.$plan->getPlan(), $plan->getSourceFilePage());
         $this->wrapper = new GDALWrapper();
         $file = $this->translateImage();
         $dir = $this->prepareDirectory();
@@ -92,10 +95,10 @@ class TilesService extends Object {
     }
 
     private function generate($file, $destination) {
-        $this->wrapper->generate($file, $destination, $this->mixZoom, $this->maxZoom);
+        $this->wrapper->generate($file, $destination, $this->minZoom, $this->maxZoom);
     }
 
-    private function prepareFile($sourcePath) {
+    private function prepareFile($sourcePath, $page=null) {
         $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $sourcePath);
         $tempFile = $this->wwwDir.'/../temp/gdal_temp.png';
         if(is_file($tempFile)) {
@@ -103,7 +106,7 @@ class TilesService extends Object {
         }
 
         if($mime != "image/png") {
-            $i = new ImageMagick($sourcePath);
+            $i = new ImageMagick($sourcePath, $page-1);
             $i->save($tempFile, null, $i::PNG, [
                 'density' => 300,
                 'trim' => true,

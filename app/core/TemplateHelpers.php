@@ -290,6 +290,12 @@ class TemplateHelpers {
 
 
     public static function image($path, $format='png', $force=false, $width, $height) {
+        $page=null;
+        if(Strings::endsWith($path, "]")) {
+            $page = Strings::match($path,"#.*\\[(\\d)\\]$#")[1];
+            $path = Strings::substring($path, 0, strlen($path)-strlen($page)-2);
+
+        }
         $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), WWW_DIR.'/'.$path);
         $fullpath = WWW_DIR.'/'.$path;
         $newPath = pathinfo($fullpath, PATHINFO_DIRNAME). '/' . pathinfo($fullpath,PATHINFO_FILENAME).'.'.$format;
@@ -298,7 +304,7 @@ class TemplateHelpers {
         }
         if(!($force == false && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
             //try converting it using imagemagick
-            $i = new ImageMagick($fullpath);
+            $i = new ImageMagick($fullpath, $page-1);
 
             switch ($format) {
                 case 'jpg':

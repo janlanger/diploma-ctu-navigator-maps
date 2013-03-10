@@ -44,7 +44,10 @@ class Plan extends BaseEntity{
     private $user;
 
     /** @Column(type="string",length=200) */
-    private $plan;
+    private $sourceFile;
+
+    /** @Column(type="integer", nullable=true) */
+    private $sourceFilePage;
 
     /** @Column(type="datetime") */
     private $added_date;
@@ -73,11 +76,11 @@ class Plan extends BaseEntity{
     }
 
     public function setPlan($plan) {
-        $this->plan = $plan;
+        $this->sourceFile = $plan;
     }
 
     public function getPlan() {
-        return $this->plan;
+        return $this->sourceFile;
     }
 
     public function setUser($user) {
@@ -151,6 +154,24 @@ class Plan extends BaseEntity{
     public function getInPublishQueue() {
         return $this->inPublishQueue;
     }
+
+    public function setSourceFile($sourceFile) {
+        $this->sourceFile = $sourceFile;
+    }
+
+    public function getSourceFile() {
+        return $this->sourceFile;
+    }
+
+    public function setSourceFilePage($sourceFilePage) {
+        $this->sourceFilePage = $sourceFilePage;
+    }
+
+    public function getSourceFilePage() {
+        return $this->sourceFilePage;
+    }
+
+
 
 
 

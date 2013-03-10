@@ -49,6 +49,7 @@ class ImageMagick extends Image
     /** @var int */
     private $height;
 
+    private $page;
 
 
     /**
@@ -56,7 +57,7 @@ class ImageMagick extends Image
      * @param  string  detected image format
      * @param  string
      */
-    public function __construct($file, & $format = NULL)
+    public function __construct($file, $page=null, & $format = NULL)
     {
         if(!function_exists('exec')) {
             throw new \InvalidArgumentException("exec() function doesn't exists, probably disabled.");
@@ -77,6 +78,7 @@ class ImageMagick extends Image
         if (!is_file($file)) {
             throw new \InvalidArgumentException("File '$file' not found.");
         }
+        $this->page = $page;
         $format = $this->setFile(realpath($file));
         if ($format === 'JPEG') $format = self::JPEG;
         elseif ($format === 'PNG') $format = self::PNG;
@@ -236,7 +238,7 @@ class ImageMagick extends Image
         }
 
 
-        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file), $command);
+        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file.($this->page!=null?"[".$this->page."]":"")), $command);
         if ($output) {
             $newFile = is_string($output)
                 ? $output

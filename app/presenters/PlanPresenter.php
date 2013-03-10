@@ -54,7 +54,8 @@ class PlanPresenter extends SecuredPresenter {
             $form->bindEntity($this->getRepository('plan')
                 ->createNew(null, ['floor'=>$plan->floor,
                     'user'=>$this->getRepository('user')->find($this->getUser()->getId()),
-                    'plan'=>$plan->plan
+                    'sourceFile'=>$plan->sourceFile,
+                    'sourceFilePage'=>$plan->sourceFilePage,
                 ]));
         }
         else {
@@ -98,12 +99,13 @@ class PlanPresenter extends SecuredPresenter {
             //set queued plan as active
             $plan->setPublished(true);
             $plan->setPublishedDate(new \DateTime());
+            $plan->setInPublishQueue(false);
 
             //generate plan
             $this->getContext()->tiles->generateTiles($plan);
             $repository->getEntityManager()->flush();
         }
-        $this->redirect('this');
+        $this->redirect('default');
     }
 
     public function createComponentGrid($name) {
@@ -138,20 +140,18 @@ class PlanPresenter extends SecuredPresenter {
     public function createComponentFormOne($name) {
         $form = new EntityForm($this, $name);
 
-        $form->addUpload("plan", "Mapový plán")
+        $form->addUpload("sourceFile", "Mapový plán")
             ->setRequired()
             ->addRule($form::MIME_TYPE, 'Podporované formáty jsou PNG, GIF, JPG a PDF', ['image/*', 'application/pdf','text/pdf'])
             ->setOption('description', 'Možné formáty JPG, PNG, GIF a PDF.');
-        $form->addText("pageNumber", "Číslo stránky")
+        $form->addText("sourceFilePage", "Číslo stránky")
             ->addRule($form::NUMERIC)
             ->setDefaultValue(1)
-            ->setOption("description", "V případě PDF dokumentu uveďte na které stránce se plán nachází.");
+            ->setOption("description", "V případě vícestránkových dokumentů uveďte na které stránce se plán nachází.");
         $form->setEntityService(new PlanFormProcessor($this->getRepository('plan')));
 
         $form->addSubmit("ok","Další krok");
-        $form->onHandle[] = function($entity, $values) {
-            $this->getSession('planManagement')->pageNumber = $values['pageNumber'];
-        };
+
         $form->onComplete[] = function($entity) use ($form) {
             $form->setRedirect('map?id='.$entity->id);
         };
@@ -167,7 +167,7 @@ class PlanPresenter extends SecuredPresenter {
         $map->setCenter($plan->floor->building->gpsCoordinates);
         $map->setZoomLevel(20);
 
-        $map->setOverlayImage('data/plans/raw/'.$plan->plan);
+        $map->setOverlayImage('data/plans/raw/'.$plan->plan.($plan->sourceFilePage != ""?"[".$plan->sourceFilePage."]":""));
     }
 
     public function createComponentGeoreferenceForm($name) {
