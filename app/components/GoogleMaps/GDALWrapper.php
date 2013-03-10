@@ -45,9 +45,9 @@ class GDALWrapper extends Object {
         $this->execute($command);
     }
 
-    public function generate($source, $destinationDir) {
+    public function generate($source, $destinationDir, $minZoom = 16, $maxZoom = 21) {
         $this->execute('echo %GDAL_DATA%');
-        $this->execute('gdal2tiles -s EPSG:4326 -g AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk -z 16-21 '.escapeshellarg($source).' '.escapeshellarg($destinationDir));
+        $this->execute('gdal2tiles -s EPSG:4326 -g AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk -z '.$minZoom.'-'.$maxZoom.' '.escapeshellarg($source).' '.escapeshellarg($destinationDir));
     }
 
     private function execute($command) {

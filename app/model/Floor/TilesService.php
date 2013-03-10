@@ -29,9 +29,11 @@ class TilesService extends Object {
     /** @var Plan */
     private $plan;
 
-    public function __construct($baseUrl, $wwwDir) {
+    public function __construct($baseUrl, $wwwDir, $minZoom, $maxZoom) {
         $this->baseUrl = $baseUrl;
         $this->wwwDir = $wwwDir;
+        $this->mixZoom = $minZoom;
+        $this->maxZoom = $maxZoom;
     }
 
     public function getTilesBasePath($plan) {
@@ -90,7 +92,7 @@ class TilesService extends Object {
     }
 
     private function generate($file, $destination) {
-        $this->wrapper->generate($file, $destination);
+        $this->wrapper->generate($file, $destination, $this->mixZoom, $this->maxZoom);
     }
 
     private function prepareFile($sourcePath) {

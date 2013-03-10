@@ -18,4 +18,4 @@ services:
         class: Maps\Core\CacheSubscriber
         tags: [doctrineEvent]
 
-    tiles: Maps\Model\Floor\TilesService('data/tiles',%wwwDir%)
+    tiles: Maps\Model\Floor\TilesService('data/tiles',%wwwDir%, 16,22)
