@@ -1,5 +1,7 @@
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-
+<div id="map-legend" n:if="$showLegend" n:inner-foreach="$pointsInfo as $info">
+    <img src="{$baseUri}{$info['url']}"> {$info['legend']}<br>
+</div>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/geocoder.js"></script>
@@ -9,8 +11,15 @@
 
     {foreach $points as $point}
         points.push({
-            position: { lat:{$point['position']['lat']}, lng: {$point['position']['long']}},
-            draggable: {$point['draggable']}
+            {foreach $point as $key=>$item}
+                {if $key == 'position'}
+                    position: { lat:{$item['lat']}, lng: {$item['long']}}
+                {elseif $key == 'icon'}
+                    icon: { url: {$item['url']}{ifset $item['anchor']}, anchor: new google.maps.Point({$item['anchor'][0]},{$item['anchor'][1]}){/ifset}},
+                {else}
+                    {$key}:{$item}
+                {/if}{sep},{/sep}
+            {/foreach}
         });
     {/foreach}
 
@@ -19,6 +28,19 @@
         customLayers[{$title}] = {$path};
     {/foreach}
 
+    var paths = [];
+    var pathOptions = {$pathOptions};
+    {if !empty($paths)}
+
+        {foreach $paths as $path}
+            paths.push({
+                start: { lat:{$path[0]['lat']}, lng:{$path[0]['long']}},
+                end: { lat:{$path[1]['lat']}, lng:{$path[1]['long']}}
+            });
+
+        {/foreach}
+    {/if}
+
 
     var mapping = new Mapping.BasicMap(document.getElementById('map_canvas'), {
         zoom: {$zoomLevel},
@@ -26,10 +48,15 @@
             lat: {$center['lat']},
             lng: {$center['long']}
         },
+        {if $showLegend}legend: document.getElementById("map-legend"),{/if}
         customLayers: customLayers,
-        points: points
+        points: points,
+        pathOptions: pathOptions,
+        paths: paths
+
     });
     {if $geodecoder}
         var geo = new Mapping.GeoCoder(mapping, 'gps-search', {$geodecoderAddress->control->id}, {$geodecoderGPS->control->id});
     {/if}
 </script>
+
