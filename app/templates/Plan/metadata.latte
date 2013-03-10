@@ -1,9 +1,0 @@
-{block #pageTitle}Editace plánu podlaží č. {$plan->floorNumber}{if $plan->name} - {$plan->name}{/if}{/block}
-
-{block content}
-<h3>{$building->name}, {$building->address}</h3>
-<br>
-
-{control map, "size"=>["100%","700px"]}
-
-{control pointForm}

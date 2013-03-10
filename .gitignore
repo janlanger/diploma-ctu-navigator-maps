@@ -11,3 +11,5 @@ _thumbs
 /www/images/articles/_thumbs
 /www/rss.xml
 /app/config/config.local.neon
+d.ts
+/www/js/typescript/*.js*

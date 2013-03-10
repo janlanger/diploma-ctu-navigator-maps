@@ -9,11 +9,16 @@ namespace Maps\Components\GoogleMaps;
  */
 abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
+    private $iconsAnchorPoint;
+    private $showLegend = false;
+    private $pointsInfo;
     private $apiKey;
     private $center;
-    private $zoomLevel;
+    private $zoomLevel=10;
     private $points = [];
 
+    private $pathOptions;
+    private $paths = [];
     public function setApiKey($apiKey) {
         $this->apiKey = $apiKey;
     }
@@ -38,8 +43,29 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         return $this->zoomLevel;
     }
 
-    public function addPoint($point) {
-        $this->points[]= $this->formatCoordinates($point);
+    public function addPoint($point, $options=[]) {
+        $options['position'] = $this->formatCoordinates($point);
+        if(!isset($options['icon']) && $this->pointsInfo != null) {
+            if(isset($options['type']) && isset($this->pointsInfo[$options['type']])) {
+                $options['icon'] = $this->pointsInfo[$options['type']];
+            }
+            else {
+                $options['icon'] = $this->pointsInfo['default'];
+            }
+        }
+        $this->points[]= $options;
+    }
+
+    public function setPointsInfo($map) {
+        $this->pointsInfo = $map;
+    }
+
+    public function setPathOptions(array $options) {
+        $this->pathOptions = $options;
+    }
+
+    public function addPath($start, $destination) {
+        $this->paths[] = [$this->formatCoordinates($start), $this->formatCoordinates($destination)];
     }
 
     protected function formatCoordinates($point) {
@@ -50,6 +76,8 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     protected function createTemplate($class = NULL) {
         $template = parent::createTemplate($class);
+
+        $template->registerHelperLoader("Maps\\Templates\\TemplateHelpers::loader");
         if($this->apiKey == null) {
             throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
         }
@@ -60,9 +88,20 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
         $template->center = $this->center;
         $template->points = $this->points;
-        $template->zoomLevel = $this->zoomLevel;
-        return $template;
 
+        $template->pathOptions = $this->pathOptions;
+        $template->paths = $this->paths;
+
+        $template->zoomLevel = $this->zoomLevel;
+
+        $template->showLegend = $this->showLegend;
+        $template->pointsInfo = $this->pointsInfo;
+
+        return $template;
+    }
+
+    public function showLegend($i) {
+        $this->showLegend = $i;
     }
 
     protected function setMapSize($template, $args) {

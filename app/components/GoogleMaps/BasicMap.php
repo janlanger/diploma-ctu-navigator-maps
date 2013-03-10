@@ -15,15 +15,21 @@ class BasicMap extends BaseMapControl{
     private $geodecoderAddress;
     private $geodecoderGPS;
 
+    private $customLayers= [];
+
 
     public function enableGeodecoder(BaseControl $addressField, BaseControl $gpsField) {
         if(trim($gpsField->value) != "") {
             $this->setCenter($gpsField->value);
-            $this->addPoint($gpsField->value);
+            $this->addPoint($gpsField->value, ['draggable'=>true]);
         }
         $this->geodecoderEnabled = true;
         $this->geodecoderAddress = $addressField;
         $this->geodecoderGPS = $gpsField;
+    }
+
+    public function addCustomTilesLayer($title, $basePath) {
+        $this->customLayers[$title] = $basePath;
     }
 
     public function render() {
@@ -35,6 +41,8 @@ class BasicMap extends BaseMapControl{
         $template->geodecoder = $this->geodecoderEnabled;
         $template->geodecoderAddress = $this->geodecoderAddress;
         $template->geodecoderGPS = $this->geodecoderGPS;
+
+        $template->customLayers = $this->customLayers;
         $template->render();
     }
 

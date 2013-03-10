@@ -73,6 +73,7 @@ class BuildingPresenter extends SecuredPresenter {
     private function googleMapBase($name) {
         $map = new \Maps\Components\GoogleMaps\BasicMap($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
+        $map->setZoomLevel(16);
         return $map;
     }
 
@@ -121,8 +122,8 @@ class BuildingPresenter extends SecuredPresenter {
     
     public function createComponentPlansGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $q = new \Maps\Model\FloorPlan\PlanDatagridQuery($this->getParameter('id'));
-        $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('plan')));
+        $q = new \Maps\Model\Floor\PlanDatagridQuery($this->getParameter('id'));
+        $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('floor')));
         $datasource->setMapping([
             'id' => 'b.id',
             'floor_number' => 'b.floor_number',
@@ -137,11 +138,8 @@ class BuildingPresenter extends SecuredPresenter {
     //    $grid->addCheckboxColumn('actual_version','Pouze poslední');
         
         $grid->addActionColumn('a', 'Akce');
-        $grid->addAction('Základní data', 'Plan:edit');
-
-        $grid->addAction('Plán', 'Plan:plan');
-        $grid->addAction('Metadata', 'Plan:metadata');
-        
+        $grid->keyName = 'id';
+        $grid->addAction('Detail', 'Floor:default');
         $grid->keyName = 'id';
         $grid['floor_number']->addDefaultSorting('asc');
     }

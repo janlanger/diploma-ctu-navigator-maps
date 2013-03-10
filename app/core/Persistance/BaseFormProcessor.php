@@ -56,7 +56,7 @@ class BaseFormProcessor extends \Nette\Object {
         if($file->isOk()) {
             $ext = pathinfo($file->getName(), PATHINFO_EXTENSION);
             $i=0;
-            while(!file_exists($dir.'/'.$filename.'-'.$i.'.'.$ext)) {
+            while(file_exists($dir.'/'.$filename.'-'.$i.'.'.$ext)) {
                 $i++;
             }
             $path = $dir.'/'.$filename.'-'.$i.'.'.$ext;

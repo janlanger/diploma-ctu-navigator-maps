@@ -1,7 +1,11 @@
 <?php
 
 namespace Maps\Templates;
+use Imagine\Imagick\Imagine;
+use Maps\Components\ImageMagick;
 use Nette\Image;
+use Nette\Utils\Strings;
+
 /**
  * Description of TemplateHelpers
  *
@@ -282,6 +286,49 @@ class TemplateHelpers {
             return true;
         }
         return false;
+    }
+
+
+    public static function image($path, $format='png', $force=false, $width, $height) {
+        $page=null;
+        if(Strings::endsWith($path, "]")) {
+            $page = Strings::match($path,"#.*\\[(\\d)\\]$#")[1];
+            $path = Strings::substring($path, 0, strlen($path)-strlen($page)-2);
+
+        }
+        $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), WWW_DIR.'/'.$path);
+        $fullpath = WWW_DIR.'/'.$path;
+        $newPath = pathinfo($fullpath, PATHINFO_DIRNAME). '/' . pathinfo($fullpath,PATHINFO_FILENAME).'.'.$format;
+        if(is_file($newPath)) {
+            return str_replace(WWW_DIR,'',$newPath);
+        }
+        if(!($force == false && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
+            //try converting it using imagemagick
+            $i = new ImageMagick($fullpath, $page-1);
+
+            switch ($format) {
+                case 'jpg':
+                    $type = Image::JPEG;
+                    break;
+                case 'gif':
+                    $type = Image::GIF;
+                    break;
+                default:
+                    $type = Image::PNG;
+
+            }
+
+            $i->save($newPath,null, $type, [
+                'density'=> 100,
+                'trim'=> true,
+                'geometry' => $width.'x'.($height == null?$width:$height.'!').'>',
+
+            ]);
+
+            return str_replace(WWW_DIR,'',$newPath);
+        }
+        return $path;
+
     }
 
 }

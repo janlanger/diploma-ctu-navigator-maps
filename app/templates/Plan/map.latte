@@ -1,0 +1,13 @@
+{block pageTitle}Umístění plánu - podlaží {$floor->name}{/block}
+
+{block js}
+
+{/block}
+
+{block #content}
+<h3>{$building->name}, {$building->address}</h3>
+<br>
+<h2>Krok 2</h2>
+{control map, 'size'=>['100%','700px']}
+
+{control georeferenceForm}

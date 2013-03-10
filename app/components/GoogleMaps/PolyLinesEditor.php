@@ -51,8 +51,9 @@ class PolyLinesEditor extends BaseMapControl {
             'study' => 'Studovna',
             'cafeteria' => 'Kantýna',
             'restroom-men' => 'WC muži',
-            'restroom-woman' => 'WC ženy',
+            'restroom-women' => 'WC ženy',
             'cloakroom' => 'Šatna',
+            'other' => 'Jiný',
         ])
             ->setPrompt('-- Typ --');
 

@@ -89,3 +89,10 @@ div.list-row {
 div.list-row:hover{
     background-color: #ddd;
 }
+#map-legend{
+    background-color: #fff;
+    margin: 5px 10px 5px 0px;
+    padding: 5px 10px;
+    border: 1px solid #AAA;
+    box-shadow: 0px 2px 4px grey;
+}

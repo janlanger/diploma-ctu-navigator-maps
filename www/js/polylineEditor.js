@@ -51,6 +51,7 @@ function changeState(newState) {
     $("#toolbar-"+newState).show();
 
     for(var i=0; i<markers.length; i++) {
+        if(!markers[i]) continue;
         markers[i].setDraggable(newState == EDITOR_DETAIL);
     }
     if(editorState == EDITOR_ADD) {
@@ -168,6 +169,7 @@ function markerDragStart(event) {
         position = this.position;
         moveStart = position;
         for (var i = 0; i < lines.length; i++) {
+            if(!lines[i]) continue;
             path = lines[i].getPath();
             if (path.getAt(0).equals(position)) {
                 movedMarker[i] = lines[i];
@@ -194,6 +196,7 @@ function markerDragEnd(event) {
             }
         }
         index = markers.indexOf(this);
+
     }
     movedMarker = [];
 }
@@ -219,6 +222,10 @@ function lineClicked(event) {
         lines[index].getPath().setAt(1,position)
         createPolyLine(position);
 
+    }
+    if(editorState == EDITOR_DETAIL) {
+        position = event.latLng;
+        initAndOpenLineIW(position, this);
     }
 }
 
@@ -263,7 +270,6 @@ function addMarker(position, draggable, options) {
         icon: getMarkerIcon(type),
         title: "#"+(markers.length +1),
         appType: type,
-        appState: 'new',
         appValues: options
     });
 
@@ -278,7 +284,7 @@ function addMarker(position, draggable, options) {
 
 function getMarkerIndexInPosition(position) {
     for(var i=0; i<markers.length; i++) {
-        if(markers[i].position.equals(position)) {
+        if(markers[i] && markers[i].position.equals(position)) {
             return i;
         }
     }
@@ -286,7 +292,7 @@ function getMarkerIndexInPosition(position) {
 
 function getMarkerInPosition(position) {
     for(var i=0; i<markers.length; i++) {
-        if(markers[i].position.equals(position)) {
+        if(markers[i] && markers[i].position.equals(position)) {
             return markers[i];
         }
     }
@@ -326,6 +332,7 @@ function initAndOpenInfoWindow(marker, window) {
                 $("#form-room", html).show();
             case 'cafeteria':
             case 'entrance':
+            case 'other':
                 $("#form-name", html).show();
                 break;
         }
@@ -345,6 +352,27 @@ function initAndOpenInfoWindow(marker, window) {
         };
         window.close()
     });
+    $("input[name=delete]", html).click(function() {
+        index = getMarkerIndexInPosition(marker.position);
+        marker.setMap(null);
+        var position = marker.position;
+
+        for(var i=0; i<lines.length; i++) {
+            if(!lines[i]) continue;
+            var l = lines[i];
+            if(!l) continue;
+            var path = l.getPath();
+
+            if(path.getAt(0).equals(position) || path.getAt(1).equals(position)) {
+                path.pop();
+                path.pop;
+                delete lines[i];
+            }
+        }
+
+        delete markers[index];
+        window.close();
+    });
     html.removeAttr('id');
     html.attr('style',"");
     $("select", html).val(markerType);
@@ -362,4 +390,26 @@ function initAndOpenInfoWindow(marker, window) {
     });
     window.open(map, marker);
 
+}
+
+function initAndOpenLineIW(position, line) {
+    infoWindow = new google.maps.InfoWindow();
+
+    var content = $("<input>");
+    content.val("Odstranit cestu");
+    content.attr("type","button");
+    content.attr("class","btn btn-small btn-danger");
+    content.click(function(event) {
+        var index = lines.indexOf(line);
+        var path = line.getPath();
+        path.pop();
+        path.pop();
+        delete lines[index];
+        infoWindow.close();
+    });
+    var x = $("<div></div>");
+    x.append(content);
+    infoWindow.setContent(x[0]);
+    infoWindow.setPosition( position);
+    infoWindow.open(map);
 }

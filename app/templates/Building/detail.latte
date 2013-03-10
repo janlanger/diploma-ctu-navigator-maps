@@ -12,7 +12,7 @@
                 <li><strong>KOS API - data místností: </strong>xy záznamů</li>
             </ul>
             <div class="pull-left">
-                <a n:href="kosApi?id={$building->id}" class="btn btn-warning">KOS API - data o místnostech</a>
+                <!--a n:href="kosApi?id={$building->id}" class="btn btn-warning">KOS API - data o místnostech</a-->
             </div>
             <div class="pull-right">
                 <a n:href="edit?id={$building->id}" class="btn btn-primary">Upravit</a>
@@ -28,7 +28,7 @@
     </div>
 </div>
 <hr>
-<h2>Mapové plány</h2>
-<a class="btn btn-primary" n:href="Plan:add?id={$building->id}">Založit nový</a>
+<h2>Podlaží</h2>
+<a class="btn btn-primary" n:href="Floor:add?id={$building->id}">Založit nové</a>
 
 {control plansGrid}
