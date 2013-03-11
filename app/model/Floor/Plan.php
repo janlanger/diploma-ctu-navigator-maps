@@ -47,7 +47,7 @@ class Plan extends BaseEntity{
     private $sourceFile;
 
     /** @Column(type="integer", nullable=true) */
-    private $sourceFilePage;
+    private $sourceFilePage = 1;
 
     /** @Column(type="datetime") */
     private $added_date;
