@@ -1,5 +1,5 @@
 <?php
-
+namespace Maps\Presenter;
 use Nette\Diagnostics\Debugger;
 
 
