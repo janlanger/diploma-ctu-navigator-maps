@@ -76,7 +76,7 @@ module Mapping {
                     tileSize: new google.maps.Size(256,256),
                     getTileUrl: (coord:google.maps.Point, zoom:number) => {
                         if(zoom > 17)
-                            return "/" + value + "/" + zoom + "/" +coord.x + "/" + (Math.pow(2, zoom) - coord.y -1) + ".png";
+                            return value + "/" + zoom + "/" +coord.x + "/" + (Math.pow(2, zoom) - coord.y -1) + ".png";
                     },
                     maxZoom: 22,
                     minZoom: 19
