@@ -58,9 +58,9 @@ class TilesService extends Object {
 
         //cleanup
         foreach(Finder::findFiles(basename($file).'*')->in(WWW_DIR.'/../temp') as $f) {
-            unlink($f->getRealPath());
+  //          unlink($f->getRealPath());
         }
-        unlink($this->sourceFile);
+//        unlink($this->sourceFile);
     }
 
     private function translateImage() {
@@ -89,7 +89,7 @@ class TilesService extends Object {
                 }
             }
         } else {
-            mkdir($fullPath,0666,true);
+            mkdir($fullPath,0777,true);
         }
         return $fullPath;
     }
@@ -108,6 +108,9 @@ class TilesService extends Object {
         if($mime != "image/png") {
             $i = new ImageMagick($sourcePath, $page-1);
             $i->save($tempFile, null, $i::PNG, [
+		'transparent'=>'white',
+		'type'=>'TrueColorMatte',
+		'depth'=>8,
                 'density' => 300,
                 'trim' => true,
             ]);

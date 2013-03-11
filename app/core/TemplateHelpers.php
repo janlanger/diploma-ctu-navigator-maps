@@ -319,6 +319,7 @@ class TemplateHelpers {
             }
 
             $i->save($newPath,null, $type, [
+		'transparent' => 'white',
                 'density'=> 100,
                 'trim'=> true,
                 'geometry' => $width.'x'.($height == null?$width:$height.'!').'>',
