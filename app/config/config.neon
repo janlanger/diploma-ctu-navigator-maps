@@ -48,7 +48,7 @@ common:
                 proxyAutogenerate: true
         debugger: Maps\Model\Persistence\ConnectionPanel
         repositoryClass: Maps\Model\Dao
-        useSimleAnnotation: true
+        useSimpleAnnotation: true
         console:
             entityManager: default
 
