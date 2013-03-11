@@ -15,7 +15,7 @@
                 {if $key == 'position'}
                     position: { lat:{$item['lat']}, lng: {$item['long']}}
                 {elseif $key == 'icon'}
-                    icon: { url: {$item['url']}{ifset $item['anchor']}, anchor: new google.maps.Point({$item['anchor'][0]},{$item['anchor'][1]}){/ifset}},
+                    icon: { url: {$baseUri}+{$item['url']}{ifset $item['anchor']}, anchor: new google.maps.Point({$item['anchor'][0]},{$item['anchor'][1]}){/ifset}},
                 {else}
                     {$key}:{$item}
                 {/if}{sep},{/sep}
@@ -25,7 +25,7 @@
 
     var customLayers = [];
     {foreach $customLayers as $title => $path}
-        customLayers[{$title}] = {$path};
+        customLayers[{$title}] = {$baseUri}+"/"+{$path};
     {/foreach}
 
     var paths = [];
