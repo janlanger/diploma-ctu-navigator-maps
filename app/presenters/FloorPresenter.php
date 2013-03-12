@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Presenter;
+use App\Model\Proxies\__CG__\Maps\Model\Building\Building;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\BasicMap;
@@ -17,18 +18,41 @@ use Nette\NotImplementedException;
  * To change this template use File | Settings | File Templates.
  */
 class FloorPresenter extends SecuredPresenter{
-    
-    public function actionAdd($id) {
-        $this->template->building = $this->getRepository('building')->find($id);
+
+    /** @persistent */
+    public $building;
+
+    private $buildingEntity = null;
+
+    /**
+     * @return Building
+     */
+    private function getBuilding() {
+        if($this->buildingEntity == null) {
+            $this->buildingEntity = $this->getRepository('building')->find($this->building);
+        }
+        return $this->buildingEntity;
+    }
+
+    protected function beforeRender()
+    {
+        $this->template->building = $this->getBuilding();
+        $this->addBreadcrumb('Building:','Budovy');
+        $this->addBreadcrumb('Building:detail?id='.$this->getBuilding()->id, $this->getBuilding()->getName());
+
+        parent::beforeRender();
+    }
+
+
+    public function actionAdd() {
         $entity = $this->getRepository('floor')->createNew();
-        $entity->setBuilding($this->template->building);
+        $entity->setBuilding($this->getBuilding());
         
         $this['form']->bindEntity($entity);
     }
 
     public function actionEdit($id) {
         $entity = $this->getRepository('floor')->find($id);
-        $this->template->building = $entity->building;
 
         $this['form']->bindEntity($entity);
 
@@ -36,7 +60,6 @@ class FloorPresenter extends SecuredPresenter{
 
     public function actionDefault($id) {
         $this->template->floor = $floor =  $this->getRepository('floor')->find($id);
-        $this->template->building = $floor->building;
         $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
         //$q2 = new GetActiveMetadataQuery($floor);
     }
@@ -59,7 +82,7 @@ class FloorPresenter extends SecuredPresenter{
     }
 
     public function createComponentMap($name) {
-        $building = $this->template->building;
+        $building = $this->getBuilding();
         $floor = $this->template->floor;
         $plan = $this->template->plan;
 

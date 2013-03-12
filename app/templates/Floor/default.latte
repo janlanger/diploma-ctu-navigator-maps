@@ -1,4 +1,5 @@
 {block #pageTitle}Detail podlaží č. {$floor->floorNumber}{if $floor->name} - {$floor->name}{/if}{/block}
+{block #breadcrumbs}{if $floor->name!=""}{$floor->name}{else}Podlaží č. {$floor->floorNumber}{/if}{/block}
 {block #content}
 
 <h3>{$building->name}, {$building->address}</h3>
