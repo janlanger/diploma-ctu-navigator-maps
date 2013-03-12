@@ -10,14 +10,12 @@
         <link rel="stylesheet" type="text/css" href="{$baseUri}/css/bootstrap-responsive.min.css">
 
         <link rel="stylesheet" href="{$baseUri}/css/datagrid.css">
-        <link rel="stylesheet" href="{$baseUri}/css/dd.css">
 
     {block #css}{/block}
 
         <script type="text/javascript" src="{$baseUri}/js/jquery-1.8.3.js"></script>
 
         <script type="text/javascript" src="{$baseUri}/js/jquery-ui-1.9.2.custom.min.js"></script>
-        <script type="text/javascript" src="{$baseUri}/js/jquery.dd.min.js"></script>
 
 
         <script type="text/javascript" src="{$baseUri}/js/bootstrap.min.js"></script>
@@ -85,6 +83,12 @@
                     </div> *}
                    {* <div class="span9">*}
                         <h1 n:ifset="#pageTitle">{include #pageTitle}</h1>
+                        <div class="breadcrumb" n:if="!empty($breadcrumbs)">
+                            {foreach  $breadcrumbs as $item}
+                                <a n:tag-if="isset($item['link']) && !is_null($item['link'])" n:href="$item['link']">{$item['title']}</a>{sep} / {/sep}
+                            {/foreach}
+                            {ifset #breadcrumbs}/ {include #breadcrumbs}{else}/ {include #pageTitle}{/ifset}
+                        </div>
                         <ul n:ifset="#secondaryNav" class="nav nav-pills">
                             {include #secondaryNav}
                         </ul>

@@ -1,6 +1,9 @@
 <?php
 namespace Maps\Presenter;
+use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
+use Nette\Latte\Macros\MacroSet;
+
 /**
  * Base presenter for all application presenters.
  */
@@ -9,6 +12,8 @@ abstract class BasePresenter extends Presenter {
     const FLASH_ERROR = 'error';
     const FLASH_WARNING = 'warning';
     const FLASH_SUCCESS = 'success';
+
+    public $breadcrumbs = [['link'=> '//Dashboard:','title'=>'Nástěnka']];
 
     protected function startup() {
         parent::startup();
@@ -40,6 +45,16 @@ abstract class BasePresenter extends Presenter {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);
         }
         return $this->getContext()->em->getRepository($entity);
+    }
+
+    protected function beforeRender() {
+        $this->template->breadcrumbs = $this->breadcrumbs;
+        parent::beforeRender();
+    }
+
+
+    public function addBreadcrumb($link, $title) {
+        $this->breadcrumbs[] = ['link'=>$link, 'title'=>$title];
     }
 
 
