@@ -81,7 +81,15 @@ class Action extends Nette\ComponentModel\Component implements IAction
 		case self::WITH_KEY:
 		default:
 			$key = $this->key == NULL || is_bool($this->key) ? $dataGrid->keyName : $this->key;
-			$link = $control->link($this->destination, array($key => $args[$dataGrid->keyName])); break;
+                $arguments[$key] = $args[$dataGrid->keyName];
+                $destination = $this->destination;
+                $a = strpos($this->destination, "?");
+                if($a !== FALSE) {
+                    parse_str(substr($this->destination, $a + 1), $x);
+                    $destination = substr($destination, 0, $a);
+                    $arguments = array_merge($x, $arguments);
+                }
+			$link = $control->link($destination, $arguments); break;
 		}
 
 		$this->html->href($link);
