@@ -27,7 +27,17 @@ class ACLPresenter extends SecuredPresenter {
         parent::startup();
         $this->repository = $this->getContext()->em->getRepository('Maps\Model\Acl\Acl');
     }
-    
+
+    protected function beforeRender()
+    {
+        $this->addBreadcrumb('User:','Uživatelé');
+        if($this->getView() != "default") {
+            $this->addBreadcrumb('ACL:','Přístupová práva');
+        }
+        parent::beforeRender();
+    }
+
+
     public function actionAdd($id) {
         $this['editForm']->bindEntity($this->getContext()->ACLService->createBlank());
         $this['editForm']->setSuccessFlashMessage('Role byla úspěšně vytvořena, nastavte jí oprávnění.');

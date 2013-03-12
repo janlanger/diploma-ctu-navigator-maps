@@ -17,6 +17,14 @@ class UserPresenter extends SecuredPresenter {
         $this->repository = $this->getContext()->em->getRepository('Maps\Model\User\User');
     }
 
+    protected function beforeRender()
+    {
+        if($this->getView() != 'default') {
+            $this->addBreadcrumb('User:','Uživatelé');
+        }
+        parent::beforeRender();
+    }
+
 
     public function actionEdit($id) {
         $this['form']->bindEntity($this->repository->find($id));
