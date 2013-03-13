@@ -26,16 +26,7 @@ class Floor extends BaseEntity {
      */
     private $building;
 
-    /**
-     * @OneToMany(targetEntity="Node", mappedBy="floor", cascade={"persist"}, orphanRemoval=true)
-     */
-    private $nodes = [];
-    
-    /**
-     * @OneToMany(targetEntity="Path", mappedBy="floor", cascade={"persist"}, orphanRemoval=true)
-     */
-    private $paths = [];
-    
+
     public function getVersion() {
         return $this->version;
     }
