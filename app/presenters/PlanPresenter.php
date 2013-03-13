@@ -47,7 +47,7 @@ class PlanPresenter extends SecuredPresenter {
 
         $this->addBreadcrumb('Building:','Budovy');
         $this->addBreadcrumb('Building:detail?id='.$building->id, $building->getName());
-        $this->addBreadcrumb('Floor:default?id='.$floor->id, $floor->name);
+        $this->addBreadcrumb('Floor:default?id='.$floor->id.'&building='.$building->id, $floor->name);
         if($this->getView() != "default") {
             $this->addBreadcrumb('Plan:default?','Plány');
         }
