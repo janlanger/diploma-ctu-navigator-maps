@@ -35,4 +35,9 @@ class Revision extends BaseEntity {
      */
     private $revision = 1;
 
+    /** @Column(type="boolean") */
+    private $published = false;
+    /** @Column(type="datetime", nullable=true) */
+    private $published_date;
+
 }

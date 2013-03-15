@@ -1,10 +1,13 @@
-{block #pageTitle}Editace plánu podlaží č. {$plan->floorNumber}{if $plan->name} - {$plan->name}{/if}{/block}
+{block #pageTitle}Správa metadat - podlaží {$floor->name}{/block}
+{block #breadcrumbs}Metadata{/block}
 
-{block content}
-<h3>{$building->name}, {$building->address}</h3>
-<br>
+{block #content}
+    <h3>{$building->name}, {$building->address}</h3>
 
-{control map, "size"=>["100%","700px"]}
+<h3>Revize</h3>
+
 <hr>
-<em>Body, ke kterým nevede žádná cesta se neuloží. <br>Cesty, které nejsou ukončeny bodem na obou koncích se neuloží.</em>
-{control pointForm}
+
+<h3>Návrhy změn</h3>
+
+<a n:href="editor">Vytvořit návrh</a>

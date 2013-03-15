@@ -38,7 +38,7 @@ abstract class BasePresenter extends Presenter {
             "acl" => "Maps\\Model\\ACL\\ACL",
             "floor" => "Maps\\Model\\Floor\\Floor",
             "plan" => "Maps\\Model\\Floor\\Plan",
-            "plannode" => "Maps\\Model\\Floor\\Node",
+            "meta_revision" => "Maps\\Model\\Metadata\\Revision",
             "planpath" => "Maps\\Model\\Floor\\Path"
         ];
         if(isset($aliasMap[strtolower($entity)])) {
