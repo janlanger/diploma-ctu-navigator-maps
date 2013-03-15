@@ -9,6 +9,7 @@ namespace Maps\Components\GoogleMaps;
  */
 abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
+    private $customLayers = [];
     private $iconsAnchorPoint;
     private $showLegend = false;
     private $pointsInfo;
@@ -74,6 +75,11 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         return ['lat'=>$parts[0],'long'=>$parts[1]];
     }
 
+    public function addCustomTilesLayer($title, $basePath)
+    {
+        $this->customLayers[$title] = $basePath;
+    }
+
     protected function createTemplate($class = NULL) {
         $template = parent::createTemplate($class);
 
@@ -96,6 +102,8 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
         $template->showLegend = $this->showLegend;
         $template->pointsInfo = $this->pointsInfo;
+
+        $template->customLayers = $this->customLayers;
 
         return $template;
     }
