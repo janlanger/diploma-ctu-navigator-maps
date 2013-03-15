@@ -27,6 +27,7 @@ module Mapping {
                 zoom: this.options.zoom,
                 center: new google.maps.LatLng(this.options.center.lat, this.options.center.lng),
                 mapTypeId: 'mystyle',
+                disableDoubleClickZoom:true,
                 streetViewControl: false,
                 mapTypeControlOptions: {
                     mapTypeIds: ['mystyle', google.maps.MapTypeId.SATELLITE]
@@ -52,13 +53,13 @@ module Mapping {
             ], {name:"Základní",maxZoom:22}));
 
             this.loaded = true;
-            if(this.options.points.length > 0) {
+            if(this.options.points && this.options.points.length > 0) {
                 this.loadMarkers(this.options.points);
             }
-            if(this.options.customLayers.length > 0) {
+            if(this.options.customLayers && this.options.customLayers.length > 0) {
                 this.loadCustomLayers(this.options.customLayers);
             }
-            if(this.options.paths.length > 0) {
+            if(this.options.paths && this.options.paths.length > 0) {
                 this.loadPaths(this.options.paths);
             }
             if(this.options.legend) {
@@ -87,10 +88,9 @@ module Mapping {
 
         private loadMarkers(definition:array) {
             $.each(definition, (index, item) => {
-                this.markers.push(new google.maps.Marker({
-                    map:this.map,
+                this.markers.push(this.createMarker({
                     draggable: (!item.draggable?false:item.draggable),
-                    position: new google.maps.LatLng(item.position['lat'],item.position['lng']),
+                    position: item.position,
                     icon:item.icon,
                     title:item.title
                 }));
@@ -98,14 +98,38 @@ module Mapping {
 
         }
 
+        public createMarker(options) {
+            options.map = this.map;
+            if(!(options.position instanceof google.maps.LatLng)) {
+                options.position = new google.maps.LatLng(options.position['lat'],options.position['lng']);
+            }
+            return new google.maps.Marker(options);
+        }
+
         private loadPaths(definition) {
             $.each(definition, (index, item) => {
-                var path = new google.maps.Polyline(this.options.pathOptions);
-                path.setMap(this.map);
-                path.getPath().push(new google.maps.LatLng(item.start.lat,item.start.lng));
-                path.getPath().push(new google.maps.LatLng(item.end.lat,item.end.lng));
-                this.paths.push(path);
+                this.paths.push(this.createPath(
+                    new google.maps.LatLng(item.start.lat,item.start.lng),
+                    new google.maps.LatLng(item.end.lat,item.end.lng)
+                ));
             })
+        }
+
+        public createPath(start, end) {
+            var path = new google.maps.Polyline(this.options.pathOptions);
+            path.setMap(this.map);
+            path.getPath().push(start);
+            path.getPath().push(end);
+            return path;
+        }
+
+        public getMarkerInPosition(position) {
+            for(var i=0; i<this.markers.length; i++) {
+                if(this.markers[i] && this.markers[i].position.equals(position)) {
+                    return this.markers[i];
+                }
+            }
+            return null;
         }
 
 

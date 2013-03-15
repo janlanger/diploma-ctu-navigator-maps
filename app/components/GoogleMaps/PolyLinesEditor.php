@@ -13,8 +13,10 @@ class PolyLinesEditor extends BaseMapControl {
 
     private $formField;
     private $submit;
+    private $types;
+    private $nodeIconBase;
 
-    public function bindedFormField(\Nette\Forms\IControl $control) {
+    public function bindFormField(\Nette\Forms\IControl $control) {
         $this->formField = $control;
     }
 
@@ -32,29 +34,31 @@ class PolyLinesEditor extends BaseMapControl {
         $this->setMapSize($template, func_get_args());
         $template->textField = $this->formField;
         $template->submit = $this->submit;
+        $template->nodeTypes = $this->types;
+        $template->iconsBasePath = $this->nodeIconBase;
 
         $template->render();
     }
 
+    public function setNodeTypes(array $types) {
+        $this->types= $types;
+    }
+
+    public function setNodeIconBase($nodeIconBase)
+    {
+        $this->nodeIconBase = $nodeIconBase;
+    }
+
+
+
     public function createComponentForm($name) {
         $form = new \Maps\Components\Forms\Form($this, $name);
+        $types = [];
+        foreach($this->types as $type=>$title) {
+            $types[$type] = $title['legend'];
+        }
 
-        $form->addSelect('type','Typ',[
-            'intersection' => 'Křižovatka',
-            'entrance' => 'Vstup',
-            'elevator' => 'Výtah',
-            'stairs' => 'Schodiště',
-            'passage' => 'Průchod (do jiné budovy)',
-            'lecture' => 'Učebna',
-            'auditorium' => 'Posluchárna',
-            'office' => 'Kancelář',
-            'study' => 'Studovna',
-            'cafeteria' => 'Kantýna',
-            'restroom-men' => 'WC muži',
-            'restroom-women' => 'WC ženy',
-            'cloakroom' => 'Šatna',
-            'other' => 'Jiný',
-        ])
+        $form->addSelect('type','Typ', $types)
             ->setPrompt('-- Typ --');
 
         $form->addText('name','Název');
