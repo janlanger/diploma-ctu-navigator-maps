@@ -10,6 +10,7 @@
 namespace Maps\Presenter;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\PolyLinesEditor;
+use Maps\Model\Building\DictionaryQuery;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
@@ -86,28 +87,30 @@ class MetadataPresenter extends SecuredPresenter{
         $map->setSubmitButton($this['pointForm']['send']);
         $map->setNodeTypes([
             'intersection' => ['anchor'=>[4,4], 'legend'=>'Křižovatka'],
-            'entrance' => ['anchor'=>[4,4], 'legend'=>'Vchod'],
-            'stairs' => ['anchor'=>[4,4], 'legend' => 'Schodiště'],
-            'elevator' => ['anchor'=>[4,4], 'legend'=>'Výtah'],
-            'passage' => ['anchor'=>[4,4], 'legend'=>'Průchod'],
-            'lecture' => ['anchor'=>[4,4], 'legend'=>'Učebna'],
-            'auditorium' => ['anchor'=>[4,4], 'legend'=>'Posluchárna'],
-            'office'=> ['anchor'=>[4,4], 'legend'=>'Kancelář'],
-            'study'=> ['anchor'=>[4,4], 'legend'=>'Studovna'],
-            'cafeteria'=> ['anchor'=>[4,4], 'legend'=>'Kantýna'],
-            'restroom-men'=> ['anchor'=>[4,4], 'legend'=>'WC muži'],
-            'restroom-women'=> ['anchor'=>[4,4], 'legend'=>'WC ženy'],
-            'cloakroom'=> ['anchor'=>[4,4], 'legend'=>'Šatna'],
-            'restriction'=> ['anchor'=>[4,4], 'legend'=>'Zákaz vstupu'],
-            'default' => ['anchor'=>[4,4], 'legend'=>'Ostatní'],
+            'entrance' => ['anchor'=>[8,8], 'legend'=>'Vchod'],
+            'stairs' => ['anchor'=>[8,8], 'legend' => 'Schodiště'],
+            'elevator' => ['anchor'=>[8,8], 'legend'=>'Výtah'],
+            'passage' => ['anchor'=>[8,8], 'legend'=>'Průchod'],
+            'lecture' => ['anchor'=>[8,8], 'legend'=>'Učebna'],
+            'auditorium' => ['anchor'=>[8,8], 'legend'=>'Posluchárna'],
+            'office'=> ['anchor'=>[8,8], 'legend'=>'Kancelář'],
+            'study'=> ['anchor'=>[8,8], 'legend'=>'Studovna'],
+            'cafeteria'=> ['anchor'=>[8,8], 'legend'=>'Kantýna'],
+            'restroom-men'=> ['anchor'=>[8,8], 'legend'=>'WC muži'],
+            'restroom-women'=> ['anchor'=>[8,8], 'legend'=>'WC ženy'],
+            'cloakroom'=> ['anchor'=>[8,8], 'legend'=>'Šatna'],
+            'restriction'=> ['anchor'=>[8,8], 'legend'=>'Zákaz vstupu'],
+            'default' => ['anchor'=>[8,8], 'legend'=>'Ostatní'],
         ]);
-        $map->setNodeIconBase('images/types');
+        $map->setNodeIconBase('images/markers/types');
 
         $map->setPathOptions([
             'strokeColor' =>'#ff0000',
             'strokeOpacity' =>0.5,
             'strokeWeight' => 1.5
         ]);
+
+        $map->setBuildingsDictionary($this->getRepository('building')->fetchPairs(new DictionaryQuery()));
 
         $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
         if($plan != null) {

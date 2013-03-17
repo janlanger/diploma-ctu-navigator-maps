@@ -21,11 +21,11 @@
 <div id="innerForm" style="display: none;">
     {form form}
         <div id="form-type" style="margin-bottom: 5px; margin-top: 10px;">{input type}</div>
-        <div id="form-name" style="margin-bottom: 5px">{input name, 'placeholder'=>'Název'}</div>
-        <div id="form-room" style="margin-bottom: 5px">{input room, 'placeholder'=>'Číslo místnosti'}</div>
+        <div id="form-name" style="margin-bottom: 5px">{input name, 'title'=>'Název'}</div>
+        <div id="form-room" style="margin-bottom: 5px">{input room, 'title'=>'Číslo místnosti'}</div>
         <div id="form-toBuilding" style="margin-bottom: 5px">{input toBuilding}</div>
-        <div id="form-fromFloor" style="margin-bottom: 5px">{input fromFloor, 'placeholder'=>'Z podlaží (nejnižší)'}</div>
-        <div id="form-toFloor" style="margin-bottom: 5px">{input toFloor, 'placeholder'=>'Do podlaží'}</div>
+        <div id="form-fromFloor" style="margin-bottom: 5px">{input fromFloor, 'title'=>'Z podlaží (nejnižší)'}</div>
+        <div id="form-toFloor" style="margin-bottom: 5px">{input toFloor, 'title'=>'Do podlaží'}</div>
         {input save, 'class'=>'btn btn-primary'}
         {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
     {/form}
@@ -36,6 +36,10 @@
 <script type="text/javascript" src="{$baseUri}/js/typescript/markerEditor.js"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/markerEditorEvents.js"></script>
 <script type="text/javascript">
+
+        $("#innerForm *[title]").each(function() {
+            $(this).attr('placeholder', $(this).attr('title'));
+        });
     var tempPolyOptions = {
         strokeOpacity:0,
         strokeColor: '#ff0000',

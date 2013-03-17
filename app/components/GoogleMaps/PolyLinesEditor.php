@@ -1,6 +1,8 @@
 <?php
 namespace Maps\Components\GoogleMaps;
 use Maps\Components\Forms\Form;
+use Maps\Model\Building\DictionaryQuery;
+use Maps\Presenter\BasePresenter;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -15,6 +17,8 @@ class PolyLinesEditor extends BaseMapControl {
     private $submit;
     private $types;
     private $nodeIconBase;
+
+    private $buildings=[];
 
     public function bindFormField(\Nette\Forms\IControl $control) {
         $this->formField = $control;
@@ -65,11 +69,15 @@ class PolyLinesEditor extends BaseMapControl {
         $form->addText('room','Číslo místnosti'); //TODO: suggest input
         $form->addText('fromFloor','Z podlaží (nejnižší)'); //TODO: select ze známých pater
         $form->addText('toFloor','Do podlaží');
-
-        $form->addSelect('toBuilding','Do budovy')
-            ->setPrompt('-- Do budovy --'); //TODO: číselník budov
+        $form->addSelect('toBuilding','Do budovy', $this->buildings)
+            ->setPrompt('-- Do budovy --');
         $form->addButton('save','Uložit');
         $form->addButton('delete','Odstranit bod');
 
+    }
+
+    public function setBuildingsDictionary($buildings)
+    {
+        $this->buildings = $buildings;
     }
 }

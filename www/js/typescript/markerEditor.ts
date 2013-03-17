@@ -136,7 +136,7 @@ module Mapping {
             $("div[id^=form-]", html).hide();
             $("div[id^=form-]:lt(3)", html).show();
             //events registration
-            var typeSelect = $("select:first", html);
+            var typeSelect = $("select[name=type]", html);
             typeSelect.change(function(event) {
                 //hide everything
                 $("div[id^=form-]", html).hide();
@@ -159,6 +159,7 @@ module Mapping {
                     case 'cafeteria':
                     case 'entrance':
                     case 'other':
+                    case 'default':
                         $("#form-name", html).show();
                         break;
                 }
@@ -169,8 +170,8 @@ module Mapping {
                     room: $("input[name='room']",html).val(),
                     fromFloor: $("input[name='fromFloor']",html).val(),
                     toFloor: $("input[name='toFloor']",html).val(),
-                    toBuilding: $("input[name='toBuilding']",html).val(),
-                    type: $("select", html).val()
+                    toBuilding: $("select[name='toBuilding']",html).val(),
+                    type: $("select[name=type]", html).val()
                 };
                 marker.setIcon(this.getMarkerIcon(marker.appOptions.type));
                 window.close()
@@ -200,8 +201,8 @@ module Mapping {
                 $("input[name='room']",html).val(marker.appOptions.room);
                 $("input[name='fromFloor']",html).val(marker.appOptions.fromFloor);
                 $("input[name='toFloor']",html).val(marker.appOptions.toFloor);
-                $("input[name='toBuilding']",html).val(marker.appOptions.toBuilding);
-                $("select", html).val(marker.appOptions.type);
+                $("select[name='toBuilding']",html).val(marker.appOptions.toBuilding);
+                $("select[name=type]", html).val(marker.appOptions.type);
             }
             window.setContent(html[0]);
             google.maps.event.addListener(window, 'domready', function() {
