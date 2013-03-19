@@ -40,4 +40,85 @@ class Revision extends BaseEntity {
     /** @Column(type="datetime", nullable=true) */
     private $published_date;
 
+    /**
+     * @OneToMany(targetEntity="Node", mappedBy="revision")
+     */
+    private $nodes;
+    /**
+     * @OneToMany(targetEntity="Path", mappedBy="revision")
+     */
+    private $paths;
+
+    public function setFloor($floor)
+    {
+        $this->floor = $floor;
+    }
+
+    public function getFloor()
+    {
+        return $this->floor;
+    }
+
+    public function setNodes($nodes)
+    {
+        $this->nodes = $nodes;
+    }
+
+    public function getNodes()
+    {
+        return $this->nodes;
+    }
+
+    public function setPaths($paths)
+    {
+        $this->paths = $paths;
+    }
+
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
+    public function setPublished($published)
+    {
+        $this->published = $published;
+    }
+
+    public function getPublished()
+    {
+        return $this->published;
+    }
+
+    public function setPublishedDate($published_date)
+    {
+        $this->published_date = $published_date;
+    }
+
+    public function getPublishedDate()
+    {
+        return $this->published_date;
+    }
+
+    public function setRevision($revision)
+    {
+        $this->revision = $revision;
+    }
+
+    public function getRevision()
+    {
+        return $this->revision;
+    }
+
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+
+
 }

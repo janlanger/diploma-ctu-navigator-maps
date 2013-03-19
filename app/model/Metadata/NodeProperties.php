@@ -36,4 +36,76 @@ class NodeProperties extends BaseEntity {
      */
     private $to_building;
 
+    public function setFromFloor($from_floor)
+    {
+        $this->from_floor = $from_floor;
+    }
+
+    public function getFromFloor()
+    {
+        return $this->from_floor;
+    }
+
+    public function setGpsCoordinates($gps_coordinates)
+    {
+        $this->gps_coordinates = $gps_coordinates;
+    }
+
+    public function getGpsCoordinates()
+    {
+        return $this->gps_coordinates;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setRoom($room)
+    {
+        $this->room = $room;
+    }
+
+    public function getRoom()
+    {
+        return $this->room;
+    }
+
+    public function setToBuilding($to_building)
+    {
+        $this->to_building = $to_building;
+    }
+
+    public function getToBuilding()
+    {
+        return $this->to_building;
+    }
+
+    public function setToFloor($to_floor)
+    {
+        $this->to_floor = $to_floor;
+    }
+
+    public function getToFloor()
+    {
+        return $this->to_floor;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+
+
 }

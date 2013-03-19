@@ -39,4 +39,48 @@ class PathProperties extends BaseEntity {
     /** @Column(type="float") */
     private $length;
 
+    /**
+     * @param \Maps\Model\Metadata\NodeProperties $endNode
+     */
+    public function setEndNode($endNode)
+    {
+        $this->endNode = $endNode;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\NodeProperties
+     */
+    public function getEndNode()
+    {
+        return $this->endNode;
+    }
+
+    public function setLength($length)
+    {
+        $this->length = $length;
+    }
+
+    public function getLength()
+    {
+        return $this->length;
+    }
+
+    /**
+     * @param \Maps\Model\Metadata\NodeProperties $startNode
+     */
+    public function setStartNode($startNode)
+    {
+        $this->startNode = $startNode;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\NodeProperties
+     */
+    public function getStartNode()
+    {
+        return $this->startNode;
+    }
+
+
+
 }
