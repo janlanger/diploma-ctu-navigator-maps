@@ -1,0 +1,17 @@
+{block #pageTitle}Vytvoření návrhu změn{/block}
+
+{block content}
+<h3>{$building->name}, {$building->address}</h3>
+<h4>Podlaží {$floor->readableName}</h4>
+<br>
+Úpravou sítě bodů níže navrhněte změny v datech pro toto podlaží.Doporučujeme také připojit krátký komentář popisující změny.
+<br>
+Návrh odešlete kliknutím na tlačítko <b>Odeslat</b> pod mapou. <br><br>
+<ul>
+    <li><em>Body ke kterým nevede žádná cesta nebudou uloženy.</em></li>
+    <li><em>Cesty, které nejsou ukončeny na obou koncích boem nebudou uloženy.</em></li>
+</ul>
+<hr>
+{control map, "size"=>["100%","700px"]}
+
+{control pointForm}

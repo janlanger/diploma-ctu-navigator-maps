@@ -82,6 +82,15 @@ class Floor extends BaseEntity {
     public function getPaths() {
         return $this->paths;
     }
+
+    public function getReadableName() {
+        if($this->name != "") {
+            return $this->name;
+        }
+        else {
+            return "č. ".$this->floor_number;
+        }
+    }
     
 }
 

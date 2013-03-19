@@ -64,6 +64,8 @@ module Mapping {
                 this.eventHandler.registerPathEvents(item);
             });
 
+            $("#"+this.options.definitionElement).hide();
+
             this.AdditionState = Mapping.Events.ADD_INCATIVE;
             this.State = Mapping.Events.STATE_ADD;
             this.ActiveMarkerType = 'intersection';
