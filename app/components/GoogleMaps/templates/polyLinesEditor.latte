@@ -18,11 +18,14 @@
 
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
 
-<div id="innerForm" style="display: none;">
+<div id="innerForm">
     {form form}
         <div id="form-type" style="margin-bottom: 5px; margin-top: 10px;">{input type}</div>
         <div id="form-name" style="margin-bottom: 5px">{input name, 'title'=>'Název'}</div>
-        <div id="form-room" style="margin-bottom: 5px">{input room, 'title'=>'Číslo místnosti'}</div>
+        <div id="form-room" style="margin-bottom: 5px" class="input-prepend">
+            <span class="add-on" n:if="$roomPrefix != ''">{$roomPrefix}</span>
+            {input room, 'title'=>'Číslo místnosti'}
+        </div>
         <div id="form-toBuilding" style="margin-bottom: 5px">{input toBuilding}</div>
         <div id="form-fromFloor" style="margin-bottom: 5px">{input fromFloor, 'title'=>'Z podlaží (nejnižší)'}</div>
         <div id="form-toFloor" style="margin-bottom: 5px">{input toFloor, 'title'=>'Do podlaží'}</div>
@@ -40,7 +43,12 @@
         $("#innerForm *[title]").each(function() {
             $(this).attr('placeholder', $(this).attr('title'));
         });
-    var tempPolyOptions = {
+        $(document).ready(function() {
+            var w = $("#form-room input").outerWidth();
+            $("#form-room input").css('width',w - 15 - $("#form-room span").outerWidth());
+            $("#innerForm").hide();
+        });
+        var tempPolyOptions = {
         strokeOpacity:0,
         strokeColor: '#ff0000',
 
@@ -71,6 +79,7 @@
         {if $showLegend}legend: document.getElementById("map-legend"),{/if}
         customLayers: customLayers,
         pathOptions: {$pathOptions},
+        roomPrefix: {$roomPrefix},
         temporaryPathOptions: tempPolyOptions,
         definitionElement: {$textField->control->id},
         submitElement: {$submit->control->id},

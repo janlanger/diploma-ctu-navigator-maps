@@ -17,6 +17,9 @@ class PolyLinesEditor extends BaseMapControl {
     private $submit;
     private $types;
     private $nodeIconBase;
+    private $roomPrefix;
+
+
 
     private $buildings=[];
 
@@ -27,6 +30,12 @@ class PolyLinesEditor extends BaseMapControl {
     public function setSubmitButton(\Nette\Forms\IControl $control) {
         $this->submit = $control;
     }
+
+    public function setRoomPrefix($roomPrefix)
+    {
+        $this->roomPrefix = $roomPrefix;
+    }
+
 
 
     public function render() {
@@ -40,6 +49,7 @@ class PolyLinesEditor extends BaseMapControl {
         $template->submit = $this->submit;
         $template->nodeTypes = $this->types;
         $template->iconsBasePath = $this->nodeIconBase;
+        $template->roomPrefix = $this->roomPrefix;
 
         $template->render();
     }

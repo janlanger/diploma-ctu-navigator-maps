@@ -166,12 +166,27 @@ module Mapping {
                         break;
                 }
             });
+            var room = $("input[name=room]", html);
+            room.attr('autocomplete','off');
+            room.typeahead({
+                source: (query, process) => {
+                    return $.get("http://navigator.jamrtal.cz/api/1/kos/rooms",
+                        {query: "code==*"+this.options.roomPrefix+query+"*"},
+                        (data)=>{
+                            return process(data.rooms);
+                        }
+                    )
+                },
+                updater: (item) => {
+                    return item.replace(this.options.roomPrefix, "");
+                }
+            });
             $("input[name=save]", html).click(() => {
                 if(!marker.appOptions) {
                     marker.appOptions = {};
                 }
                 marker.appOptions.name = $("input[name='name']",html).val();
-                marker.appOptions.room = $("input[name='room']",html).val();
+                marker.appOptions.room = this.options.roomPrefix + $("input[name='room']",html).val();
                 marker.appOptions.fromFloor = $("input[name='fromFloor']",html).val();
                 marker.appOptions.toFloor = $("input[name='toFloor']",html).val();
                 marker.appOptions.toBuilding = $("select[name='toBuilding']",html).val();
@@ -202,7 +217,7 @@ module Mapping {
 
             if(marker.appOptions != null) {
                 $("input[name='name']",html).val(marker.appOptions.name);
-                $("input[name='room']",html).val(marker.appOptions.room);
+                $("input[name='room']",html).val((marker.appOptions.room?marker.appOptions.room.replace(this.options.roomPrefix,""):""));
                 $("input[name='fromFloor']",html).val(marker.appOptions.fromFloor);
                 $("input[name='toFloor']",html).val(marker.appOptions.toFloor);
                 $("select[name='toBuilding']",html).val(marker.appOptions.toBuilding);

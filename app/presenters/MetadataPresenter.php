@@ -90,6 +90,9 @@ class MetadataPresenter extends SecuredPresenter{
 
         $map->setCenter($this->template->building->getGpsCoordinates());
         $map->setZoomLevel(20);
+
+        $map->setRoomPrefix($this->template->building->roomPrefix);
+
         $map->bindFormField($this['pointForm']['definition']);
         $map->setSubmitButton($this['pointForm']['send']);
         $map->setNodeTypes([
