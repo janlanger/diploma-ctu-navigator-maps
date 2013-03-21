@@ -152,11 +152,11 @@ class ProposalProcessor {
                 $this->nodesAdd[] = $this->nodePropertiesRepository->createNew(null, array(
                     'gpsCoordinates' => $node->position,
                     'type' => $node->type,
-                    'name' => (isset($node->name) ? $node->name : null),
-                    'room' => (isset($node->room) ? $node->room : null),
-                    'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : null,
-                    'toFloor' => isset($node->toFloor) ? $node->toFloor : null,
-                    'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : null,
+                    'name' => (isset($node->name) && trim($node->name) != "" ? $node->name : null),
+                    'room' => (isset($node->room) && trim($node->room) != "" ? $node->room : null),
+                    'fromFloor' => isset($node->fromFloor) && trim($node->fromFloor) != "" ? $node->fromFloor : null,
+                    'toFloor' => isset($node->toFloor) && trim($node->toFloor) != "" ? $node->toFloor : null,
+                    'toBuilding' => isset($node->toBuilding) && trim($node->toBuilding) != "" ? $node->toBuilding : null,
                 ));
                 $node->addedId = count($this->nodesAdd) -1;
             } else {
@@ -167,7 +167,7 @@ class ProposalProcessor {
                 foreach($node as $key=>$value) {
                     if(in_array($key, ['id','state','propertyId'])) continue;
                     $getMethod = "get".ucfirst($key);
-                    if($value == "") $value = null;
+                    if(trim($value) == "") $value = null;
                     if($value != $entity->$getMethod()) {
                         $entityChanged = true;
                     }
@@ -177,11 +177,11 @@ class ProposalProcessor {
                     $this->nodesChange[$node->id] = $this->nodePropertiesRepository->createNew(null, [
                         'gpsCoordinates' => $node->position,
                         'type' => $node->type,
-                        'name' => (isset($node->name) ? $node->name : null),
-                        'room' => (isset($node->room) ? $node->room : null),
-                        'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : null,
-                        'toFloor' => isset($node->toFloor) ? $node->toFloor : null,
-                        'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : null,
+                        'name' => (isset($node->name) && trim($node->name) != "" ? $node->name : null),
+                        'room' => (isset($node->room) && trim($node->room) != "" ? $node->room : null),
+                        'fromFloor' => isset($node->fromFloor) && trim($node->fromFloor) != "" ? $node->fromFloor : null,
+                        'toFloor' => isset($node->toFloor) && trim($node->toFloor) != "" ? $node->toFloor : null,
+                        'toBuilding' => isset($node->toBuilding) && trim($node->toBuilding) != "" ? $node->toBuilding : null,
                     ]);
                 }
                 unset($unprocessedNodes[$node->id]);
