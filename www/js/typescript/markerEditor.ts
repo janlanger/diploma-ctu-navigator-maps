@@ -167,14 +167,16 @@ module Mapping {
                 }
             });
             $("input[name=save]", html).click(() => {
-                marker.appOptions = {
-                    name: $("input[name='name']",html).val(),
-                    room: $("input[name='room']",html).val(),
-                    fromFloor: $("input[name='fromFloor']",html).val(),
-                    toFloor: $("input[name='toFloor']",html).val(),
-                    toBuilding: $("select[name='toBuilding']",html).val(),
-                    type: $("select[name=type]", html).val()
-                };
+                if(!marker.appOptions) {
+                    marker.appOptions = {};
+                }
+                marker.appOptions.name = $("input[name='name']",html).val();
+                marker.appOptions.room = $("input[name='room']",html).val();
+                marker.appOptions.fromFloor = $("input[name='fromFloor']",html).val();
+                marker.appOptions.toFloor = $("input[name='toFloor']",html).val();
+                marker.appOptions.toBuilding = $("select[name='toBuilding']",html).val();
+                marker.appOptions.type = $("select[name=type]", html).val();
+
                 marker.setIcon(this.getMarkerIcon(marker.appOptions.type));
                 window.close()
             });

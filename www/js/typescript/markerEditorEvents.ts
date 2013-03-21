@@ -57,17 +57,18 @@ module Mapping {
 
         private mapClicked(event:google.maps.MouseEvent) {
             if(this.editor.State == Mapping.Events.STATE_ADD) {
-                if(this.editor.AdditionState == Mapping.Events.ADD_INCATIVE) {
-                    this.editor.addMarker(event.latLng);
-                    this.enableTemporaryLine(event.latLng);
-                    this.editor.AdditionState = Mapping.Events.ADD_ACTIVE;
-                }
                 if(this.editor.AdditionState == Mapping.Events.ADD_ACTIVE) {
                     this.editor.addMarker(event.latLng);
                     this.editor.addPath(this.tempLine.getPath().getAt(0), event.latLng);
                     this.disableTemporaryLine();
                     this.enableTemporaryLine(event.latLng);
                 }
+                if(this.editor.AdditionState == Mapping.Events.ADD_INCATIVE) {
+                    this.editor.addMarker(event.latLng);
+                    this.enableTemporaryLine(event.latLng);
+                    this.editor.AdditionState = Mapping.Events.ADD_ACTIVE;
+                }
+
             }
         }
 
@@ -190,7 +191,6 @@ module Mapping {
         }
 
         public submitHandler(event, textElement) {
-            event.preventDefault();
             var field = $("#"+textElement);
             var markerFields = [];
             for(var i=0; i<this.editor.markers.length; i++) {
@@ -215,7 +215,6 @@ module Mapping {
                 });
             }
             field.val(JSON.stringify({ nodes: markerFields, paths: lineFields}));
-
         }
 
         // --- temporary line handle
