@@ -16,10 +16,7 @@ use Maps\Model\BaseEntity;
  * Class PathProperties
  * @package Maps\Model\Metadata
  * @Entity
- * @Table(name="metadata_path_properties",
- *  uniqueConstraints={
- *      @UniqueConstraint(columns={"startNode", "endNode"})
- *  })
+ * @Table(name="metadata_path_properties")
  */
 class PathProperties extends BaseEntity {
 

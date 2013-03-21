@@ -22,7 +22,7 @@ class PathChange extends BaseEntity {
 
     /**
      * @var Changeset
-     * @ManyToOne(targetEntity="Changeset")
+     * @ManyToOne(targetEntity="Changeset", cascade={"persist"})
      * @JoinColumn(name="changeset_id", referencedColumnName="id", nullable=false)
      */
     private $changeset;
@@ -34,8 +34,8 @@ class PathChange extends BaseEntity {
 
     /**
      * @var PathProperties
-     * @OneToOne(targetEntity="PathProperties")
-     * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=false)
+     * @OneToOne(targetEntity="PathProperties", cascade={"persist"})
+     * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=true)
      */
     private $properties;
 
@@ -45,4 +45,70 @@ class PathChange extends BaseEntity {
      * @JoinColumn(name="original_id", referencedColumnName="id", nullable=true)
      */
     private $original;
+
+    /**
+     * @param \Maps\Model\Metadata\Changeset $changeset
+     */
+    public function setChangeset($changeset)
+    {
+        $this->changeset = $changeset;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\Changeset
+     */
+    public function getChangeset()
+    {
+        return $this->changeset;
+    }
+
+    /**
+     * @param \Maps\Model\Metadata\Path $original
+     */
+    public function setOriginal($original)
+    {
+        $this->original = $original;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\Path
+     */
+    public function getOriginal()
+    {
+        return $this->original;
+    }
+
+    /**
+     * @param \Maps\Model\Metadata\PathProperties $properties
+     */
+    public function setProperties($properties)
+    {
+        $this->properties = $properties;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\PathProperties
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param boolean $was_deleted
+     */
+    public function setWasDeleted($was_deleted)
+    {
+        $this->was_deleted = $was_deleted;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getWasDeleted()
+    {
+        return $this->was_deleted;
+    }
+
+
 }

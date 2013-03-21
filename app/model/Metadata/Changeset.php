@@ -56,7 +56,7 @@ class Changeset extends BaseEntity {
     private $processed_by;
     /**
      * @var \DateTime
-     * @Column(type="datetime")
+     * @Column(type="datetime", nullable=true)
      */
     private $processed_date;
     /**
@@ -69,5 +69,140 @@ class Changeset extends BaseEntity {
      * @Column(type="string", length=50)
      */
     private $comment;
+
+    public function __construct() {
+        $this->submitted_date = new \DateTime();
+    }
+
+
+    /**
+     * @param \Maps\Model\Metadata\Revision $against_revision
+     */
+    public function setAgainstRevision($against_revision)
+    {
+        $this->against_revision = $against_revision;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\Revision
+     */
+    public function getAgainstRevision()
+    {
+        return $this->against_revision;
+    }
+
+    /**
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param \Maps\Model\Metadata\Revision $in_revision
+     */
+    public function setInRevision($in_revision)
+    {
+        $this->in_revision = $in_revision;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\Revision
+     */
+    public function getInRevision()
+    {
+        return $this->in_revision;
+    }
+
+    /**
+     * @param \Maps\Model\User\User $processed_by
+     */
+    public function setProcessedBy($processed_by)
+    {
+        $this->processed_by = $processed_by;
+    }
+
+    /**
+     * @return \Maps\Model\User\User
+     */
+    public function getProcessedBy()
+    {
+        return $this->processed_by;
+    }
+
+    /**
+     * @param \DateTime $processed_date
+     */
+    public function setProcessedDate($processed_date)
+    {
+        $this->processed_date = $processed_date;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getProcessedDate()
+    {
+        return $this->processed_date;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return string
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param \Maps\Model\User\User $submitted_by
+     */
+    public function setSubmittedBy($submitted_by)
+    {
+        $this->submitted_by = $submitted_by;
+    }
+
+    /**
+     * @return \Maps\Model\User\User
+     */
+    public function getSubmittedBy()
+    {
+        return $this->submitted_by;
+    }
+
+    /**
+     * @param \DateTime $submitted_date
+     */
+    public function setSubmittedDate($submitted_date)
+    {
+        $this->submitted_date = $submitted_date;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getSubmittedDate()
+    {
+        return $this->submitted_date;
+    }
+
+
 
 }

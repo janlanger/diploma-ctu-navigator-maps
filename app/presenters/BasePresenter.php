@@ -39,7 +39,11 @@ abstract class BasePresenter extends Presenter {
             "floor" => "Maps\\Model\\Floor\\Floor",
             "plan" => "Maps\\Model\\Floor\\Plan",
             "meta_revision" => "Maps\\Model\\Metadata\\Revision",
-            "planpath" => "Maps\\Model\\Floor\\Path"
+            "meta_node_properties" => "Maps\\Model\\Metadata\\NodeProperties",
+            "meta_path_properties" => "Maps\\Model\\Metadata\\PathProperties",
+            "meta_changeset" => "Maps\\Model\\Metadata\\Changeset",
+            "meta_node_change" => "Maps\\Model\\Metadata\\NodeChange",
+            "meta_path_change" => "Maps\\Model\\Metadata\\PathChange",
         ];
         if(isset($aliasMap[strtolower($entity)])) {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);

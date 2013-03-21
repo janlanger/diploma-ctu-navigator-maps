@@ -13,6 +13,7 @@ use Maps\Components\GoogleMaps\PolyLinesEditor;
 use Maps\Model\Building\DictionaryQuery;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
+use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Revision;
 
@@ -69,10 +70,14 @@ class MetadataPresenter extends SecuredPresenter{
 
 
         $form->onSuccess[] = function(Form $form) {
-            $x = new \Maps\Model\Floor\MetadataFormProcessor(
-                $this->getRepository('plannode'),
-                $this->getRepository('planpath'),
-                $this->getRepository('floor')->find($this->getParameter('id'))
+            $x = new ProposalProcessor(
+                $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())),
+                $this->getRepository('user')->find($this->getUser()->getId()),
+                $this->getRepository("meta_node_properties"),
+                $this->getRepository("meta_path_properties"),
+                $this->getRepository('meta_changeset'),
+                $this->getRepository('meta_node_change'),
+                $this->getRepository('meta_path_change')
             );
             $x->handle($form);
             $this->redirect("this");

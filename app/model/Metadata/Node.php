@@ -77,6 +77,7 @@ class Node extends BaseEntity implements \JsonSerializable {
     {
         return [
             'id' => $this->id,
+            'propertyId' => $this->properties->id,
             'position' => $this->properties->getGpsCoordinates(),
             'name' => $this->properties->getName(),
             'type' => $this->properties->getType(),

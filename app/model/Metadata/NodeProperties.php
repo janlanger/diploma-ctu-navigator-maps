@@ -106,6 +106,10 @@ class NodeProperties extends BaseEntity {
         return $this->type;
     }
 
+    public function getPosition() {
+        return $this->gps_coordinates;
+    }
+
 
 
 }
