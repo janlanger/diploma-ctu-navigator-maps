@@ -104,4 +104,18 @@ class Mixed extends Nette\Object {
         return $value;
     }
 
+    public static function mapAssoc($collection, $key) {
+        $arr = [];
+        foreach($collection as $item) {
+            if(!isset($item->$key)) {
+               throw new \InvalidArgumentException('Key '.$key.' does not exists in every item.');
+            }
+            if(array_key_exists($item->$key, $arr)) {
+                throw new Nette\InvalidStateException('Associative key '.$key.' is not unique in collection.');
+            }
+            $arr[$item->$key] = $item;
+        }
+        return $arr;
+    }
+
 }
