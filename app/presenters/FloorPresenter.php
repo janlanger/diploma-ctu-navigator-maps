@@ -7,6 +7,8 @@ use Maps\Components\GoogleMaps\BasicMap;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Node;
 use Maps\Model\Floor\Path;
+use Maps\Model\Metadata\Queries\ActiveRevision;
+use Maps\Model\Metadata\Queries\CountUnprocessedProposals;
 use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\NotImplementedException;
 
@@ -22,13 +24,13 @@ class FloorPresenter extends SecuredPresenter{
     /** @persistent */
     public $building;
 
-    private $buildingEntity = null;
+    private $buildingEntity = NULL;
 
     /**
      * @return Building
      */
     private function getBuilding() {
-        if($this->buildingEntity == null) {
+        if($this->buildingEntity == NULL) {
             $this->buildingEntity = $this->getRepository('building')->find($this->building);
         }
         return $this->buildingEntity;
@@ -61,7 +63,12 @@ class FloorPresenter extends SecuredPresenter{
     public function actionDefault($id) {
         $this->template->floor = $floor =  $this->getRepository('floor')->find($id);
         $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
-        //$q2 = new GetActiveMetadataQuery($floor);
+        $this->template->metadata = $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($floor));
+
+        $proposal = $this->getRepository('meta_changeset')->fetchOne(new CountUnprocessedProposals($metadata));
+        if(!empty($proposal)) {
+            $this->template->unprocessedProposals = array_shift($proposal);
+        }
     }
 
 
@@ -85,6 +92,7 @@ class FloorPresenter extends SecuredPresenter{
         $building = $this->getBuilding();
         $floor = $this->template->floor;
         $plan = $this->template->plan;
+        $metadata = $this->template->metadata;
 
 
 
@@ -94,7 +102,7 @@ class FloorPresenter extends SecuredPresenter{
 
         $map->setZoomLevel(20);
 
-        if($plan != null) {
+        if($plan != NULL) {
             $map->addCustomTilesLayer($floor->name, $this->getContext()->tiles->getTilesBasePath($plan));
         }
 
@@ -115,7 +123,7 @@ class FloorPresenter extends SecuredPresenter{
             'restriction'=> ['url'=>'/images/markers/dots/dark_red.png','anchor'=>[4,4], 'legend'=>'Zákaz vstupu'],
             'default' => ['url'=>'/images/markers/dots/light_red.png','anchor'=>[4,4], 'legend'=>'Ostatní'],
         ]);
-        $nodes = $floor->nodes;
+        $nodes = $metadata->nodes;
 
         $types = [
             'entrance' => 'Vchod',
@@ -137,28 +145,28 @@ class FloorPresenter extends SecuredPresenter{
         /** @var $node Node */
         foreach($nodes as $node) {
             $title = [];
-            if(isset($types[$node->type])) {
-                if($types[$node->type]) {
-                    $title[] = $types[$node->type];
+            if(isset($types[$node->properties->type])) {
+                if($types[$node->properties->type]) {
+                    $title[] = $types[$node->properties->type];
                 }
 
-                if($node->getName() != "") {
-                    $title[] = $node->getName();
+                if($node->properties->getName() != "") {
+                    $title[] = $node->properties->getName();
                 }
 
-                if($node->getRoom() != "") {
-                    $title[] = $node->getRoom();
+                if($node->properties->getRoom() != "") {
+                    $title[] = $node->properties->getRoom();
                 }
 
             }
-            $map->addPoint($node->getPosition(), [
-                'draggable'=>false,
-                'title' => (!empty($title)?implode(" - ", $title):null),
-                'type' => $node->type,
+            $map->addPoint($node->properties->getPosition(), [
+                'draggable'=>FALSE,
+                'title' => (!empty($title)?implode(" - ", $title):NULL),
+                'type' => $node->properties->type,
             ]);
         }
 
-        $paths = $floor->paths;
+        $paths = $metadata->paths;
 
         $map->setPathOptions([
             'strokeColor' =>'#aa0000',
@@ -168,10 +176,10 @@ class FloorPresenter extends SecuredPresenter{
 
         /** @var $path Path */
         foreach($paths as $path) {
-            $map->addPath($path->getStartNode()->position, $path->getEndNode()->position);
+            $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
         }
 
-        $map->showLegend(true);
+        $map->showLegend(TRUE);
 
 
 

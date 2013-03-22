@@ -4,22 +4,27 @@
 
 <h3>{$building->name}, {$building->address}</h3>
 
-<div class="row well">
+<div class="row well" style="margin-left: 0px">
     <div class="span6">
         <ul style="list-style-type: none">
             <li style="font-size: 20px; margin-bottom: 10px;">{$floor->floorNumber}. nadzemní podlaží</li>
             <li>Aktivní revize plánu: <b>{if $plan}{$plan->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
-            <li>Aktivní revize metadat: TODO</li>
+            <li>Aktivní revize metadat: <b>{if $metadata}{$metadata->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
+            <li n:if="isset($unprocessedProposals)"><br>
+                Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>
+            </li>
         </ul>
+
     </div>
     <div class="span6">
         <ul style="list-style-type: none">
             <li style="margin-bottom: 10px;"><a n:href="edit?id=$floor->id" class="btn btn-info">Upravit základní data</a></li>
-            <li style="margin-bottom: 10px;"><a n:href="Metadata:default?floor=$floor->id" class="btn btn-primary">Spravovat metadata</a></li>
-            <li><a n:href="Plan:default?floor=$floor->id" class="btn btn-warning">Spravovat plán</a></li>
+            <li style="margin-bottom: 10px;"><a n:href="Plan:default?floor=$floor->id" class="btn btn-warning">Spravovat plán</a></li>
+            <li style="margin-bottom: 10px;"><a n:if="$unprocessedProposals > 0" n:href="Metadata:default?floor=$floor->id" class="btn btn-danger">Spravovat revize metadat</a></li>
+            <li><a n:href="Metadata:proposal?floor=$floor->id" class="btn btn-primary">Vytvořit návrh</a></li>
         </ul>
     </div>
 </div>
 <hr>
-
+<h4>Aktuálně publikovaný plán a metadata:</h4>
 {control map, size=>['100%','700px']}
