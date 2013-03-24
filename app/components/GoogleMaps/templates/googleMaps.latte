@@ -1,6 +1,6 @@
 <div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-<div id="map-legend" n:if="$showLegend" n:inner-foreach="$pointsInfo as $info">
-    <img src="{$baseUri}{$info['url']}"> {$info['legend']}<br>
+<div id="map-legend" n:if="$showLegend" n:inner-foreach="$pointsTypes as $type => $info">
+    <img src="{$baseUri}/{$iconsBasePath}/{=isset($info['url'])?$info['url']:$type.".png"}"> {$info['legend']}<br>
 </div>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
@@ -11,11 +11,16 @@
 
     {foreach $points as $point}
         points.push({
+            {ifset $pointsTypes}
+            icon: {
+                url: {$baseUri}+"/"+{$iconsBasePath}+"/"+{=isset($pointsTypes[$point['type']]['url'])?$pointsTypes[$point['type']]['url']:$point['type']."png"}
+                {ifset $pointsTypes[$point['type']]['anchor']}, anchor: new google.maps.Point({$pointsTypes[$point['type']]['anchor'][0]}, {$pointsTypes[$point['type']]['anchor'][1]}){/ifset}
+            },
+            {/ifset}
             {foreach $point as $key=>$item}
+
                 {if $key == 'position'}
                     position: { lat:{$item['lat']}, lng: {$item['long']}}
-                {elseif $key == 'icon'}
-                    icon: { url: {$baseUri}+{$item['url']}{ifset $item['anchor']}, anchor: new google.maps.Point({$item['anchor'][0]},{$item['anchor'][1]}){/ifset}},
                 {else}
                     {$key}:{$item}
                 {/if}{sep},{/sep}

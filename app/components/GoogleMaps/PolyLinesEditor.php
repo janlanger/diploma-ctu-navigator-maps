@@ -16,7 +16,6 @@ class PolyLinesEditor extends BaseMapControl {
     private $formField;
     private $submit;
     private $types;
-    private $nodeIconBase;
     private $roomPrefix;
 
 
@@ -47,23 +46,10 @@ class PolyLinesEditor extends BaseMapControl {
         $this->setMapSize($template, func_get_args());
         $template->textField = $this->formField;
         $template->submit = $this->submit;
-        $template->nodeTypes = $this->types;
-        $template->iconsBasePath = $this->nodeIconBase;
         $template->roomPrefix = $this->roomPrefix;
 
         $template->render();
     }
-
-    public function setNodeTypes(array $types) {
-        $this->types= $types;
-    }
-
-    public function setNodeIconBase($nodeIconBase)
-    {
-        $this->nodeIconBase = $nodeIconBase;
-    }
-
-
 
     public function createComponentForm($name) {
         $form = new \Maps\Components\Forms\Form($this, $name);

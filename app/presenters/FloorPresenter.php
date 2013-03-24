@@ -106,23 +106,25 @@ class FloorPresenter extends SecuredPresenter{
             $map->addCustomTilesLayer($floor->name, $this->getContext()->tiles->getTilesBasePath($plan));
         }
 
-        $map->setPointsInfo([
-            'intersection' => ['url'=>'/images/markers/dots/mini.png','anchor'=>[4,4], 'legend'=>'Křižovatka'],
-            'entrance' => ['url'=>'/images/markers/dots/light_green.png','anchor'=>[4,4], 'legend'=>'Vchod'],
-            'stairs' => ['url'=>'/images/markers/dots/light_purple.png','anchor'=>[4,4], 'legend' => 'Schodiště'],
-            'elevator' => ['url'=>'/images/markers/dots/light_yellow.png','anchor'=>[4,4], 'legend'=>'Výtah'],
-            'passage' => ['url'=>'/images/markers/dots/light_blue.png','anchor'=>[4,4], 'legend'=>'Průchod'],
-            'lecture' => ['url'=>'/images/markers/dots/red.png','anchor'=>[4,4], 'legend'=>'Učebna'],
-            'auditorium' => ['url'=>'/images/markers/dots/red.png','anchor'=>[4,4], 'legend'=>'Posluchárna'],
-            'office'=> ['url'=>'/images/markers/dots/green.png','anchor'=>[4,4], 'legend'=>'Kancelář'],
-            'study'=> ['url'=>'/images/markers/dots/yellow.png','anchor'=>[4,4], 'legend'=>'Studovna'],
-            'cafeteria'=> ['url'=>'/images/markers/dots/dark_blue.png','anchor'=>[4,4], 'legend'=>'Kantýna'],
-            'restroom-men'=> ['url'=>'/images/markers/dots/purple.png','anchor'=>[4,4], 'legend'=>'WC muži'],
-            'restroom-women'=> ['url'=>'/images/markers/dots/purple.png','anchor'=>[4,4], 'legend'=>'WC ženy'],
-            'cloakroom'=> ['url'=>'/images/markers/dots/pink.png','anchor'=>[4,4], 'legend'=>'Šatna'],
-            'restriction'=> ['url'=>'/images/markers/dots/dark_red.png','anchor'=>[4,4], 'legend'=>'Zákaz vstupu'],
-            'default' => ['url'=>'/images/markers/dots/light_red.png','anchor'=>[4,4], 'legend'=>'Ostatní'],
+        $map->setNodeTypes([
+            'intersection' => ['url'=>'mini.png','anchor'=>[4,4], 'legend'=>'Křižovatka'],
+            'entrance' => ['url'=>'light_green.png','anchor'=>[4,4], 'legend'=>'Vchod'],
+            'stairs' => ['url'=>'light_purple.png','anchor'=>[4,4], 'legend' => 'Schodiště'],
+            'elevator' => ['url'=>'light_yellow.png','anchor'=>[4,4], 'legend'=>'Výtah'],
+            'passage' => ['url'=>'light_blue.png','anchor'=>[4,4], 'legend'=>'Průchod'],
+            'lecture' => ['url'=>'red.png','anchor'=>[4,4], 'legend'=>'Učebna'],
+            'auditorium' => ['url'=>'red.png','anchor'=>[4,4], 'legend'=>'Posluchárna'],
+            'office'=> ['url'=>'green.png','anchor'=>[4,4], 'legend'=>'Kancelář'],
+            'study'=> ['url'=>'yellow.png','anchor'=>[4,4], 'legend'=>'Studovna'],
+            'cafeteria'=> ['url'=>'dark_blue.png','anchor'=>[4,4], 'legend'=>'Kantýna'],
+            'restroom-men'=> ['url'=>'purple.png','anchor'=>[4,4], 'legend'=>'WC muži'],
+            'restroom-women'=> ['url'=>'purple.png','anchor'=>[4,4], 'legend'=>'WC ženy'],
+            'cloakroom'=> ['url'=>'pink.png','anchor'=>[4,4], 'legend'=>'Šatna'],
+            'restriction'=> ['url'=>'dark_red.png','anchor'=>[4,4], 'legend'=>'Zákaz vstupu'],
+            'default' => ['url'=>'light_red.png','anchor'=>[4,4], 'legend'=>'Ostatní'],
         ]);
+
+        $map->setNodeIconBase("images/markers/dots");
         $nodes = $metadata->nodes;
 
         $types = [

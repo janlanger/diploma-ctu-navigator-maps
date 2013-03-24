@@ -9,10 +9,10 @@ namespace Maps\Components\GoogleMaps;
  */
 abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
+    private $nodeIconBase;
+
     private $customLayers = [];
-    private $iconsAnchorPoint;
-    private $showLegend = false;
-    private $pointsInfo;
+    private $showLegend = FALSE;
     private $apiKey;
     private $center;
     private $zoomLevel=10;
@@ -20,6 +20,10 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     private $pathOptions;
     private $paths = [];
+
+
+    private $types;
+
     public function setApiKey($apiKey) {
         $this->apiKey = $apiKey;
     }
@@ -46,20 +50,17 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     public function addPoint($point, $options=[]) {
         $options['position'] = $this->formatCoordinates($point);
-        if(!isset($options['icon']) && $this->pointsInfo != null) {
-            if(isset($options['type']) && isset($this->pointsInfo[$options['type']])) {
-                $options['icon'] = $this->pointsInfo[$options['type']];
+       /* if(!isset($options['icon']) && $this->types != NULL) {
+            if(isset($options['type']) && isset($this->types[$options['type']])) {
+                $options['icon'] = $this->types[$options['type']];
             }
             else {
                 $options['icon'] = $this->pointsInfo['default'];
             }
-        }
+        }*/
         $this->points[]= $options;
     }
 
-    public function setPointsInfo($map) {
-        $this->pointsInfo = $map;
-    }
 
     public function setPathOptions(array $options) {
         $this->pathOptions = $options;
@@ -80,11 +81,19 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         $this->customLayers[$title] = $basePath;
     }
 
+
+
+    public function setNodeIconBase($nodeIconBase) {
+        $this->nodeIconBase = $nodeIconBase;
+    }
+
+
+
     protected function createTemplate($class = NULL) {
         $template = parent::createTemplate($class);
 
         $template->registerHelperLoader("Maps\\Templates\\TemplateHelpers::loader");
-        if($this->apiKey == null) {
+        if($this->apiKey == NULL) {
             throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
         }
         $template->apiKey = $this->apiKey;
@@ -101,7 +110,9 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         $template->zoomLevel = $this->zoomLevel;
 
         $template->showLegend = $this->showLegend;
-        $template->pointsInfo = $this->pointsInfo;
+        $template->pointsTypes = $this->types;
+
+        $template->iconsBasePath = $this->nodeIconBase;
 
         $template->customLayers = $this->customLayers;
 
@@ -110,6 +121,10 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     public function showLegend($i) {
         $this->showLegend = $i;
+    }
+
+    public function setNodeTypes(array $types) {
+        $this->types = $types;
     }
 
     protected function setMapSize($template, $args) {
