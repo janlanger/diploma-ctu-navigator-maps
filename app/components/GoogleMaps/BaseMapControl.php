@@ -127,6 +127,14 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         $this->types = $types;
     }
 
+
+
+    public function getNodeTypes() {
+        return $this->types;
+    }
+
+
+
     protected function setMapSize($template, $args) {
         if(!empty($args)) {
             $args = array_shift($args);

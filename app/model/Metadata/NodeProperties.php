@@ -110,6 +110,17 @@ class NodeProperties extends BaseEntity {
         return $this->gps_coordinates;
     }
 
-
+    public function toArray() {
+        return [
+            'id' => $this->id,
+            'type' => $this->type,
+            "toBuilding" => ($this->to_building != null?$this->to_building->id: null),
+            "gpsCoordinates" => $this->gps_coordinates,
+            "name" => $this->name,
+            "room" => $this->room,
+            "fromFloor" => $this->from_floor,
+            "toFloor" => $this->to_floor,
+        ];
+    }
 
 }

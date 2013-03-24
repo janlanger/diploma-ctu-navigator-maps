@@ -70,6 +70,17 @@ class Changeset extends BaseEntity {
      */
     private $comment;
 
+
+    /**
+     * @OneToMany(targetEntity="NodeChange", mappedBy="changeset")
+     */
+    private $nodes;
+
+    /**
+     * @OneToMany(targetEntity="PathChange", mappedBy="changeset")
+     */
+    private $paths;
+
     public function __construct() {
         $this->submitted_date = new \DateTime();
     }
@@ -202,6 +213,20 @@ class Changeset extends BaseEntity {
     {
         return $this->submitted_date;
     }
+
+
+
+    public function getNodes() {
+        return $this->nodes;
+    }
+
+
+
+    public function getPaths() {
+        return $this->paths;
+    }
+
+
 
 
 
