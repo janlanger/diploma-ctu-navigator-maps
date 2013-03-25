@@ -60,7 +60,8 @@ module Mapping {
              this.editor.State = Mapping.Events.STATE_DETAIL;
              });*/
             var _this = this;
-            $("a[id^='marker-']").click(function () {
+            $("a[id^='marker-']").click(function (event) {
+                event.preventDefault();
                 _this.editor.ActiveMarkerType = this.id.substring(7);
             });
         }
