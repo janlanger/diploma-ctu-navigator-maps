@@ -88,12 +88,16 @@ module Mapping {
 
         private loadMarkers(definition:array) {
             $.each(definition, (index, item) => {
-                this.markers.push(this.createMarker({
+                var marker = this.createMarker({
                     draggable: (!item.draggable?false:item.draggable),
                     position: item.position,
                     icon:item.icon,
                     title:item.title
-                }));
+                });
+                if(item.appOptions) {
+                    marker.appOptions = JSON.parse(item.appOptions);
+                }
+                this.markers.push(marker);
             });
 
         }
