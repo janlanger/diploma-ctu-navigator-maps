@@ -1,9 +1,6 @@
-<div class="btn-group pull-left">
-    <a href="#" class="btn" id="switcher-add" title="Umístění bodů">Vkládání bodů</a>
-    <a href="#" class="btn" id="switcher-detail" title="Úprava sítě">Úprava bodů</a>
-</div>
-<div id="toolbar-add" class="pull-right">
-    <div class="btn-group" n:inner-foreach="$nodeTypes as $type=>$title">
+<div id="toolbar-add">
+    <p><strong>Levé tlačítko</strong> - přidání bodu, napojení cesty; <strong>Tažení</strong> - přesun bodu; <strong>Pravé tlačítko</strong> - úprava vlastností, odstranění bodu/cesty</p>
+    <div class="btn-group" n:inner-foreach="$pointsTypes as $type=>$title">
         <a href="#" class="btn" id="marker-{$type}" title="{$title['legend']}">
             {if is_file(WWW_DIR."/".$iconsBasePath."/".$type.".png")}
                 <img src="{$baseUri}/{$iconsBasePath}/{$type}.png">
@@ -83,7 +80,7 @@
         temporaryPathOptions: tempPolyOptions,
         definitionElement: {$textField->control->id},
         submitElement: {$submit->control->id},
-        markerTypes: {$nodeTypes},
+        markerTypes: {$pointsTypes},
         iconsBasePath: {$baseUri}+"/"+{$iconsBasePath}
     });
 

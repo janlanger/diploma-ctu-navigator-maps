@@ -15,7 +15,6 @@ class PolyLinesEditor extends BaseMapControl {
 
     private $formField;
     private $submit;
-    private $types;
     private $roomPrefix;
 
 
@@ -54,7 +53,7 @@ class PolyLinesEditor extends BaseMapControl {
     public function createComponentForm($name) {
         $form = new \Maps\Components\Forms\Form($this, $name);
         $types = [];
-        foreach($this->types as $type=>$title) {
+        foreach($this->getNodeTypes() as $type=>$title) {
             $types[$type] = $title['legend'];
         }
 
