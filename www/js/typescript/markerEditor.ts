@@ -10,7 +10,7 @@
 module Mapping {
     export class MarkerEditor extends Mapping.BasicMap {
 
-        private eventHandler:Mapping.Events;
+        public eventHandler:Mapping.Events;
 
         //      private editorState:string;
         private additionState:string;
@@ -126,13 +126,13 @@ module Mapping {
             this.eventHandler.registerMarkerEvents(marker);
         }
 
-        private createMarker(markerOptions, additional = {}) {
+        public createMarker(markerOptions, additional = {}) {
             var marker = super.createMarker(markerOptions);
             marker.appOptions = additional;
             return marker;
         }
 
-        private getMarkerIcon(type:string):google.maps.MarkerImage {
+        public getMarkerIcon(type:string):google.maps.MarkerImage {
             var url = this.options.iconsBasePath + "/" + type + ".png";
             return {url: url, anchor: new google.maps.Point(this.options.markerTypes[type].anchor[0], this.options.markerTypes[type].anchor[1])};
         }
@@ -202,20 +202,7 @@ module Mapping {
                 window.close()
             });
             $("input[name=delete]", html).click((event) => {
-                var index = this.markers.indexOf(marker);
-                marker.setMap(null);
-                var position = marker.getPosition();
-
-                $.each(this.paths, (index, line:google.maps.Polyline) => {
-                    if (!line) return;
-                    var path = line.getPath();
-                    if (path.getAt(0).equals(position) || path.getAt(1).equals(position)) {
-                        line.setPath([]);
-                        delete this.paths[index];
-                    }
-                });
-
-                delete this.markers[index];
+                this.removeNode(marker);
                 window.close();
             });
             html.removeAttr('id');
@@ -254,6 +241,25 @@ module Mapping {
             infoWindow.setContent(x[0]);
             infoWindow.setPosition(position);
             infoWindow.open(this.map);
+        }
+
+        public  removeNode(marker:google.maps.Marker, linesToo = true) {
+            var index = this.markers.indexOf(marker);
+            marker.setMap(null);
+            var position = marker.getPosition();
+
+            if(linesToo) {
+                $.each(this.paths, (index, line:google.maps.Polyline) => {
+                    if (!line) return;
+                    var path = line.getPath();
+                    if (path.getAt(0).equals(position) || path.getAt(1).equals(position)) {
+                        line.setPath([]);
+                        delete this.paths[index];
+                    }
+                });
+            }
+
+            delete this.markers[index];
         }
 
     }

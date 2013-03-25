@@ -78,6 +78,11 @@ class PathProperties extends BaseEntity {
         return $this->startNode;
     }
 
-
-
+    public function toArray() {
+        return [
+            "startNode" => $this->startNode->id,
+            "endNode" => $this->endNode->id,
+            "id" => $this->id,
+        ];
+    }
 }

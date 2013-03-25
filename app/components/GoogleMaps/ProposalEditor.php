@@ -4,16 +4,36 @@
 namespace Maps\Components\GoogleMaps;
 
 
+use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
 use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Queries\ActiveProposals;
+use Nette\Application\UI\Control;
 
-class ProposalEditor extends BaseMapControl {
+class ProposalEditor extends Control {
 
     /** @var Dao */
     private $proposalRepository;
 
     private $activeRevision;
+
+
+
+    function __call($name, $arguments) {
+        $mapComponent = $this->getMapComponent();
+        if(method_exists($mapComponent, $name)) {
+            call_user_func_array(array($mapComponent, $name), $arguments);
+        }
+    }
+
+
+
+    /**
+     * @return PolyLinesEditor
+     */
+    private function getMapComponent() {
+        return $this['mapEditor'];
+    }
 
 
 
@@ -35,8 +55,10 @@ class ProposalEditor extends BaseMapControl {
 
         foreach ($nodes as $node) {
             $this->addPoint($node->properties->gpsCoordinates, [
+                "draggable" => TRUE,
                 "title" => $this->getNodeTitle($node->properties),
                 "type" => $node->properties->type,
+                "appOptions" => json_encode($node),
             ]);
         }
 
@@ -50,25 +72,45 @@ class ProposalEditor extends BaseMapControl {
 
         $template->setFile(__DIR__ . '/templates/proposalEditor.latte');
 
-        $this->setMapSize($template, func_get_args());
+        $args = func_get_args();
+        if (!empty($args)) {
+            $args = array_shift($args);
 
-        $template->proposals = $this->loadProposals();
+            if (isset($args['size'])) {
+                $template->mapWidth = $args['size'][0];
+                $template->mapHeight = $args['size'][1];
+            }
+        }
+
+        $template->proposals = $this->getProposals();
 
 
 
         $template->render();
     }
 
+    public function createComponentMapEditor($name) {
+        $editor = new PolyLinesEditor();
+        $editor->overiden = TRUE;
+        return $editor;
+    }
 
 
-    private function loadProposals() {
-        return $this->proposalRepository->fetch(new ActiveProposals());
+
+    private function getProposals() {
+        static $items;
+        if($items == NULL) {
+            $items = $this->proposalRepository->fetch(new ActiveProposals());
+        }
+        return $items;
+
     }
 
     private function getNodeTitle(NodeProperties $properties) {
         $title = "";
-        if(isset($this->nodeTypes[$properties->getType()])) {
-            $title.= $this->nodeTypes[$properties->getType()]['legend'];
+        $nodeTypes = $this->getMapComponent()->getNodeTypes();
+        if(isset($nodeTypes[$properties->getType()])) {
+            $title.= $nodeTypes[$properties->getType()]['legend'];
         }
 
         if($properties->getRoom() != "") {
@@ -76,6 +118,14 @@ class ProposalEditor extends BaseMapControl {
         }
 
         return $title;
+    }
+
+    public function createComponentProposalForm($name) {
+        $form = new Form($this, $name);
+        foreach($this->getProposals() as $proposal) {
+            $form->addCheckbox('proposal'.$proposal->id);
+        }
+        $form->addSubmit("send", 'Zpracovat');
     }
 
 }

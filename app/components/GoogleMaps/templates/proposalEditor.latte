@@ -1,51 +1,9 @@
-<div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-<div id="map-legend" n:if="$showLegend" n:inner-foreach="$pointsInfo as $info">
-    <img src="{$baseUri}{$info['url']}"> {$info['legend']}<br>
-</div>
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
-<script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
+
+{control mapEditor, size=>[$mapWidth, $mapHeight]}
+
 <script type="text/javascript" src="{$baseUri}/js/typescript/proposalEditor.js"></script>
 <script type="text/javascript">
 
-    var points = [];
-
-    {foreach $points as $point}
-    points.push({
-        {ifset $pointsTypes}
-        icon: {
-            url: {$baseUri}+"/"+{$iconsBasePath}+"/"+{=isset($pointsTypes[$point['type']]['url'])?$pointsTypes[$point['type']]['url']:$point['type'].".png"}
-            {ifset $pointsTypes[$point['type']]['anchor']}, anchor: new google.maps.Point({$pointsTypes[$point['type']]['anchor'][0]}, {$pointsTypes[$point['type']]['anchor'][1]}){/ifset}
-        },
-        {/ifset}
-        {foreach $point as $key=>$item}
-
-        {if $key == 'position'}
-        position: { lat:{$item['lat']}, lng: {$item['long']}}
-    {else}
-    {$key}:{$item}
-    {/if}{sep},{/sep}
-    {/foreach}
-    })
-    ;
-    {/foreach}
-
-    var customLayers = [];
-    {foreach $customLayers as $title => $path}
-        customLayers[{$title}] = {$baseUri}+"/"+{$path};
-    {/foreach}
-
-    var paths = [];
-    var pathOptions = {$pathOptions};
-    {if !empty($paths)}
-
-        {foreach $paths as $path}
-            paths.push({
-                start: { lat:{$path[0]['lat']}, lng:{$path[0]['long']}},
-                end: { lat:{$path[1]['lat']}, lng:{$path[1]['long']}}
-            });
-
-        {/foreach}
-    {/if}
 
     var proposals = {};
 
@@ -72,6 +30,12 @@
                     {foreach $proposal->paths as $path}
                     {
                         deleted:{$path->wasDeleted}
+                        {if $path->original != null}
+                        , original: {$path->original->properties->toArray()}
+                        {/if}
+                        {if $path->properties != null}
+                        , properties: {$path->properties->toArray()}
+                        {/if}
                     }{sep},{/sep}
                     {/foreach}
                 ]
@@ -79,26 +43,18 @@
         };
     {/foreach}
 
+    editorOptions.proposals = proposals;
+    editorOptions.points = points;
+    editorOptions.paths = paths;
 
-    var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), {
-        zoom: {$zoomLevel},
-        center: {
-            lat: {$center['lat']},
-            lng: {$center['long']}
-        },
-        {if $showLegend}legend: document.getElementById("map-legend"),{/if}
-        customLayers: customLayers,
-        points: points,
-        pathOptions: pathOptions,
-        paths: paths,
-        proposals: proposals,
-        nodeTypes: {$pointsTypes}
-    });
+
+    var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
 </script>
 <h4>Návrhy</h4></h4>
+{form proposalForm}
 <table class="table table-hover table-striped">
     <tr>
-        <th>&nbsp;</th>
+        <th>Aplikovat</th>
         <th>Zadáno</th>
         <th>Vytvořil</th>
         <th>Komentář</th>
@@ -106,7 +62,7 @@
     </tr>
 {foreach $proposals as $proposal}
     <tr id="proposal{$proposal->id}">
-        <td><input type="checkbox"></td>
+        <td>{input proposal$proposal->id}</td>
         <td>{$proposal->submittedDate|date:"d.m.Y H:i"}</td>
         <td>{$proposal->submittedBy->name}</td>
         <td>{$proposal->comment}</td>
@@ -114,6 +70,8 @@
     </tr>
 {/foreach}
 </table>
+    {input send}
+{/form}
 <div id="modalTemplate" class="modal hide fade" tabindex="-1" aria-labelledby="modal-header" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

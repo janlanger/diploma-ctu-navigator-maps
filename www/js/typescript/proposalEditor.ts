@@ -7,7 +7,9 @@
  */
 
 module Mapping {
-	export class ProposalEditor extends Mapping.BasicMap {
+	export class ProposalEditor extends Mapping.MarkerEditor {
+
+        public reverseChanges = [];
 
 		constructor(private mapElement:Element, private options) {
 			super(mapElement, options);
@@ -19,9 +21,10 @@ module Mapping {
 		}
 
 		private registerEvents() {
+            var _this = this;
 			if (this.options.proposals) {
 				$.each(this.options.proposals, (index, item) => {
-					$("#" + index).click(() => {
+					$("#" + index + " a").click(() => {
 						var element = $("#modalTemplate");
 						$("#modal-header", element).text("Návrh od " + item.author + " z " + item.date + ":");
 						var content = "Komentář uživatele: <em>" + item.comment + "</em><br><br>";
@@ -53,7 +56,10 @@ module Mapping {
 
 						return false;
 					});
+
+                    $("#"+index+" input[type=checkbox]").change(function(event) { _this.handleCheckboxClick(event, this, index)})
 				});
+
 			}
 		}
 
@@ -118,11 +124,223 @@ module Mapping {
 		}
 
 		private readableNodeType(index) {
-			if (this.options.nodeTypes[index]) {
-				return this.options.nodeTypes[index].legend;
+			if (this.options.markerTypes[index]) {
+				return this.options.markerTypes[index].legend;
 			}
 			return index;
 		}
+
+        public handleCheckboxClick(event, checkbox, index) {
+            checkbox = $(checkbox);
+            if(checkbox.is(':checked')) {
+                this.applyChanges(index, this.options.proposals[index].specification);
+            }
+            else {
+                this.removeChanges(this.reverseChanges[index]);
+                this.reverseChanges[index] = {};
+            }
+        }
+
+        private applyChanges(name, spec) {
+            this.reverseChanges[name] = {};
+
+            if (spec.nodes) {
+                this.reverseChanges[name].nodes = {
+                    deleted: [],
+                    added: [],
+                    changed: []
+                };
+                for (var i = 0; i < spec.nodes.length > 0; i++) {
+                    var item = spec.nodes[i];
+                    if (!item.original) {
+                        //add
+                        var position = this.parsePositionString(item.properties.gpsCoordinates);
+                        var marker = this.createMarker({
+                            draggable: true,
+                            position: position,
+                            icon: this.getMarkerIcon(item.properties.type)
+                        }, item.properties);
+                        this.eventHandler.registerMarkerEvents(marker);
+                        this.markers.push(marker)
+                        this.addStrokeMarker(marker);
+                        this.reverseChanges[name].nodes.added.push(this.markers.length - 1);
+                    }
+                }
+            }
+            if (spec.paths) {
+                this.reverseChanges[name].paths = {
+                    deleted: [],
+                    added: []
+                };
+
+                for (var i = 0; i < spec.paths.length > 0; i++) {
+                    var item = spec.paths[i];
+                    if (item.deleted) {
+                        //remove
+
+                        var path = this.getPathBetween(item.original.startNode, item.original.endNode);
+
+                        path.setPath([]);
+                        path.setMap(null);
+                        this.reverseChanges[name].paths.deleted.push(item.original);
+                        delete this.paths[this.paths.indexOf(path)];
+
+                    }
+                    else {
+                        var path = this.createPath(this.findNodeWithId(item.properties.startNode).getPosition(), this.findNodeWithId(item.properties.endNode).getPosition());
+                        this.paths.push(path);
+                        this.reverseChanges[name].paths.added.push(this.paths.length - 1);
+                    }
+                }
+            }
+
+            if(spec.nodes) {
+                for(var i=0; i< spec.nodes.length > 0; i++) {
+                    var item = spec.nodes[i];
+                    if(item.deleted) {
+                        var node = this.findNodeWithId(item.original.id);
+                        this.reverseChanges[name].nodes.deleted.push(node);
+                        this.removeNode(node, false);
+                    }
+                    if(!item.deleted && item.original) {
+                        //change
+                        var node = this.findNodeWithId(item.original.id);
+                        if(node) {
+                            if(item.original.gpsCoordinates != item.properties.gpsCoordinates) {
+                                var newPosition = this.parsePositionString(item.properties.gpsCoordinates);
+                                this.movePathEnd(node.getPosition(), newPosition);
+                                node.setPosition(newPosition);
+                            }
+                            if (item.original.type != item.properties.type) {
+                                node.setIcon(this.getMarkerIcon(this.properties.type));
+                            }
+                            node.appOptions.toBuilding = item.properties.toBuilding;
+                            node.appOptions.toFloor = item.properties.toFloor;
+                            node.appOptions.fromFloor = item.properties.fromFloor;
+                            node.appOptions.name = item.properties.name;
+                            node.appOptions.room = item.properties.room;
+
+                            this.addStrokeMarker(node);
+                            this.reverseChanges[name].nodes.changed[this.markers.indexOf(node)] = item.original;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        private removeChanges(reverseSpec) {
+            if(reverseSpec.nodes) {
+                for(var i=0; i<reverseSpec.nodes.deleted.length; i++) {
+                    var item = reverseSpec.nodes.deleted[i];
+                    item.setMap(this.map);
+                    this.markers.push(item);
+                }
+                for(var i=0; i<reverseSpec.nodes.added.length; i++) {
+                    var item = this.markers[reverseSpec.nodes.added[i]];
+                    if(item.appStroke) {
+                        item.appStroke.setMap(null);
+                    }
+                    this.removeNode(item, false);
+                }
+                for (var i = 0; i < reverseSpec.nodes.changed.length; i++) {
+                    var item = reverseSpec.nodes.changed[i];
+                    if(!item) continue;
+
+                    var node = this.findNodeWithId(item.id);
+                    node.appStroke.setMap(null);
+
+                    var newPosition = this.parsePositionString(item.gpsCoordinates);
+                    this.movePathEnd(node.getPosition(), newPosition);
+                    node.setPosition(newPosition);
+
+                    node.setIcon(this.getMarkerIcon(item.type));
+                    node.appOptions.toBuilding = item.toBuilding;
+                    node.appOptions.toFloor = item.toFloor;
+                    node.appOptions.fromFloor = item.fromFloor;
+                    node.appOptions.name = item.name;
+                    node.appOptions.room = item.room;
+
+                }
+            }
+            if (reverseSpec.paths) {
+                for (var i = 0; i < reverseSpec.paths.deleted.length; i++) {
+                    var item = reverseSpec.paths.deleted[i];
+                    this.paths.push(this.createPath(this.findNodeWithId(item.startNode).getPosition(), this.findNodeWithId(item.endNode).getPosition()));
+                }
+                for (var i = 0; i < reverseSpec.paths.added.length; i++) {
+                    var path = this.paths[reverseSpec.paths.added[i]];
+                    path.setMap(null);
+                    path.setPath([]);
+                    delete this.paths[this.paths.indexOf(path)];
+                }
+            }
+        }
+
+        private parsePositionString(position) {
+            var p = position.split(",");
+            return new google.maps.LatLng(p[0],p[1]);
+        }
+
+        private findNodeWithId(id, additionalSource = null) {
+            var r = null;
+            for(var i=0; i<this.markers.length; i++) {
+                if (this.markers[i] && (this.markers[i].appOptions.propertyId == id ||
+                    (this.markers[i].appOptions.propertyId == undefined && this.markers[i].appOptions.id == id))) {
+                    return this.markers[i];
+                }
+            }
+        }
+        private addStrokeMarker(marker) {
+            var stroke = new google.maps.Marker({
+                position: marker.getPosition(),
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 11,
+                    strokeWeight: 2,
+                    strokeColor: "#00ff00"
+                },
+                map: this.map,
+                clickable: false
+            });
+
+            google.maps.event.addListener(marker, 'dragend', function(event) {
+                stroke.setPosition(this.getPosition());
+            });
+            marker.appStroke = stroke;
+        }
+
+        private movePathEnd(old, newOne) {
+            if(old.equals(newOne)) return;
+            for (var i = 0; i < this.paths.length; i++) {
+                var line = this.paths[i];
+                if (!line) continue;
+                var path = line.getPath();
+                if (path.length < 2) continue;
+                if (path.getAt(0).equals(old)) {
+                    path.setAt(0, newOne);
+                }
+                if (path.getAt(1).equals(old)) {
+                    path.setAt(1, newOne);
+                }
+
+            }
+        }
+
+        private getPathBetween(start, end) {
+            var sP = this.findNodeWithId(start).getPosition();
+            var eP = this.findNodeWithId(end).getPosition();
+            for(var i=0; i<this.paths.length; i++) {
+                var line = this.paths[i];
+                if (!line) continue;
+                var path = line.getPath();
+                if (path.length < 2) continue;
+                if (path.getAt(0).equals(sP) && path.getAt(1).equals(eP)) {
+                    return line;
+                }
+            }
+        }
 
 	}
 }
