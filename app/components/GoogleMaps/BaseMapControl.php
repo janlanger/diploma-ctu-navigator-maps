@@ -28,6 +28,44 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         $this->apiKey = $apiKey;
     }
 
+
+
+    public function setCustomLayers($customLayers) {
+        $this->customLayers = $customLayers;
+    }
+
+
+
+    public function getCustomLayers() {
+        return $this->customLayers;
+    }
+
+
+
+    public function setPaths($paths) {
+        $this->paths = $paths;
+    }
+
+
+
+    public function getPaths() {
+        return $this->paths;
+    }
+
+    public function setPoints($points) {
+        $this->points = $points;
+    }
+
+    public function getPoints() {
+        return $this->points;
+    }
+
+    public function getShowLegend() {
+        return $this->showLegend;
+    }
+
+
+
     public function getApiKey() {
         return $this->apiKey;
     }

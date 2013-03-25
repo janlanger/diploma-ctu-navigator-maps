@@ -1,5 +1,7 @@
 <div id="toolbar-add">
-    <p><strong>Levé tlačítko</strong> - přidání bodu, napojení cesty; <strong>Tažení</strong> - přesun bodu; <strong>Pravé tlačítko</strong> - úprava vlastností, odstranění bodu/cesty</p>
+    <p><strong>Levé tlačítko</strong> - přidání bodu, napojení cesty; <strong>Tažení</strong> - přesun bodu; <strong>Pravé tlačítko</strong> - úprava
+        vlastností, odstranění bodu/cesty</p>
+
     <div class="btn-group" n:inner-foreach="$pointsTypes as $type=>$title">
         <a href="#" class="btn" id="marker-{$type}" title="{$title['legend']}">
             {if is_file(WWW_DIR."/".$iconsBasePath."/".$type.".png")}
@@ -26,8 +28,8 @@
         <div id="form-toBuilding" style="margin-bottom: 5px">{input toBuilding}</div>
         <div id="form-fromFloor" style="margin-bottom: 5px">{input fromFloor, 'title'=>'Z podlaží (nejnižší)'}</div>
         <div id="form-toFloor" style="margin-bottom: 5px">{input toFloor, 'title'=>'Do podlaží'}</div>
-        {input save, 'class'=>'btn btn-primary'}
-        {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
+    {input save, 'class'=>'btn btn-primary'}
+    {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
     {/form}
 </div>
 
@@ -37,51 +39,89 @@
 <script type="text/javascript" src="{$baseUri}/js/typescript/markerEditorEvents.js"></script>
 <script type="text/javascript">
 
-        $("#innerForm *[title]").each(function() {
-            $(this).attr('placeholder', $(this).attr('title'));
-        });
-        $(document).ready(function() {
-            var w = $("#form-room input").outerWidth();
-            $("#form-room input").css('width',w - 15 - $("#form-room span").outerWidth());
-            $("#innerForm").hide();
-        });
-        var tempPolyOptions = {
-        strokeOpacity:0,
+    $("#innerForm *[title]").each(function () {
+        $(this).attr('placeholder', $(this).attr('title'));
+    });
+    $(document).ready(function () {
+        var w = $("#form-room input").outerWidth();
+        $("#form-room input").css('width', w - 15 - $("#form-room span").outerWidth());
+        $("#innerForm").hide();
+    });
+
+    var points = [];
+
+    {foreach $points as $point}
+    points.push({
+        {ifset $pointsTypes}
+        icon: {
+            url: {$baseUri}+"/"+{$iconsBasePath}+"/"+{=isset($pointsTypes[$point['type']]['url'])?$pointsTypes[$point['type']]['url']:$point['type'].".png"}
+            {ifset $pointsTypes[$point['type']]['anchor']}, anchor: new google.maps.Point({$pointsTypes[$point['type']]['anchor'][0]}, {$pointsTypes[$point['type']]['anchor'][1]}){/ifset}
+        },
+        {/ifset}
+        {foreach $point as $key=>$item}
+        {if $key == 'position'}
+        position: { lat:{$item['lat']}, lng: {$item['long']}}
+        {else}
+        {$key}:{$item}{/if}{sep},{/sep}
+    {/foreach}
+    });
+    {/foreach}
+    var paths = [];
+    var pathOptions = {$pathOptions};
+    {if !empty($paths)}
+
+    {foreach $paths as $path}
+    paths.push({
+        start: { lat:{$path[0]['lat']}, lng:{$path[0]['long']}},
+        end: { lat:{$path[1]['lat']}, lng:{$path[1]['long']}}
+    });
+
+    {/foreach}
+    {/if}
+
+    var tempPolyOptions = {
+        strokeOpacity: 0,
         strokeColor: '#ff0000',
 
-        icons: [{
-            icon: {
-                path: 'M 0,-1 0,1',
-                strokeOpacity: 0.5,
-                strokeWeight: 2,
-                scale: 4
-            },
-            offset: '0',
-            repeat: '20px'
-        }],
+        icons: [
+            {
+                icon: {
+                    path: 'M 0,-1 0,1',
+                    strokeOpacity: 0.5,
+                    strokeWeight: 2,
+                    scale: 4
+                },
+                offset: '0',
+                repeat: '20px'
+            }
+        ],
         clickable: false
     }
 
     var customLayers = [];
     {foreach $customLayers as $title => $path}
-    customLayers[{$title}] = {$baseUri}+"/"+{$path};
+    customLayers[{$title}] = {$baseUri}+"/" +{$path};
     {/foreach}
-
-    var editor = new Mapping.MarkerEditor(document.getElementById('map_canvas'), {
+    var editorOptions = {
         zoom: {$zoomLevel},
         center: {
             lat: {$center['lat']},
             lng: {$center['long']}
         },
-        {if $showLegend}legend: document.getElementById("map-legend"),{/if}
+        {if $showLegend}legend: document.getElementById("map-legend"), {/if}
         customLayers: customLayers,
         pathOptions: {$pathOptions},
         roomPrefix: {$roomPrefix},
         temporaryPathOptions: tempPolyOptions,
+        {ifset $textField}
         definitionElement: {$textField->control->id},
         submitElement: {$submit->control->id},
+        {/ifset}
         markerTypes: {$pointsTypes},
-        iconsBasePath: {$baseUri}+"/"+{$iconsBasePath}
-    });
+        iconsBasePath: {$baseUri}+"/" +{$iconsBasePath}
+    };
+    {if !isset($overiden)}
+    var editor = new Mapping.MarkerEditor(document.getElementById('map_canvas'), editorOptions);
+    {/if}
 
 </script>

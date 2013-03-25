@@ -16,6 +16,7 @@ class PolyLinesEditor extends BaseMapControl {
     private $formField;
     private $submit;
     private $roomPrefix;
+    private $overiden;
 
 
 
@@ -24,6 +25,20 @@ class PolyLinesEditor extends BaseMapControl {
     public function bindFormField(\Nette\Forms\IControl $control) {
         $this->formField = $control;
     }
+
+
+
+    public function setOveriden($overiden) {
+        $this->overiden = $overiden;
+    }
+
+
+
+    public function getOveriden() {
+        return $this->overiden;
+    }
+
+
 
     public function setSubmitButton(\Nette\Forms\IControl $control) {
         $this->submit = $control;
@@ -46,6 +61,7 @@ class PolyLinesEditor extends BaseMapControl {
         $template->textField = $this->formField;
         $template->submit = $this->submit;
         $template->roomPrefix = $this->roomPrefix;
+        $template->overiden = $this->overiden;
 
         $template->render();
     }
