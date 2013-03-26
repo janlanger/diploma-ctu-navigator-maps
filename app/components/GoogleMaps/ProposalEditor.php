@@ -81,9 +81,9 @@ class ProposalEditor extends Control {
                 $template->mapHeight = $args['size'][1];
             }
         }
-
-        $template->proposals = $this->getProposals();
-        $template->collisions = $this->collisionResolution();
+        $proposals = $this->getProposals();
+        $template->collisions = $this->collisionResolution($proposals);
+        $template->proposals = $proposals;
 
 
 
@@ -101,7 +101,7 @@ class ProposalEditor extends Control {
     private function getProposals() {
         static $items;
         if($items == NULL) {
-            $items = $this->proposalRepository->fetch(new ActiveProposals());
+            $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(), 'id');
         }
         return $items;
 
@@ -129,8 +129,7 @@ class ProposalEditor extends Control {
         $form->addSubmit("send", 'Zpracovat');
     }
 
-    private function collisionResolution() {
-        $proposals = $this->getProposals();
+    private function collisionResolution($proposals) {
         $changesNodes = [];
         $changedPaths = [];
         foreach($proposals as $proposal) {
@@ -145,6 +144,7 @@ class ProposalEditor extends Control {
                 }
             }
         }
+
         $collisions = [];
         foreach($changesNodes as $proposalId => $nodes) {
             foreach($changesNodes as $secondId => $n) {

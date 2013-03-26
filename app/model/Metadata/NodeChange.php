@@ -35,14 +35,14 @@ class NodeChange extends BaseEntity {
 
     /**
      * @var NodeProperties
-     * @OneToOne(targetEntity="NodeProperties", cascade={"persist"})
+     * @OneToOne(targetEntity="NodeProperties", cascade={"persist"}, fetch="EAGER")
      * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=true)
      */
     private $properties;
 
     /**
      * @var Node
-     * @ManyToOne(targetEntity="Node")
+     * @ManyToOne(targetEntity="Node", fetch="EAGER")
      * @JoinColumn(name="original_id", referencedColumnName="id", nullable=true)
      */
     private $original;

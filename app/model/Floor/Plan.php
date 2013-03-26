@@ -18,6 +18,9 @@ use Maps\Model\BaseEntity;
  * @package Maps\Model\Floor
  * @Entity
  * @Table(name="floor_plans",
+ * indexes={
+ *  @Index(columns={"published"})
+ * },
  * uniqueConstraints={
  *      @UniqueConstraint(columns={"floor_id", "revision"})
  *  })

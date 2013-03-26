@@ -31,8 +31,10 @@ class ActiveProposals extends QueryObjectBase {
      * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
      */
     protected function doCreateQuery(IQueryable $repository) {
-        $q = $repository->createQueryBuilder("c")->select("c, u")
+        $q = $repository->createQueryBuilder("c")->select("c, u, n, p")
             ->innerJoin("c.submitted_by", 'u')
+            ->leftJoin('c.nodes', 'n')
+            ->leftJoin('c.paths', 'p')
             ->where("c.state = :state")
             ->setParameter("state", Changeset::STATE_NEW)
         ->orderBy("c.submitted_date", 'desc');

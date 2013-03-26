@@ -34,14 +34,14 @@ class PathChange extends BaseEntity {
 
     /**
      * @var PathProperties
-     * @OneToOne(targetEntity="PathProperties", cascade={"persist"})
+     * @OneToOne(targetEntity="PathProperties", cascade={"persist"}, fetch="EAGER")
      * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=true)
      */
     private $properties;
 
     /**
      * @var Path
-     * @ManyToOne(targetEntity="Path")
+     * @ManyToOne(targetEntity="Path", fetch="EAGER")
      * @JoinColumn(name="original_id", referencedColumnName="id", nullable=true)
      */
     private $original;
