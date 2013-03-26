@@ -1,4 +1,4 @@
-
+{dump $collisions}
 {control mapEditor, size=>[$mapWidth, $mapHeight]}
 
 <script type="text/javascript" src="{$baseUri}/js/typescript/proposalEditor.js"></script>
@@ -46,6 +46,7 @@
     editorOptions.proposals = proposals;
     editorOptions.points = points;
     editorOptions.paths = paths;
+    editorOptions.collisions = {$collisions};
 
 
     var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
@@ -54,7 +55,9 @@
 {form proposalForm}
 <table class="table table-hover table-striped">
     <tr>
-        <th>Aplikovat</th>
+        <th>&nbsp;</th>
+        <th>A</th>
+        <th>D</th>
         <th>Zadáno</th>
         <th>Vytvořil</th>
         <th>Komentář</th>
@@ -62,7 +65,9 @@
     </tr>
 {foreach $proposals as $proposal}
     <tr id="proposal{$proposal->id}">
+        <td>#{$proposal->id}</td>
         <td>{input proposal$proposal->id}</td>
+        <td>&nbsp;</td>
         <td>{$proposal->submittedDate|date:"d.m.Y H:i"}</td>
         <td>{$proposal->submittedBy->name}</td>
         <td>{$proposal->comment}</td>

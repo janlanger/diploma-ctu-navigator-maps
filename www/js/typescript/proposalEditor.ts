@@ -18,6 +18,7 @@ module Mapping {
 		public initialize() {
 			super.initialize();
 			this.registerEvents();
+            this.detectCollisions();
 		}
 
 		private registerEvents() {
@@ -342,5 +343,19 @@ module Mapping {
             }
         }
 
+        private detectCollisions() {
+            $.each(this.options.collisions, (index, item)=> {
+                var element = $("<img>");
+                element.attr("src", "/images/icons/warning.png");
+                var title = "Tento návrh upravuje stejné prvky jako návrh ";
+                for(var key in item) {
+                    if (key === 'length' || !item.hasOwnProperty(key)) continue;
+                    title += "#"+key;
+                }
+                element.attr("title", title);
+                element.css("margin", '0px 5px');
+                $("#proposal"+index).children("td:first").append(element);
+            });
+        }
 	}
 }

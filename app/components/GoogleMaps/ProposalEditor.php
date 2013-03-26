@@ -83,6 +83,7 @@ class ProposalEditor extends Control {
         }
 
         $template->proposals = $this->getProposals();
+        $template->collisions = $this->collisionResolution();
 
 
 
@@ -126,6 +127,52 @@ class ProposalEditor extends Control {
             $form->addCheckbox('proposal'.$proposal->id);
         }
         $form->addSubmit("send", 'Zpracovat');
+    }
+
+    private function collisionResolution() {
+        $proposals = $this->getProposals();
+        $changesNodes = [];
+        $changedPaths = [];
+        foreach($proposals as $proposal) {
+            foreach($proposal->nodes as $node) {
+                if($node->original != NULL) {
+                    $changesNodes[$proposal->id][$node->original->id] = TRUE;
+                }
+            }
+            foreach($proposal->paths as $path) {
+                if($path->original != NULL) {
+                    $changedPaths[$proposal->id][$path->original->id] = TRUE;
+                }
+            }
+        }
+        $collisions = [];
+        foreach($changesNodes as $proposalId => $nodes) {
+            foreach($changesNodes as $secondId => $n) {
+                if($proposalId == $secondId) continue;
+
+                foreach($nodes as $nodeId => $foo) {
+                    if(array_key_exists($nodeId, $n)) {
+                        $collisions[$proposalId][$secondId] = TRUE;
+                    }
+                }
+            }
+        }
+
+        foreach ($changedPaths as $proposalId => $path) {
+            foreach ($changedPaths as $secondId => $p) {
+                if ($proposalId == $secondId)
+                    continue;
+
+                foreach ($path as $pathId => $foo) {
+                    if (array_key_exists($pathId, $p)) {
+                        $collisions[$proposalId][$secondId] = TRUE;
+                    }
+                }
+            }
+        }
+        return $collisions;
+
+        dump($collisions);
     }
 
 }
