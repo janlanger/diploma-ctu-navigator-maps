@@ -119,8 +119,8 @@ module Mapping {
             })
         }
 
-        public createPath(start, end) {
-            var path = new google.maps.Polyline(this.options.pathOptions);
+        public createPath(start, end, options = this.options.pathOptions) {
+            var path = new google.maps.Polyline(options);
             path.setMap(this.map);
             path.getPath().push(start);
             path.getPath().push(end);

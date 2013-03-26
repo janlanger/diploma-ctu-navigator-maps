@@ -202,8 +202,8 @@ class MetadataPresenter extends SecuredPresenter{
 
         $map->setPathOptions([
             'strokeColor' => '#ff0000',
-            'strokeOpacity' => 0.5,
-            'strokeWeight' => 1.5
+            'strokeOpacity' => 0.8,
+            'strokeWeight' => 2
         ]);
 
         return $map;

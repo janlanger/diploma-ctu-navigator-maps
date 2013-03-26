@@ -196,7 +196,9 @@ module Mapping {
 
                     }
                     else {
-                        var path = this.createPath(this.findNodeWithId(item.properties.startNode).getPosition(), this.findNodeWithId(item.properties.endNode).getPosition());
+                        var options = $.extend({}, this.options.pathOptions);
+                        options.strokeColor = "#00ff00";
+                        var path = this.createPath(this.findNodeWithId(item.properties.startNode).getPosition(), this.findNodeWithId(item.properties.endNode).getPosition(), options);
                         this.paths.push(path);
                         this.reverseChanges[name].paths.added.push(this.paths.length - 1);
                     }
