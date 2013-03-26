@@ -1,5 +1,5 @@
 {
-    "hash": "95ede83735162818d34b6aa757330714",
+    "hash": "88e8c3a9fe199b1b0e78b2bb83e5b95a",
     "packages": [
         {
             "name": "doctrine/common",
@@ -491,6 +491,53 @@
             "time": "2013-01-01 20:42:38"
         },
         {
+            "name": "nextras/forms",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nextras/forms.git",
+                "reference": "c14424a8b77d7cbae3e07f50923078db8eaec40a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nextras/forms/zipball/c14424a8b77d7cbae3e07f50923078db8eaec40a",
+                "reference": "c14424a8b77d7cbae3e07f50923078db8eaec40a",
+                "shasum": ""
+            },
+            "require": {
+                "nette/nette": ">=2.0.0",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Nextras\\Forms": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause",
+                "GPL-2.0",
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "David Grudl",
+                    "homepage": "http://davidgrudl.com"
+                },
+                {
+                    "name": "Nextras Community",
+                    "homepage": "https://github.com/nextras/forms/graphs/contributors"
+                }
+            ],
+            "description": "Extra form components for Nette Framework.",
+            "keywords": [
+                "form",
+                "nette"
+            ],
+            "time": "2013-03-04 18:27:47"
+        },
+        {
             "name": "symfony/console",
             "version": "v2.2.0",
             "target-dir": "Symfony/Component/Console",
@@ -546,6 +593,7 @@
     "stability-flags": {
         "kdyby/curl": 20,
         "nella/doctrine": 20,
-        "nella/console": 20
+        "nella/console": 20,
+        "nextras/forms": 20
     }
 }
