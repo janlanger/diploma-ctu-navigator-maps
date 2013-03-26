@@ -125,6 +125,7 @@ class ProposalEditor extends Control {
         $form = new Form($this, $name);
         foreach($this->getProposals() as $proposal) {
             $form->addCheckbox('proposal'.$proposal->id);
+            $form->addCheckbox('proposal_reject'.$proposal->id);
         }
         $form->addSubmit("send", 'Zpracovat');
     }

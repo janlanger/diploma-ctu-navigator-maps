@@ -56,8 +56,8 @@
 <table class="table table-hover table-striped">
     <tr>
         <th>&nbsp;</th>
-        <th>A</th>
-        <th>D</th>
+        <th><img src="{$baseUri}/images/icons/Check_16x16.png" title="Zařadit do revize"></th>
+        <th><img src="{$baseUri}/images/icons/Delete_16x16.png" title="Zamítnout"></th>
         <th>Zadáno</th>
         <th>Vytvořil</th>
         <th>Komentář</th>
@@ -67,7 +67,7 @@
     <tr id="proposal{$proposal->id}">
         <td>#{$proposal->id}</td>
         <td>{input proposal$proposal->id}</td>
-        <td>&nbsp;</td>
+        <td>{input proposal_reject$proposal->id}</td>
         <td>{$proposal->submittedDate|date:"d.m.Y H:i"}</td>
         <td>{$proposal->submittedBy->name}</td>
         <td>{$proposal->comment}</td>
