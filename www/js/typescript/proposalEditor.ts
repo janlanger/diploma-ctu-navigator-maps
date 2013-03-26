@@ -58,7 +58,7 @@ module Mapping {
 						return false;
 					});
 
-                    $("#"+index+" input[type=checkbox]").change(function(event) { _this.handleCheckboxClick(event, this, index)})
+                    $("#"+index+" input[type=radio]").change(function(event) { _this.handleApproveClick(event, this, index)})
 				});
 
 			}
@@ -131,12 +131,20 @@ module Mapping {
 			return index;
 		}
 
-        public handleCheckboxClick(event, checkbox, index) {
-            checkbox = $(checkbox);
-            if(checkbox.is(':checked')) {
+        public handleApproveClick(event, radio, index) {
+            radio = $(radio);
+            if(!radio.is(':checked')) {
+                return;
+            }
+
+            if(radio.val() == "approve") {
+                radio.parent().parent().removeClass("error");
+                radio.parent().parent().addClass("success");
                 this.applyChanges(index, this.options.proposals[index].specification);
             }
             else {
+                radio.parent().parent().addClass("error");
+                radio.parent().parent().removeClass("success");
                 this.removeChanges(this.reverseChanges[index]);
                 this.reverseChanges[index] = {};
             }
@@ -232,6 +240,7 @@ module Mapping {
         }
 
         private removeChanges(reverseSpec) {
+            if(reverseSpec == undefined) return;
             if(reverseSpec.nodes) {
                 for(var i=0; i<reverseSpec.nodes.deleted.length; i++) {
                     var item = reverseSpec.nodes.deleted[i];

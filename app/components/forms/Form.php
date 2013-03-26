@@ -4,6 +4,7 @@ use Nette\Application\UI\Form AS AppForm;
 use Maps\Presenter\BasePresenter;
 use Kdyby\BootstrapFormRenderer\BootstrapRenderer;
 use Nette\Forms\Form as NForm;
+use Nextras\Forms\Controls\OptionList;
 
 /**
  * Description of BaseForm
@@ -88,6 +89,10 @@ class Form extends AppForm {
         $component->getControlPrototype()->addClass("btn-primary");
         return $component;
 
+    }
+
+    public function addOptionList($name, $label = NULL, array $items = NULL) {
+        return $this[$name] = new OptionList($label, $items);
     }
 
 

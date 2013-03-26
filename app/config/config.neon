@@ -33,6 +33,10 @@ common:
 
         session:
             expiration: 14 days
+    factories:
+        nette.latte:
+            setup:
+                - 'Nextras\Forms\Latte\Macros::install(?->compiler)'(@self)
 
 
 

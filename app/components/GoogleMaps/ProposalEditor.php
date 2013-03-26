@@ -124,8 +124,7 @@ class ProposalEditor extends Control {
     public function createComponentProposalForm($name) {
         $form = new Form($this, $name);
         foreach($this->getProposals() as $proposal) {
-            $form->addCheckbox('proposal'.$proposal->id);
-            $form->addCheckbox('proposal_reject'.$proposal->id);
+            $form->addOptionList('proposal' . $proposal->id, null, ['approve'=>'Zařadit do revize','reject'=>'Zamítnout']);
         }
         $form->addSubmit("send", 'Zpracovat');
     }
@@ -172,8 +171,6 @@ class ProposalEditor extends Control {
             }
         }
         return $collisions;
-
-        dump($collisions);
     }
 
 }

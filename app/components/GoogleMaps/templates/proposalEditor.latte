@@ -63,11 +63,12 @@
         <th>Komentář</th>
         <th>&nbsp;</th>
     </tr>
+
 {foreach $proposals as $proposal}
     <tr id="proposal{$proposal->id}">
         <td>#{$proposal->id}</td>
-        <td>{input proposal$proposal->id}</td>
-        <td>{input proposal_reject$proposal->id}</td>
+        <td>{input proposal$proposal->id:approve, class=>'approve'}</td>
+        <td>{input proposal$proposal->id:reject, class=>'reject'}</td>
         <td>{$proposal->submittedDate|date:"d.m.Y H:i"}</td>
         <td>{$proposal->submittedBy->name}</td>
         <td>{$proposal->comment}</td>
