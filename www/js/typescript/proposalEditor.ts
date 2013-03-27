@@ -151,9 +151,11 @@ module Mapping {
                     for(var key in this.paths) {
                         if(checked[key]) continue;
                         if(!this.paths[key] || this.paths[key].getPath().length < 2) continue;
+                        var start = this.markers[this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(0))];
+                        var end = this.markers[this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(1))];
                         addedPaths[key] = {
-                            start: this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(0)),
-                            end: this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(1))
+                            start: $.extend(start.appOptions, {id: this.markers.indexOf(start),position: start.getPosition().lat()+","+start.getPosition().lng()}),
+                            end: $.extend(end.appOptions, {id: this.markers.indexOf(end),position: end.getPosition().lat() + "," + end.getPosition().lng()})
                         };
                     }
 

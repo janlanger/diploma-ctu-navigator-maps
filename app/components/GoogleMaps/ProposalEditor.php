@@ -8,9 +8,11 @@ use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
 use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Queries\ActiveProposals;
+use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Nette\Application\UI\Control;
 
 class ProposalEditor extends Control {
+    public $submitHandler;
 
     /** @var Dao */
     private $proposalRepository;
@@ -128,13 +130,7 @@ class ProposalEditor extends Control {
         }
         $form->addTextArea("custom_changes");
         $form->addSubmit("send", 'Zpracovat');
-        $form->onSuccess[] = function(Form $form) {
-            $values = $form->getValues();
-            dump($values);
-            $changes = json_decode($values['custom_changes']);
-            dump($changes);
-            exit;
-        };
+        $form->onSuccess[] = $this->submitHandler;
     }
 
     private function collisionResolution($proposals) {
@@ -180,5 +176,16 @@ class ProposalEditor extends Control {
         }
         return $collisions;
     }
+
+    public function setSubmitHandler($submitHandler)
+    {
+        $this->submitHandler = $submitHandler;
+    }
+
+    public function getSubmitHandler()
+    {
+        return $this->submitHandler;
+    }
+
 
 }

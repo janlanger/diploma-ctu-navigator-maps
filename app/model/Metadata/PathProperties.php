@@ -33,7 +33,6 @@ class PathProperties extends BaseEntity {
      */
     private $endNode;
 
-    /** @Column(type="float") */
     private $length;
 
     /**

@@ -22,6 +22,7 @@ use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
+use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Maps\Model\Metadata\Revision;
 use Nette\Utils\Html;
 
@@ -205,6 +206,21 @@ class MetadataPresenter extends SecuredPresenter{
             'strokeOpacity' => 0.8,
             'strokeWeight' => 2
         ]);
+
+        $map->setSubmitHandler(function (Form $form) {
+            $p = new RevisionProcessor(
+                $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())),
+                $this->getRepository('user')->find($this->getUser()->getId()),
+                $this->getRepository("meta_node_properties"),
+                $this->getRepository("meta_path_properties"),
+                $this->getRepository('meta_changeset'),
+                $this->getRepository('meta_node_change'),
+                $this->getRepository('meta_path_change'),
+                $this->getRepository('meta_node'),
+                $this->getRepository('meta_path')
+            );
+            $p->handle($form);
+        });
 
         return $map;
     }
