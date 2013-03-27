@@ -23,7 +23,7 @@ class PathChange extends BaseEntity {
     /**
      * @var Changeset
      * @ManyToOne(targetEntity="Changeset", cascade={"persist"})
-     * @JoinColumn(name="changeset_id", referencedColumnName="id", nullable=false)
+     * @JoinColumn(name="changeset_id", referencedColumnName="id", nullable=false,onDelete="CASCADE")
      */
     private $changeset;
     /**
