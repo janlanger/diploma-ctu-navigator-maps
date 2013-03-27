@@ -7,137 +7,211 @@
  */
 
 module Mapping {
-	export class ProposalEditor extends Mapping.MarkerEditor {
+    export class ProposalEditor extends Mapping.MarkerEditor {
 
         public reverseChanges = [];
+        private markersOriginals = [];
 
-		constructor(private mapElement:Element, private options) {
-			super(mapElement, options);
-		}
+        constructor(private mapElement:Element, private options) {
+            super(mapElement, options);
+        }
 
-		public initialize() {
-			super.initialize();
-			this.registerEvents();
+        public initialize() {
+            super.initialize();
+
+            for (var key in this.markers) {
+                var item = this.markers[key];
+
+                this.markersOriginals[key] = $.extend({}, item.appOptions);
+                this.markersOriginals[key].gps = item.getPosition();
+            }
+
+            this.registerEvents();
             this.detectCollisions();
-		}
+        }
 
-		private registerEvents() {
+        /*  public createMarker(markerOptions, additional = {}) {
+         var marker = super.createMarker(markerOptions, additional);
+
+         if(marker.appOptions) {
+         alert('aaaa');
+         marker.appOptionsOriginal = $.extend({}, marker.appOptions);
+         }
+         return marker;
+         }*/
+
+        private registerEvents() {
             var _this = this;
-			if (this.options.proposals) {
-				$.each(this.options.proposals, (index, item) => {
-					$("#" + index + " a").click(() => {
-						var element = $("#modalTemplate");
-						$("#modal-header", element).text("Návrh od " + item.author + " z " + item.date + ":");
-						var content = "Komentář uživatele: <em>" + item.comment + "</em><br><br>";
-						if (item.specification.nodes && item.specification.nodes.length > 0) {
-							content += "<strong>Body:</strong><ul>";
-							for (var i = 0; i < item.specification.nodes.length; i++) {
-								content += "<li>" + this.getNodeChangeTextual(item.specification.nodes[i]) + "</li>";
-							}
-							content += "</ul>";
-						}
-						if (item.specification.paths && item.specification.paths.length > 0) {
-							content += "<strong>Cesty:</strong> ";
-							var added = 0;
-							var deleted = 0;
-							for(var i = 0; i< item.specification.paths.length; i++) {
-								if(item.specification.paths[i].deleted) {
-									deleted++;
-								} else {
-									added++;
-								}
-							}
-							if(added > 0)
-								content += "<b>" + added + "x</b> nová ";
-							if(deleted > 0)
-								content += "<b>"+ deleted +"x</b> odstraněná";
-						}
-						$("#modal-content", element).html(content);
-						element.modal({show: true});
+            if (this.options.proposals) {
+                $.each(this.options.proposals, (index, item) => {
+                    $("#" + index + " a").click(() => {
+                        var element = $("#modalTemplate");
+                        $("#modal-header", element).text("Návrh od " + item.author + " z " + item.date + ":");
+                        var content = "Komentář uživatele: <em>" + item.comment + "</em><br><br>";
+                        if (item.specification.nodes && item.specification.nodes.length > 0) {
+                            content += "<strong>Body:</strong><ul>";
+                            for (var i = 0; i < item.specification.nodes.length; i++) {
+                                content += "<li>" + this.getNodeChangeTextual(item.specification.nodes[i]) + "</li>";
+                            }
+                            content += "</ul>";
+                        }
+                        if (item.specification.paths && item.specification.paths.length > 0) {
+                            content += "<strong>Cesty:</strong> ";
+                            var added = 0;
+                            var deleted = 0;
+                            for (var i = 0; i < item.specification.paths.length; i++) {
+                                if (item.specification.paths[i].deleted) {
+                                    deleted++;
+                                } else {
+                                    added++;
+                                }
+                            }
+                            if (added > 0)
+                                content += "<b>" + added + "x</b> nová ";
+                            if (deleted > 0)
+                                content += "<b>" + deleted + "x</b> odstraněná";
+                        }
+                        $("#modal-content", element).html(content);
+                        element.modal({show: true});
 
-						return false;
-					});
+                        return false;
+                    });
 
-                    $("#"+index+" input[type=radio]").change(function(event) { _this.handleApproveClick(event, this, index)})
-				});
+                    $("#" + index + " input[type=radio]").change(function (event) {
+                        _this.handleApproveClick(event, this, index)
+                    })
+                });
 
-			}
-		}
+                $("#proposal-send").click((event) => {
+                    event.preventDefault();
+                    var addedNodes = [];
+                    var changedNodes = [];
+                    var deletedNodes = [];
+                    var checked = [];
+                    for (var key in this.markers) {
+                        var original = this.markersOriginals[key];
+                        var item = this.markers[key];
+                        item.appOptions.gps = item.getPosition();
+                        if (!original) {
+                            //added
+                            addedNodes[key] = item.appOptions;
+                        }
 
-		private getNodeChangeTextual(nodeChange) {
-			var description = "";
-			if (nodeChange.original && !nodeChange.deleted) {
-				description = "Změna bodu:";
-				description += "<ul><li>" + this.nodeChangeDesc(nodeChange.original, nodeChange.properties).join("</li><li>") + "</li></ul>";
-			}
-			if (nodeChange.deleted) {
-				description = "Odstranění bodu";
-				description += "<ul><li>" + this.nodeChangeDesc(nodeChange.original).join("</li><li>") + "</li></ul>";
-			}
-			else if (!nodeChange.original) {
-				description = "Nový bod:";
-				description += "<ul><li>" + this.nodeChangeDesc(nodeChange.properties).join("</li><li>") + "</li></ul>";
-			}
-			return description;
-		}
+                        if (item.getMap() == null) {
+                            //deleted
+                            deletedNodes[key] = this.markersOriginals[key];
+                        }
+                        if (original && item.getMap() != null && !this.optionsEquals(original, item.appOptions)) {
+                            changedNodes[key] = item.appOptions;
+                            console.log(item.appOptions, original);
+                        }
+                        checked[key] = true;
+                    }
 
-		private nodeChangeDesc(original, newNode = "") {
-			var x = [];
-			$.each(original, (index, item) => {
-				var y = "";
-				if (index == "id") return;
-				if (newNode && item == newNode[index]) return;
-				if (newNode) {
-					if (index == "gpsCoordinates") {
-						y += "<b>Změna pozice</b>";
-					} else  {
-						var newOne = newNode[index];
-						if (index == "type") {
-							item = this.readableNodeType(item);
-							newOne = this.readableNodeType(newOne);
-						}
-						y += "<b>" + this.readableIndex(index) + ":</b> " + (item == null ? "prázdný" : item) + "->" + newOne;
-					}
-				} else {
-					if (index == "gpsCoordinates" || item == null) {
-						return;
-					}
-					if (index == "type") {
-						item = this.readableNodeType(item);
-					}
-					y += "<b>" + this.readableIndex(index) + ":</b> " + (item == null ? "prázdný" : item);
-				}
-				x.push(y);
-			});
-			return x;
-		}
+                    for (var key in this.markersOriginals) {
+                        if (checked[key]) continue;
+                        deletedNodes[key] = this.markersOriginals[key];
+                    }
+                    console.log(addedNodes, changedNodes, deletedNodes);
+                    return false;
 
-		private readableIndex(index) {
-			var x = {
-				room: "Místnost",
-				type: "Typ bodu",
-				name: "Popisek",
-				fromFloor: "Z patra",
-				toFloor: "Do patra",
-				toBuilding: "Do budovy"
-			};
-			return x[index];
-		}
+                });
 
-		private readableNodeType(index) {
-			if (this.options.markerTypes[index]) {
-				return this.options.markerTypes[index].legend;
-			}
-			return index;
-		}
+            }
+        }
+
+        private optionsEquals(obj1, obj2) {
+            for (var i in obj1) {
+                if (obj1.hasOwnProperty(i)) {
+                    if (!obj2.hasOwnProperty(i)) return false;
+                    if (i != "gps" && obj1[i] != obj2[i]) return false;
+                    if (i == "gps" && obj1[i] != null && obj1[i].equals != undefined && !obj1[i].equals(obj2[i])) return false;
+                }
+            }
+            for (var i in obj2) {
+                if (obj2.hasOwnProperty(i)) {
+                    if (!obj1.hasOwnProperty(i)) return false;
+                    if (i != "gps" && obj1[i] != obj2[i]) return false;
+                    if (i == "gps" && obj2[i] != null && obj2[i].equals != undefined && !obj2[i].equals(obj1[i])) return false;
+                }
+            }
+            return true;
+        }
+
+        private getNodeChangeTextual(nodeChange) {
+            var description = "";
+            if (nodeChange.original && !nodeChange.deleted) {
+                description = "Změna bodu:";
+                description += "<ul><li>" + this.nodeChangeDesc(nodeChange.original, nodeChange.properties).join("</li><li>") + "</li></ul>";
+            }
+            if (nodeChange.deleted) {
+                description = "Odstranění bodu";
+                description += "<ul><li>" + this.nodeChangeDesc(nodeChange.original).join("</li><li>") + "</li></ul>";
+            }
+            else if (!nodeChange.original) {
+                description = "Nový bod:";
+                description += "<ul><li>" + this.nodeChangeDesc(nodeChange.properties).join("</li><li>") + "</li></ul>";
+            }
+            return description;
+        }
+
+        private nodeChangeDesc(original, newNode = "") {
+            var x = [];
+            $.each(original, (index, item) => {
+                var y = "";
+                if (index == "id") return;
+                if (newNode && item == newNode[index]) return;
+                if (newNode) {
+                    if (index == "gpsCoordinates") {
+                        y += "<b>Změna pozice</b>";
+                    } else {
+                        var newOne = newNode[index];
+                        if (index == "type") {
+                            item = this.readableNodeType(item);
+                            newOne = this.readableNodeType(newOne);
+                        }
+                        y += "<b>" + this.readableIndex(index) + ":</b> " + (item == null ? "prázdný" : item) + "->" + newOne;
+                    }
+                } else {
+                    if (index == "gpsCoordinates" || item == null) {
+                        return;
+                    }
+                    if (index == "type") {
+                        item = this.readableNodeType(item);
+                    }
+                    y += "<b>" + this.readableIndex(index) + ":</b> " + (item == null ? "prázdný" : item);
+                }
+                x.push(y);
+            });
+            return x;
+        }
+
+        private readableIndex(index) {
+            var x = {
+                room: "Místnost",
+                type: "Typ bodu",
+                name: "Popisek",
+                fromFloor: "Z patra",
+                toFloor: "Do patra",
+                toBuilding: "Do budovy"
+            };
+            return x[index];
+        }
+
+        private readableNodeType(index) {
+            if (this.options.markerTypes[index]) {
+                return this.options.markerTypes[index].legend;
+            }
+            return index;
+        }
 
         public handleApproveClick(event, radio, index) {
             radio = $(radio);
-            if(!radio.is(':checked')) {
+            if (!radio.is(':checked')) {
                 return;
             }
 
-            if(radio.val() == "approve") {
+            if (radio.val() == "approve") {
                 radio.parent().parent().removeClass("error");
                 radio.parent().parent().addClass("success");
                 this.applyChanges(index, this.options.proposals[index].specification);
@@ -205,19 +279,23 @@ module Mapping {
                 }
             }
 
-            if(spec.nodes) {
-                for(var i=0; i< spec.nodes.length > 0; i++) {
+            if (spec.nodes) {
+                for (var i = 0; i < spec.nodes.length > 0; i++) {
                     var item = spec.nodes[i];
-                    if(item.deleted) {
+                    if (item.deleted) {
                         var node = this.findNodeWithId(item.original.id);
-                        this.reverseChanges[name].nodes.deleted.push(node);
-                        this.removeNode(node, false);
+
+                        this.reverseChanges[name].nodes.deleted.push(this.markers.indexOf(node));
+                        if (node.appStroke) {
+                            node.appStroke.setMap(null);
+                        }
+                        node.setMap(null); //hides the node from map
                     }
-                    if(!item.deleted && item.original) {
+                    if (!item.deleted && item.original) {
                         //change
                         var node = this.findNodeWithId(item.original.id);
-                        if(node) {
-                            if(item.original.gpsCoordinates != item.properties.gpsCoordinates) {
+                        if (node) {
+                            if (item.original.gpsCoordinates != item.properties.gpsCoordinates) {
                                 var newPosition = this.parsePositionString(item.properties.gpsCoordinates);
                                 this.movePathEnd(node.getPosition(), newPosition);
                                 node.setPosition(newPosition);
@@ -242,37 +320,43 @@ module Mapping {
         }
 
         private removeChanges(reverseSpec) {
-            if(reverseSpec == undefined) return;
-            if(reverseSpec.nodes) {
-                for(var i=0; i<reverseSpec.nodes.deleted.length; i++) {
-                    var item = reverseSpec.nodes.deleted[i];
+            if (reverseSpec == undefined) return;
+            if (reverseSpec.nodes) {
+                for (var i = 0; i < reverseSpec.nodes.deleted.length; i++) {
+                    var index = reverseSpec.nodes.deleted[i];
+                    var item = this.markers[index];
                     item.setMap(this.map);
-                    this.markers.push(item);
+                    if (item.appStroke) {
+                        item.appStroke.setMap(this.map);
+                    }
                 }
-                for(var i=0; i<reverseSpec.nodes.added.length; i++) {
+                for (var i = 0; i < reverseSpec.nodes.added.length; i++) {
                     var item = this.markers[reverseSpec.nodes.added[i]];
-                    if(item.appStroke) {
+                    if (item.appStroke) {
                         item.appStroke.setMap(null);
                     }
                     this.removeNode(item, false);
                 }
                 for (var i = 0; i < reverseSpec.nodes.changed.length; i++) {
                     var item = reverseSpec.nodes.changed[i];
-                    if(!item) continue;
+                    if (!item) continue;
 
                     var node = this.findNodeWithId(item.id);
-                    node.appStroke.setMap(null);
+                    if (node) {
+                        node.appStroke.setMap(null);
+                        node.appStroke = undefined;
 
-                    var newPosition = this.parsePositionString(item.gpsCoordinates);
-                    this.movePathEnd(node.getPosition(), newPosition);
-                    node.setPosition(newPosition);
+                        var newPosition = this.parsePositionString(item.gpsCoordinates);
+                        this.movePathEnd(node.getPosition(), newPosition);
+                        node.setPosition(newPosition);
 
-                    node.setIcon(this.getMarkerIcon(item.type));
-                    node.appOptions.toBuilding = item.toBuilding;
-                    node.appOptions.toFloor = item.toFloor;
-                    node.appOptions.fromFloor = item.fromFloor;
-                    node.appOptions.name = item.name;
-                    node.appOptions.room = item.room;
+                        node.setIcon(this.getMarkerIcon(item.type));
+                        node.appOptions.toBuilding = item.toBuilding;
+                        node.appOptions.toFloor = item.toFloor;
+                        node.appOptions.fromFloor = item.fromFloor;
+                        node.appOptions.name = item.name;
+                        node.appOptions.room = item.room;
+                    }
 
                 }
             }
@@ -292,18 +376,19 @@ module Mapping {
 
         private parsePositionString(position) {
             var p = position.split(",");
-            return new google.maps.LatLng(p[0],p[1]);
+            return new google.maps.LatLng(p[0], p[1]);
         }
 
         private findNodeWithId(id, additionalSource = null) {
             var r = null;
-            for(var i=0; i<this.markers.length; i++) {
+            for (var i = 0; i < this.markers.length; i++) {
                 if (this.markers[i] && (this.markers[i].appOptions.propertyId == id ||
                     (this.markers[i].appOptions.propertyId == undefined && this.markers[i].appOptions.id == id))) {
                     return this.markers[i];
                 }
             }
         }
+
         private addStrokeMarker(marker) {
             var stroke = new google.maps.Marker({
                 position: marker.getPosition(),
@@ -313,18 +398,19 @@ module Mapping {
                     strokeWeight: 2,
                     strokeColor: "#00ff00"
                 },
-                map: this.map,
+                map: marker.getMap(),
                 clickable: false
             });
 
-            google.maps.event.addListener(marker, 'dragend', function(event) {
+
+            google.maps.event.addListener(marker, 'dragend', function (event) {
                 stroke.setPosition(this.getPosition());
             });
             marker.appStroke = stroke;
         }
 
         private movePathEnd(old, newOne) {
-            if(old.equals(newOne)) return;
+            if (old.equals(newOne)) return;
             for (var i = 0; i < this.paths.length; i++) {
                 var line = this.paths[i];
                 if (!line) continue;
@@ -343,7 +429,7 @@ module Mapping {
         private getPathBetween(start, end) {
             var sP = this.findNodeWithId(start).getPosition();
             var eP = this.findNodeWithId(end).getPosition();
-            for(var i=0; i<this.paths.length; i++) {
+            for (var i = 0; i < this.paths.length; i++) {
                 var line = this.paths[i];
                 if (!line) continue;
                 var path = line.getPath();
@@ -359,14 +445,14 @@ module Mapping {
                 var element = $("<img>");
                 element.attr("src", "/images/icons/warning.png");
                 var title = "Tento návrh upravuje stejné prvky jako návrh ";
-                for(var key in item) {
+                for (var key in item) {
                     if (key === 'length' || !item.hasOwnProperty(key)) continue;
-                    title += "#"+key;
+                    title += "#" + key;
                 }
                 element.attr("title", title);
                 element.css("margin", '0px 5px');
-                $("#proposal"+index).children("td:first").append(element);
+                $("#proposal" + index).children("td:first").append(element);
             });
         }
-	}
+    }
 }

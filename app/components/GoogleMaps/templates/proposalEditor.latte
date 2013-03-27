@@ -76,7 +76,8 @@
     </tr>
 {/foreach}
 </table>
-    {input send}
+    {input custom_changes, style=> 'width:100%;height:200px', id=>'custom_changes'}
+    {input send, id => 'proposal-send'}
 {/form}
 <div id="modalTemplate" class="modal hide fade" tabindex="-1" aria-labelledby="modal-header" aria-hidden="true">
     <div class="modal-header">

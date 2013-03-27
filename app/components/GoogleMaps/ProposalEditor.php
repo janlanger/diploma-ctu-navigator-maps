@@ -126,6 +126,7 @@ class ProposalEditor extends Control {
         foreach($this->getProposals() as $proposal) {
             $form->addOptionList('proposal' . $proposal->id, null, ['approve'=>'Zařadit do revize','reject'=>'Zamítnout']);
         }
+        $form->addTextArea("custom_changes");
         $form->addSubmit("send", 'Zpracovat');
     }
 
