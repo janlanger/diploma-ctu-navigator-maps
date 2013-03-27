@@ -103,7 +103,7 @@ class ProposalEditor extends Control {
     private function getProposals() {
         static $items;
         if($items == NULL) {
-            $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(), 'id');
+            $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(null, $this->activeRevision), 'id');
         }
         return $items;
 

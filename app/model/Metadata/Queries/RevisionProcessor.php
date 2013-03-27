@@ -63,7 +63,9 @@ class RevisionProcessor extends Object {
 
         $this->processNewChanges($changes);
 
+        $changesets = $this->changesetRepository->fetchAssoc(new ActiveProposals(null, $this->actualRevision),'id');
 
+        dump($changesets);
 
         exit;
     }
@@ -221,7 +223,6 @@ class RevisionProcessor extends Object {
 
             $this->nodeChangeRepository->getEntityManager()->flush();
 
-            exit;
         }
     }
 

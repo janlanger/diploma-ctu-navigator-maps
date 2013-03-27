@@ -17,11 +17,11 @@ use Maps\Model\Persistence\QueryObjectBase;
 class ActiveProposals extends QueryObjectBase {
 
     private $user;
+    private $revision;
 
-
-
-    function __construct($user=NULL) {
+    function __construct($user=NULL, $revision = null) {
         $this->user = $user;
+        $this->revision = $revision;
     }
 
 
@@ -37,11 +37,15 @@ class ActiveProposals extends QueryObjectBase {
             ->leftJoin('c.paths', 'p')
             ->where("c.state = :state")
             ->setParameter("state", Changeset::STATE_NEW)
-        ->orderBy("c.submitted_date", 'desc');
+            ->orderBy("c.submitted_date", 'desc');
         if($this->user != NULL) {
-            $q->where("c.submitted_by = :user")
+            $q->andWhere("c.submitted_by = :user")
                 ->setParameter('user',$this->user);
+        } else {
+            $q->andWhere("c.against_revision = :revision")
+                ->setParameter("revision", $this->revision);
         }
+
         return $q;
     }
 }
