@@ -37,6 +37,8 @@ class RevisionProcessor extends Object {
     /** @var Revision */
     private $actualRevision = null;
 
+    private $directChangeset = null;
+
     function __construct($actualRevision, User $user,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
@@ -61,6 +63,8 @@ class RevisionProcessor extends Object {
 
         $this->processNewChanges($changes);
 
+
+
         exit;
     }
 
@@ -80,7 +84,7 @@ class RevisionProcessor extends Object {
 
         if($this->hasChanges($changes)) {
             /** @var $changeset Changeset */
-            $changeset = $this->changesetRepository->createNew(null, [
+            $this->directChangeset = $changeset = $this->changesetRepository->createNew(null, [
                 'state' => Changeset::STATE_NEW,
                 'againstRevision' => $this->actualRevision,
                 'comment' => "",
@@ -216,6 +220,7 @@ class RevisionProcessor extends Object {
             $this->pathChangeRepository->add($paths);
 
             $this->nodeChangeRepository->getEntityManager()->flush();
+
             exit;
         }
     }
