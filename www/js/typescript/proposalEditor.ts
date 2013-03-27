@@ -11,6 +11,7 @@ module Mapping {
 
         public reverseChanges = [];
         private markersOriginals = [];
+        private pathOriginals = [];
 
         constructor(private mapElement:Element, private options) {
             super(mapElement, options);
@@ -24,6 +25,14 @@ module Mapping {
 
                 this.markersOriginals[key] = $.extend({}, item.appOptions);
                 this.markersOriginals[key].gps = item.getPosition();
+            }
+            for (var key in this.paths) {
+                var item = this.paths[key];
+                var path = item.getPath();
+                this.pathOriginals[key] = {
+                    start: this.getMarkerInPosition(path.getAt(0)).appOptions.propertyId,
+                    end: this.getMarkerInPosition(path.getAt(1)).appOptions.propertyId
+                };
             }
 
             this.registerEvents();
@@ -83,7 +92,6 @@ module Mapping {
                 });
 
                 $("#proposal-send").click((event) => {
-                    event.preventDefault();
                     var addedNodes = [];
                     var changedNodes = [];
                     var deletedNodes = [];
@@ -92,29 +100,74 @@ module Mapping {
                         var original = this.markersOriginals[key];
                         var item = this.markers[key];
                         item.appOptions.gps = item.getPosition();
-                        if (!original) {
+                        if (!original && item.getMap() != null) {
                             //added
                             addedNodes[key] = item.appOptions;
+                            addedNodes[key].position = item.getPosition().lat() + "," + item.getPosition().lng();
+                            addedNodes[key].gps = undefined;
                         }
 
-                        if (item.getMap() == null) {
-                            //deleted
-                            deletedNodes[key] = this.markersOriginals[key];
-                        }
                         if (original && item.getMap() != null && !this.optionsEquals(original, item.appOptions)) {
-                            changedNodes[key] = item.appOptions;
-                            console.log(item.appOptions, original);
+                            changedNodes[item.appOptions.propertyId] = $.extend({}, item.appOptions);
+                            changedNodes[item.appOptions.propertyId].position = item.getPosition().lat() + "," +item.getPosition().lng();
+                            changedNodes[item.appOptions.propertyId].gps = undefined;
                         }
                         checked[key] = true;
                     }
 
                     for (var key in this.markersOriginals) {
+                        // deleted directly
                         if (checked[key]) continue;
-                        deletedNodes[key] = this.markersOriginals[key];
+                        deletedNodes.push(this.markersOriginals[key].propertyId);
                     }
-                    console.log(addedNodes, changedNodes, deletedNodes);
-                    return false;
 
+                    var addedPaths = [];
+                    var deletedPaths = [];
+
+                    var checked = [];
+
+                    for (var key in this.pathOriginals) {
+                        var original = this.pathOriginals[key];
+                        var start = this.findNodeWithId(original.start);
+                        var end = this.findNodeWithId(original.end);
+
+                        checked[key] = true;
+
+                        if(!start || !end) {
+                            //deleted
+                            deletedPaths[key] = original;
+                            continue;
+                        }
+                        var path = this.getPathBetween(start.getPosition(), end.getPosition());
+                        if(!path) {
+                            deletedPaths[key] = original;
+                            if(this.paths[key] && this.paths[key].getPath().length > 0) {
+                                // path was changed, not deleted - delete and add
+                                checked[key] = false;
+                            }
+                        }
+                    }
+
+                    for(var key in this.paths) {
+                        if(checked[key]) continue;
+                        if(!this.paths[key] || this.paths[key].getPath().length < 2) continue;
+                        addedPaths[key] = {
+                            start: this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(0)),
+                            end: this.getMarkerIndexInPosition(this.paths[key].getPath().getAt(1))
+                        };
+                    }
+
+                    $("#custom_changes").val(JSON.stringify({
+                        nodes: {
+                            added: addedNodes,
+                            changed: changedNodes,
+                            deleted: deletedNodes
+                        },
+                        paths: {
+                            added: addedPaths,
+                            deleted: deletedPaths
+                        }
+                    }));
                 });
 
             }
@@ -246,7 +299,12 @@ module Mapping {
                         this.eventHandler.registerMarkerEvents(marker);
                         this.markers.push(marker)
                         this.addStrokeMarker(marker);
-                        this.reverseChanges[name].nodes.added.push(this.markers.length - 1);
+                        var markerId = this.markers.length - 1;
+                        this.reverseChanges[name].nodes.added.push(markerId);
+
+                        var x = $.extend({}, item.properties);
+                        x.gps = marker.getPosition();
+                        this.markersOriginals[markerId] = x;
                     }
                 }
             }
@@ -265,16 +323,26 @@ module Mapping {
 
                         path.setPath([]);
                         path.setMap(null);
-                        this.reverseChanges[name].paths.deleted.push(item.original);
-                        delete this.paths[this.paths.indexOf(path)];
+                        var pathIndex = this.paths.indexOf(path);
+                        this.reverseChanges[name].paths.deleted[pathIndex] = item.original;
+                        delete this.pathOriginals[pathIndex];
+                    //    delete this.paths[this.paths.indexOf(path)];
 
                     }
                     else {
                         var options = $.extend({}, this.options.pathOptions);
                         options.strokeColor = "#00ff00";
-                        var path = this.createPath(this.findNodeWithId(item.properties.startNode).getPosition(), this.findNodeWithId(item.properties.endNode).getPosition(), options);
+                        var startNode = this.findNodeWithId(item.properties.startNode);
+                        var endNode = this.findNodeWithId(item.properties.endNode);
+                        var path = this.createPath(startNode.getPosition(), endNode.getPosition(), options);
+                        this.eventHandler.registerPathEvents(path);
                         this.paths.push(path);
                         this.reverseChanges[name].paths.added.push(this.paths.length - 1);
+                        this.pathOriginals[this.paths.length -1] = {
+                            start: startNode.appOptions.propertyId,
+                            end: endNode.appOptions.propertyId
+                        };
+
                     }
                 }
             }
@@ -284,8 +352,9 @@ module Mapping {
                     var item = spec.nodes[i];
                     if (item.deleted) {
                         var node = this.findNodeWithId(item.original.id);
-
-                        this.reverseChanges[name].nodes.deleted.push(this.markers.indexOf(node));
+                        var nodeIndex = this.markers.indexOf(node);
+                        this.reverseChanges[name].nodes.deleted.push(nodeIndex);
+                        delete this.markersOriginals[nodeIndex];
                         if (node.appStroke) {
                             node.appStroke.setMap(null);
                         }
@@ -310,7 +379,12 @@ module Mapping {
                             node.appOptions.room = item.properties.room;
 
                             this.addStrokeMarker(node);
-                            this.reverseChanges[name].nodes.changed[this.markers.indexOf(node)] = item.original;
+                            var nodeIndex = this.markers.indexOf(node);
+                            this.reverseChanges[name].nodes.changed[nodeIndex] = item.original;
+
+                            var opp = $.extend({}, node.appOptions);
+                            opp.gps = node.getPosition();
+                            this.markersOriginals[nodeIndex] = opp;
                         }
                     }
                 }
@@ -326,6 +400,8 @@ module Mapping {
                     var index = reverseSpec.nodes.deleted[i];
                     var item = this.markers[index];
                     item.setMap(this.map);
+                    this.markersOriginals[index] = $.extend({}, item.appOptions);
+                    this.markersOriginals[index].gps = item.getPosition();
                     if (item.appStroke) {
                         item.appStroke.setMap(this.map);
                     }
@@ -336,6 +412,7 @@ module Mapping {
                         item.appStroke.setMap(null);
                     }
                     this.removeNode(item, false);
+                    delete this.markersOriginals[reverseSpec.nodes.added[i]];
                 }
                 for (var i = 0; i < reverseSpec.nodes.changed.length; i++) {
                     var item = reverseSpec.nodes.changed[i];
@@ -356,20 +433,38 @@ module Mapping {
                         node.appOptions.fromFloor = item.fromFloor;
                         node.appOptions.name = item.name;
                         node.appOptions.room = item.room;
+
+                        var opp = $.extend({}, node.appOptions);
+                        opp.gps = node.getPosition();
+                        this.markersOriginals[this.markers.indexOf(node)] = opp;
                     }
 
                 }
             }
             if (reverseSpec.paths) {
-                for (var i = 0; i < reverseSpec.paths.deleted.length; i++) {
-                    var item = reverseSpec.paths.deleted[i];
-                    this.paths.push(this.createPath(this.findNodeWithId(item.startNode).getPosition(), this.findNodeWithId(item.endNode).getPosition()));
+                for (var key in reverseSpec.paths.deleted) {
+                    var item = reverseSpec.paths.deleted[key];
+                    var p = this.paths[key];
+                    p.setMap(this.map);
+
+                    var startNode = this.findNodeWithId(item.startNode);
+                    var endNode = this.findNodeWithId(item.endNode);
+
+                    p.getPath().push(startNode.getPosition());
+                    p.getPath().push(endNode.getPosition());
+                    this.pathOriginals[key] = {
+                        start: startNode.appOptions.propertyId,
+                        end: endNode.appOptions.propertyId
+                    }
+                    //this.paths.push(this.createPath(this.findNodeWithId(item.startNode).getPosition(), this.findNodeWithId(item.endNode).getPosition()));
                 }
                 for (var i = 0; i < reverseSpec.paths.added.length; i++) {
                     var path = this.paths[reverseSpec.paths.added[i]];
                     path.setMap(null);
                     path.setPath([]);
-                    delete this.paths[this.paths.indexOf(path)];
+                    var pathIndex = this.paths.indexOf(path);
+                    delete this.paths[pathIndex];
+                    delete this.pathOriginals[pathIndex];
                 }
             }
         }
@@ -426,9 +521,13 @@ module Mapping {
             }
         }
 
-        private getPathBetween(start, end) {
-            var sP = this.findNodeWithId(start).getPosition();
-            var eP = this.findNodeWithId(end).getPosition();
+        private getPathBetween(sP, eP) {
+            if(!(sP instanceof google.maps.LatLng)) {
+                sP = this.findNodeWithId(sP).getPosition();
+            }
+            if(!(eP instanceof google.maps.LatLng)) {
+                eP = this.findNodeWithId(eP).getPosition();
+            }
             for (var i = 0; i < this.paths.length; i++) {
                 var line = this.paths[i];
                 if (!line) continue;

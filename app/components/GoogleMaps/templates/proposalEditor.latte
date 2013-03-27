@@ -21,7 +21,7 @@
                             ,original: {$node->original->properties->toArray()}
                         {/if}
                         {if $node->properties != null}
-                            ,properties: {$node->properties->toArray()}
+                            ,properties: {=array_merge($node->properties->toArray(),["propertyId"=>$node->properties->id])}
                         {/if}
                     }{sep},{/sep}
                     {/foreach}
@@ -34,7 +34,7 @@
                         , original: {$path->original->properties->toArray()}
                         {/if}
                         {if $path->properties != null}
-                        , properties: {$path->properties->toArray()}
+                        , properties: {=array_merge($path->properties->toArray(),["propertyId"=>$path->properties->id])}
                         {/if}
                     }{sep},{/sep}
                     {/foreach}

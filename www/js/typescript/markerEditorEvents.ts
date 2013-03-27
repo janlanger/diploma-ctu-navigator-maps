@@ -138,7 +138,7 @@ module Mapping {
                     var line = this.editor.paths[i];
                     if (!line) continue;
                     var path = line.getPath();
-
+                    if(!path || path.length < 2) continue;
                     if (path.getAt(0).equals(this.previousPosition)) {
                         path.setAt(0, marker.getPosition());
                     }

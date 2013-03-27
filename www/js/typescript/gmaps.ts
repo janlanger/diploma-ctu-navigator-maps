@@ -128,9 +128,15 @@ module Mapping {
         }
 
         public getMarkerInPosition(position) {
-            for(var i=0; i<this.markers.length; i++) {
-                if(this.markers[i] && this.markers[i].position.equals(position)) {
-                    return this.markers[i];
+            var m = this.getMarkerIndexInPosition(position);
+
+            return m === null ? m : this.markers[m];
+        }
+
+        public getMarkerIndexInPosition(position) {
+            for (var i = 0; i < this.markers.length; i++) {
+                if (this.markers[i] && this.markers[i].position.equals(position)) {
+                    return i;
                 }
             }
             return null;

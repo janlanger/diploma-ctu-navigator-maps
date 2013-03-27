@@ -128,6 +128,13 @@ class ProposalEditor extends Control {
         }
         $form->addTextArea("custom_changes");
         $form->addSubmit("send", 'Zpracovat');
+        $form->onSuccess[] = function(Form $form) {
+            $values = $form->getValues();
+            dump($values);
+            $changes = json_decode($values['custom_changes']);
+            dump($changes);
+            exit;
+        };
     }
 
     private function collisionResolution($proposals) {

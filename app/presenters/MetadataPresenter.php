@@ -168,7 +168,7 @@ class MetadataPresenter extends SecuredPresenter{
         $map = new ProposalEditor();
 
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
-        $map->setCenter($this->template->building->gpsCoordinates);
+        $map->setCenter($this->getFloor()->getBuilding()->gpsCoordinates);
         $map->setZoomLevel(20);
 
 
