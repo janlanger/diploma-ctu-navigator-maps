@@ -27,7 +27,7 @@ class Path extends BaseEntity {
     private $revision;
     /**
      * @var PathProperties
-     * @OneToOne(targetEntity="PathProperties", fetch="EAGER")
+     * @ManyToOne(targetEntity="PathProperties", fetch="EAGER", cascade={"persist"})
      * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=false)
      */
     private $properties;

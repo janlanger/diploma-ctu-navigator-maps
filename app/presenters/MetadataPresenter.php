@@ -211,6 +211,7 @@ class MetadataPresenter extends SecuredPresenter{
             $p = new RevisionProcessor(
                 $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())),
                 $this->getRepository('user')->find($this->getUser()->getId()),
+                $this->getRepository('meta_revision'),
                 $this->getRepository("meta_node_properties"),
                 $this->getRepository("meta_path_properties"),
                 $this->getRepository('meta_changeset'),

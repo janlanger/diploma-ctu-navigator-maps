@@ -10,6 +10,7 @@
 namespace Maps\Model\Metadata;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Maps\Model\BaseEntity;
 
 /**
@@ -17,6 +18,9 @@ use Maps\Model\BaseEntity;
  * @package Maps\Model\Metadata
  * @Entity
  * @table(name="metadata_revision")
+ *
+ * @property ArrayCollection $nodes
+ * @property ArrayCollection $paths
  */
 class Revision extends BaseEntity {
 
@@ -48,6 +52,13 @@ class Revision extends BaseEntity {
      * @OneToMany(targetEntity="Path", mappedBy="revision")
      */
     private $paths;
+
+    function __construct()
+    {
+        $this->nodes = new ArrayCollection();
+        $this->paths = new ArrayCollection();
+    }
+
 
     public function setFloor($floor)
     {

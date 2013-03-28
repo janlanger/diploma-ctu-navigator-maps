@@ -29,7 +29,7 @@ class Node extends BaseEntity implements \JsonSerializable {
 
     /**
      * @var NodeProperties
-     * @OneToOne(targetEntity="NodeProperties", fetch="EAGER")
+     * @ManyToOne(targetEntity="NodeProperties", fetch="EAGER", cascade={"persist"})
      * @JoinColumn(name="properties_id", referencedColumnName="id", nullable=false)
      */
     private $properties;

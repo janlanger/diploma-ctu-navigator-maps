@@ -18,7 +18,7 @@
                     {
                         deleted: {$node->wasDeleted}
                         {if $node->original != null}
-                            ,original: {$node->original->properties->toArray()}
+                            ,original: {$node->original->toArray()}
                         {/if}
                         {if $node->properties != null}
                             ,properties: {=array_merge($node->properties->toArray(),["propertyId"=>$node->properties->id])}
@@ -31,7 +31,7 @@
                     {
                         deleted:{$path->wasDeleted}
                         {if $path->original != null}
-                        , original: {$path->original->properties->toArray()}
+                        , original: {$path->original->toArray()}
                         {/if}
                         {if $path->properties != null}
                         , properties: {=array_merge($path->properties->toArray(),["propertyId"=>$path->properties->id])}
