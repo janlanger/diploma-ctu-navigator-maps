@@ -72,20 +72,20 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "2.3.2",
+            "version": "2.3.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/doctrine/dbal",
-                "reference": "2.3.2"
+                "url": "https://github.com/doctrine/dbal.git",
+                "reference": "2.3.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/dbal/archive/2.3.2.zip",
-                "reference": "2.3.2",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/2.3.3",
+                "reference": "2.3.3",
                 "shasum": ""
             },
             "require": {
-                "doctrine/common": "2.3.*",
+                "doctrine/common": ">=2.3.0,<2.5-dev",
                 "php": ">=5.3.2"
             },
             "type": "library",
@@ -131,20 +131,20 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-01-07 20:03:43"
+            "time": "2013-03-24 19:16:29"
         },
         {
             "name": "doctrine/orm",
-            "version": "2.3.2",
+            "version": "2.3.3",
             "source": {
                 "type": "git",
-                "url": "git://github.com/doctrine/doctrine2.git",
-                "reference": "2.3.2"
+                "url": "https://github.com/doctrine/doctrine2.git",
+                "reference": "2.3.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/doctrine2/archive/2.3.2.zip",
-                "reference": "2.3.2",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/2.3.3",
+                "reference": "2.3.3",
                 "shasum": ""
             },
             "require": {
@@ -201,7 +201,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2013-01-07 20:05:04"
+            "time": "2013-03-24 20:43:58"
         },
         {
             "name": "kdyby/bootstrap-form-renderer",
@@ -257,12 +257,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Kdyby/Curl.git",
-                "reference": "cdefd9157af825023ce34225441f73bcb86dc8f9"
+                "reference": "ddd60a1ddb8313248aedf64bb21dcf456c09b0d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/cdefd9157af825023ce34225441f73bcb86dc8f9",
-                "reference": "cdefd9157af825023ce34225441f73bcb86dc8f9",
+                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/ddd60a1ddb8313248aedf64bb21dcf456c09b0d4",
+                "reference": "ddd60a1ddb8313248aedf64bb21dcf456c09b0d4",
                 "shasum": ""
             },
             "require": {
@@ -300,7 +300,7 @@
                 "http",
                 "nette"
             ],
-            "time": "2013-02-21 17:50:19"
+            "time": "2013-03-07 08:44:30"
         },
         {
             "name": "nella/console",
@@ -418,16 +418,16 @@
         },
         {
             "name": "nette/nette",
-            "version": "v2.0.8",
+            "version": "v2.0.10",
             "source": {
                 "type": "git",
-                "url": "http://github.com/nette/nette",
-                "reference": "v2.0.8"
+                "url": "https://github.com/nette/nette.git",
+                "reference": "v2.0.10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/nette/nette/archive/v2.0.8.zip",
-                "reference": "v2.0.8",
+                "url": "https://api.github.com/repos/nette/nette/zipball/v2.0.10",
+                "reference": "v2.0.10",
                 "shasum": ""
             },
             "require": {
@@ -488,7 +488,7 @@
                 "neon",
                 "templating"
             ],
-            "time": "2013-01-01 20:42:38"
+            "time": "2013-03-08 15:44:35"
         },
         {
             "name": "nextras/forms",
@@ -585,7 +585,9 @@
             "time": "2013-03-01 06:43:14"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
@@ -595,5 +597,11 @@
         "nella/doctrine": 20,
         "nella/console": 20,
         "nextras/forms": 20
-    }
+    },
+    "platform": {
+        "php": ">=5.3"
+    },
+    "platform-dev": [
+
+    ]
 }
