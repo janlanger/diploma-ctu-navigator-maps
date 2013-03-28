@@ -24,6 +24,7 @@ class Changeset extends BaseEntity {
     const STATE_NEW = 'new';
     const STATE_APPROVED = 'approved';
     const STATE_REJECTED = 'rejected';
+    const STATE_WITHDRAWN = 'withdrawn';
 
     /**
      * @var User
@@ -69,6 +70,12 @@ class Changeset extends BaseEntity {
      * @Column(type="string", length=50)
      */
     private $comment;
+
+    /**
+     * @var string
+     * @column(type="string", length=50)
+     */
+    private $admin_comment;
 
 
     /**
@@ -224,6 +231,20 @@ class Changeset extends BaseEntity {
 
     public function getPaths() {
         return $this->paths;
+    }
+
+    /**
+     * @param string $admin_comment
+     */
+    public function setAdminComment($admin_comment) {
+        $this->admin_comment = $admin_comment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdminComment() {
+        return $this->admin_comment;
     }
 
 

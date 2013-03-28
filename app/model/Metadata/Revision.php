@@ -17,7 +17,10 @@ use Maps\Model\BaseEntity;
  * Class Revision
  * @package Maps\Model\Metadata
  * @Entity
- * @table(name="metadata_revision")
+ * @table(name="metadata_revision",
+ * uniqueConstraints={
+ *      @UniqueConstraint(columns={"floor_id", "revision"})
+ * })
  *
  * @property ArrayCollection $nodes
  * @property ArrayCollection $paths
@@ -40,7 +43,7 @@ class Revision extends BaseEntity {
     private $revision = 1;
 
     /** @Column(type="boolean") */
-    private $published = false;
+    private $published = FALSE;
     /** @Column(type="datetime", nullable=true) */
     private $published_date;
 

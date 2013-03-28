@@ -22,6 +22,7 @@ use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
+use Maps\Model\Metadata\Queries\RevisionGridQuery;
 use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Maps\Model\Metadata\Revision;
 use Nette\Utils\Html;
@@ -229,26 +230,30 @@ class MetadataPresenter extends SecuredPresenter{
 
     public function createComponentProposalGrid($name) {
         $grid = new DataGrid($this, $name);
-        $q = new ProposalsGridQuery();
+        $q = new ProposalsGridQuery($this->getFloor());
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('meta_changeset')));
 
         $datasource->setMapping([
             'date' => 'c.submitted_date',
             'state' => 'c.state',
-            'user' => 'submitted_user',
+            'user' => 'author',
             'comment'=>'c.comment',
+            'processed_by' => 'name',
+            "processed_date" => "c.processed_date",
+            'in_revision' => "revision",
+            'admin_comment' => 'c.admin_comment',
         ]);
 
 
         $grid->setDataSource($datasource);
 
-        $states = [Changeset::STATE_NEW => 'Nový', Changeset::STATE_APPROVED => 'Přijatý', Changeset::STATE_REJECTED => 'Odmítnutý'];
+        $states = [Changeset::STATE_NEW => 'Nový', Changeset::STATE_APPROVED => 'Přijatý', Changeset::STATE_REJECTED => 'Odmítnutý', Changeset::STATE_WITHDRAWN => 'Zrušený'];
 
         $grid->addDateColumn("date",'Odesláno dne', "%d.%m.%Y %H:%M");
 
         $grid->addColumn("state","Stav návrhu")
             ->addSelectboxFilter($states, TRUE, FALSE);
-        $grid['state']->addDefaultFiltering(Changeset::STATE_NEW);
+        //$grid['state']->addDefaultFiltering(Changeset::STATE_NEW);
         $grid['state']->formatCallback[] = function($value, $data) use ($states) {
 
             $el = Html::el('span')->setText($states[$value]);
@@ -267,11 +272,67 @@ class MetadataPresenter extends SecuredPresenter{
             return $el;
         };
         $grid->addColumn("user", "Navrhl");
-        $grid->addColumn("comment",'Komentář');
+        $grid->addColumn("processed_by", "Zpracoval");
+        $grid->addColumn("in_revision", "V revizi");
+
+        $grid['processed_by']->formatCallback[] = function($value, $data) {
+            if($value != ""){
+                return $value." (".$data["processed_date"]->format("d.m. H:i").")";
+            }
+        };
+
+        $grid->addColumn("comment", 'Komentáře');
+        $grid['comment']->formatCallback[] = function($value, $data) {
+            $r = "";
+            if($value != "") {
+                $r .= Html::el("span class=badge")->setHtml("Uživatel")->addTitle($value);
+            }
+            if ($data['admin_comment'] != "") {
+                $r .= Html::el("span class=badge badge-info")->setHtml("Admin")->addTitle($data['admin_comment']);
+            }
+
+            return $r;
+
+        };
+
 
         $grid['date']->addDefaultSorting('asc');
 
 
+
+    }
+
+    public function createComponentRevisionGrid($name) {
+        $q = new RevisionGridQuery($this->getFloor());
+        $ds = new QueryBuilder($q->getQueryBuilder($this->getRepository("meta_revision")));
+        $ds->setMapping([
+            'id' => 'r.id',
+            'revision' => 'r.revision',
+            'published' => 'r.published',
+            'user' => 'u.name',
+            'published_date' => 'r.published_date',
+        ]);
+
+
+        $grid = new DataGrid($this, $name);
+        $grid->setDataSource($ds);
+
+        $grid->addColumn('revision', 'Revize')->addDefaultSorting('desc');
+        $grid->addColumn('published', 'Aktivní');
+        $grid->addDateColumn('published_date', 'Publikováno', "%d.%m.%Y %H:%M");
+        $grid->addColumn('user', 'Vytvořil');
+
+        $grid->keyName = 'id';
+        $grid->addActionColumn('a', 'Akce');
+        $grid->addAction('Zobrazit', 'edit');
+        $grid->addAction('Publikovat', 'publish!');
+
+        $grid['published']->formatCallback[] = function($value, $data) {
+            if($value == 1) {
+                return "<span class='label label-success'><i class='icon-ok icon-white'>&nbsp;</i></span>";
+            }
+            return $value;
+        };
 
     }
 }
