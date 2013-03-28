@@ -41,8 +41,8 @@ class NodeChange extends BaseEntity {
     private $properties;
 
     /**
-     * @var Node
-     * @ManyToOne(targetEntity="Node", fetch="EAGER")
+     * @var NodeProperties
+     * @ManyToOne(targetEntity="NodeProperties", fetch="EAGER")
      * @JoinColumn(name="original_id", referencedColumnName="id", nullable=true)
      */
     private $original;

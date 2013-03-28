@@ -124,9 +124,8 @@ class RevisionProcessor extends Object {
             $nodePropertiesIds = array_unique($nodePropertiesIds, SORT_NUMERIC);
 
             $dbNodeProperties = $this->nodePropertiesRepository->fetchAssoc(new NodePropertiesQuery($nodePropertiesIds), 'id');
-            $dbNodes = $this->nodeRepository->fetchAssoc(new NodesByPropertiesId($nodePropertiesIds, $this->actualRevision), 'id');
+            
             $dbPathProperties = $this->pathPropertiesRepository->fetchAssoc(new PathPropertiesByNodes($pathNodeIds), 'id');
-            $dbPath = $this->pathRepository->fetchAssoc(new PathsByPropertiesId(array_keys($dbPathProperties), $this->actualRevision), 'id');
 
             //load end
 
@@ -170,7 +169,7 @@ class RevisionProcessor extends Object {
                 $nodes[] = $this->nodeChangeRepository->createNew(null, [
                     'changeset' => $changeset,
                     'properties' => $item,
-                    'original' => $this->getNodeByPropertiesId($node['propertyId'], $dbNodes),
+                    'original' => $dbNodeProperties[$node['propertyId']],
                     'wasDeleted' => false
                 ]);
             }
@@ -180,7 +179,7 @@ class RevisionProcessor extends Object {
                 $nodes[] = $this->nodeChangeRepository->createNew(null, [
                     'changeset' => $changeset,
                     'properties' => null,
-                    'original' => $this->getNodeByPropertiesId($nodeId, $dbNodes),
+                    'original' => $dbNodeProperties[$nodeId],
                     'wasDeleted' => true
                 ]);
             }
@@ -204,8 +203,8 @@ class RevisionProcessor extends Object {
             $deletedPaths = [];
 
             foreach($changes['paths']['deleted'] as $path) {
-                foreach($dbPath as $p) {
-                    if($p->properties->startNode->id == $path['start'] && $p->properties->endNode->id == $path['end']) {
+                foreach($dbPathProperties as $p) {
+                    if($p->startNode->id == $path['start'] && $p->endNode->id == $path['end']) {
                         break;
                     }
                 }

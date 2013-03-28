@@ -40,8 +40,8 @@ class PathChange extends BaseEntity {
     private $properties;
 
     /**
-     * @var Path
-     * @ManyToOne(targetEntity="Path", fetch="EAGER")
+     * @var PathProperties
+     * @ManyToOne(targetEntity="PathProperties", fetch="EAGER")
      * @JoinColumn(name="original_id", referencedColumnName="id", nullable=true)
      */
     private $original;
