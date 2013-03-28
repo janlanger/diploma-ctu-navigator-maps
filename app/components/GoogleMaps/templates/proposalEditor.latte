@@ -52,6 +52,10 @@
     var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
 </script>
 <h4>Návrhy</h4></h4>
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    Aplikace návrhů při zpracování probíhá v pořadí podle času zaslání návrhu, <strong>od nejstarších po nejnovější</strong>. Pokud provedete nějaké změny přímo v zde, <strong>aplikují se jako poslední</strong>.
+</div>
 {form proposalForm}
 <table class="table table-hover table-striped">
     <tr>
@@ -63,7 +67,9 @@
         <th>Komentář</th>
         <th>&nbsp;</th>
     </tr>
-
+    <tr n:if="empty($proposals)">
+        <td colspan="7" style="text-align: center">Neexstijí žádné otevřené návrhy. Můžete ale upravit data přímo v mapě a vytvořit tím novou revizi.</td>
+    </tr>
 {foreach $proposals as $proposal}
     <tr id="proposal{$proposal->id}">
         <td>#{$proposal->id}</td>
@@ -76,7 +82,7 @@
     </tr>
 {/foreach}
 </table>
-    {input custom_changes, style=> 'width:100%;height:200px', id=>'custom_changes'}
+    {input custom_changes, style=> 'width:100%;height:200px', class=>'hide', id=>'custom_changes'}
     {input send, id => 'proposal-send'}
 {/form}
 <div id="modalTemplate" class="modal hide fade" tabindex="-1" aria-labelledby="modal-header" aria-hidden="true">

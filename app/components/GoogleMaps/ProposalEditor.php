@@ -105,6 +105,9 @@ class ProposalEditor extends Control {
         if($items == NULL) {
             $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(null, $this->activeRevision), 'id');
         }
+        if($items == null) {
+            $items = array();
+        }
         return $items;
 
     }
