@@ -171,6 +171,7 @@ class MetadataPresenter extends SecuredPresenter{
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
         $map->setCenter($this->getFloor()->getBuilding()->gpsCoordinates);
         $map->setZoomLevel(20);
+        $map->setRoomPrefix($this->getFloor()->getBuilding()->roomPrefix);
 
 
         $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
