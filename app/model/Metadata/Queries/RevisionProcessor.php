@@ -134,7 +134,7 @@ class RevisionProcessor extends Object {
             $this->directChangeset = $changeset = $this->changesetRepository->createNew(NULL, [
                 'state' => Changeset::STATE_NEW,
                 'againstRevision' => $this->actualRevision,
-                'comment' => "",
+                'comment' => "Automaticky vytvořený návrh při tvorbě revize.",
                 'submittedBy' => $this->user,
             ]);
 
