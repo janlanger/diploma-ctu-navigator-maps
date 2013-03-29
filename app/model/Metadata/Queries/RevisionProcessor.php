@@ -41,6 +41,8 @@ class RevisionProcessor extends Object {
     /** @var Changeset */
     private $directChangeset = NULL;
 
+    private $changedKeys = [];
+
     function __construct(User $user, Dao $revision,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
@@ -101,6 +103,8 @@ class RevisionProcessor extends Object {
 
             $this->applyChanges($newRevision, $changesetsToApply);
 
+            $this->autoCloseChangesets($changesets, $this->changedKeys);
+
             $this->nodeRepository->add($newRevision->nodes);
             $this->pathRepository->add($newRevision->paths);
             $this->revisionRepository->save($newRevision);
@@ -108,7 +112,7 @@ class RevisionProcessor extends Object {
             //saves rejections
             $this->changesetRepository->save();
         }
-        return true;
+        return TRUE;
     }
 
     private function processNewChanges($changes) {
@@ -266,7 +270,6 @@ class RevisionProcessor extends Object {
         }
     }
 
-
     private function hasChanges($changes) {
         $nodes = $changes['nodes'];
         $paths = $changes['paths'];
@@ -354,6 +357,7 @@ class RevisionProcessor extends Object {
                 $revision->nodes->set($key, $this->nodeRepository->createNew(NULL, ["revision" => $revision, "properties" => $node->properties]));
                 $changesMap[$node->original->id] = $key;
             }
+            $this->changedKeys['nodes'][$node->original->id] = TRUE;
         }
         foreach ($changes as $change) {
             foreach ($change->paths as $path) {
@@ -361,6 +365,7 @@ class RevisionProcessor extends Object {
                     $revision->paths[] = $this->pathRepository->createNew(NULL, ["revision" => $revision, "properties" => $path->properties]);
                 } else {
                     $revision->paths->remove($this->findKeyByPropertiesId($revision->paths, $path->original));
+                    $this->changedKeys['paths'][$path->original->id] = TRUE;
                 }
             }
         }
@@ -423,6 +428,39 @@ class RevisionProcessor extends Object {
         foreach ($collection as $key => $value) {
             if($value->properties->id == $nodeP->id) {
                 return $key;
+            }
+        }
+    }
+
+    private function autoCloseChangesets($changesets, $keys) {
+        /** @var $changeset Changeset */
+        foreach($changesets as $changeset) {
+            if($changeset->getState() != Changeset::STATE_NEW) {
+                //we are dealing with this only if the changeset should stay open after this
+                continue;
+            }
+
+            $close = FALSE;
+            foreach($changeset->nodes as $node) {
+                if($node->original != NULL && isset($keys['nodes'][$node->original->id])) {
+                    $close = TRUE;
+                    break;
+                }
+            }
+            if(!$close) {
+                foreach ($changeset->paths as $path) {
+                    if ($path->original != NULL && isset($keys['paths'][$path->original->id])) {
+                        $close = TRUE;
+                        break;
+                    }
+                }
+            }
+
+            if($close) {
+                $changeset->setState(Changeset::STATE_REJECTED);
+                $changeset->setAdminComment("Návrh byl automaticky uzavřen kvůli kolizi s nově uloženou verzí dat.");
+                $changeset->setProcessedBy($this->user);
+                $changeset->setProcessedDate(new \DateTime());
             }
         }
     }
