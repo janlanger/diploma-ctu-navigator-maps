@@ -117,11 +117,11 @@ class PlanPresenter extends SecuredPresenter {
             $plan->setPublished(true);
             $plan->setPublishedDate(new \DateTime());
             $plan->setInPublishQueue(false);
-
-            //generate plan
-            $this->getContext()->tiles->generateTiles($plan);
-            $repository->getEntityManager()->flush();
         }
+        //generate plan
+        $this->getContext()->tiles->generateTiles($plan);
+        $repository->getEntityManager()->flush();
+
         $this->redirect('default');
     }
 
