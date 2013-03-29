@@ -86,7 +86,7 @@ module Mapping {
         }
 
 
-        private loadMarkers(definition:array) {
+        public loadMarkers(definition:array) {
             $.each(definition, (index, item) => {
                 var marker = this.createMarker({
                     draggable: (!item.draggable?false:item.draggable),
@@ -94,8 +94,10 @@ module Mapping {
                     icon:item.icon,
                     title:item.title
                 });
-                if(item.appOptions) {
+                if(typeof item.appOptions != "object") {
                     marker.appOptions = JSON.parse(item.appOptions);
+                } else {
+                    marker.appOptions = item.appOptions;
                 }
                 this.markers.push(marker);
             });
@@ -110,7 +112,7 @@ module Mapping {
             return new google.maps.Marker(options);
         }
 
-        private loadPaths(definition) {
+        public loadPaths(definition) {
             $.each(definition, (index, item) => {
                 this.paths.push(this.createPath(
                     new google.maps.LatLng(item.start.lat,item.start.lng),

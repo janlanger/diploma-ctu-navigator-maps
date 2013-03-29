@@ -42,8 +42,9 @@ class ActiveProposals extends QueryObjectBase {
             $q->andWhere("c.submitted_by = :user")
                 ->setParameter('user',$this->user);
         } else {
-            $q->andWhere("c.against_revision = :revision")
-                ->setParameter("revision", $this->revision);
+            $q->innerJoin("c.against_revision", "r");
+            $q->andWhere("r.floor = :floor")
+                ->setParameter("floor", $this->revision->floor);
         }
 
         return $q;

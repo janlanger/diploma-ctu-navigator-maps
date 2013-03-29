@@ -12,12 +12,21 @@ use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Nette\Application\UI\Control;
 
 class ProposalEditor extends Control {
-    public $submitHandler;
+    private $submitHandler;
+    private $revisionDictionary;
 
     /** @var Dao */
     private $proposalRepository;
 
     private $activeRevision;
+
+    public function setRevisionDictionary($revisionDictionary) {
+        $this->revisionDictionary = $revisionDictionary;
+    }
+
+    public function getRevisionDictionary() {
+        return $this->revisionDictionary;
+    }
 
 
 
@@ -103,9 +112,9 @@ class ProposalEditor extends Control {
     private function getProposals() {
         static $items;
         if($items == NULL) {
-            $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(null, $this->activeRevision), 'id');
+            $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(NULL, $this->activeRevision), 'id');
         }
-        if($items == null) {
+        if($items == NULL) {
             $items = array();
         }
         return $items;
@@ -129,10 +138,11 @@ class ProposalEditor extends Control {
     public function createComponentProposalForm($name) {
         $form = new Form($this, $name);
         foreach($this->getProposals() as $proposal) {
-            $form->addOptionList('proposal' . $proposal->id, null, ['approve'=>'Zařadit do revize','reject'=>'Zamítnout']);
+            $form->addOptionList('proposal' . $proposal->id, NULL, ['approve'=>'Zařadit do revize','reject'=>'Zamítnout']);
         }
         $form->addTextArea("custom_changes");
         $form->addSubmit("send", 'Zpracovat');
+        $form->addHidden("revision", $this->activeRevision->id);
         $form->onSuccess[] = $this->submitHandler;
     }
 
@@ -188,6 +198,31 @@ class ProposalEditor extends Control {
     public function getSubmitHandler()
     {
         return $this->submitHandler;
+    }
+
+    public function createComponentRevisionChanger() {
+        $form = new Form();
+
+        $form->addSelect("against",NULL, $this->revisionDictionary)
+        ->setDefaultValue($this->activeRevision->id);
+
+        $form->onSuccess[] = function($form) {
+            $id = $form->values['against'];
+            $revision = $this->proposalRepository->getEntityManager()->getRepository("Maps\\Model\\Metadata\\Revision")->find($id);
+            $arr = ["nodes" => $revision->nodes->toArray()];
+
+            foreach($revision->paths as $path) {
+                $arr['paths'][] = [
+                    'start' => explode(",",$path->properties->startNode->position),
+                    'end' => explode(",", $path->properties->endNode->position),
+                ];
+            }
+
+            echo json_encode($arr);
+            exit;
+        };
+
+        return $form;
     }
 
 

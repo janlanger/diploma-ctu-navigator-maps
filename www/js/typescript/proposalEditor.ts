@@ -20,34 +20,69 @@ module Mapping {
         public initialize() {
             super.initialize();
 
+            this.initOriginals();
+
+            this.registerEvents();
+            this.detectCollisions();
+        }
+
+        public setNewData(points, paths, revision) {
+            $.each(this.markers, (index, item) => {
+                if(!item) return;
+                if(item.appStroke) {
+                    item.appStroke.setMap(null);
+                }
+                item.setMap(null);
+            });
+            this.markers = [];
+            $.each(this.paths, (index, item) => {
+                if (!item) return;
+                item.setPath([]);
+                item.setMap(null);
+            });
+            this.paths = [];
+
+            this.loadMarkers(points);
+
+            this.loadPaths(paths);
+
+            $.each(this.markers, (index, item) => {
+                this.eventHandler.registerMarkerEvents(item);
+            });
+
+            $.each(this.paths, (index, item) => {
+                this.eventHandler.registerPathEvents(item);
+            });
+
+            $("#revision-field").val(revision);
+            $("input[type=radio]").prop("checked", false);
+            $("tr[id^=proposal]").removeClass("success");
+            $("tr[id^=proposal]").removeClass("error");
+            this.initOriginals();
+
+
+        }
+
+        private initOriginals() {
+            this.markersOriginals = [];
             for (var key in this.markers) {
                 var item = this.markers[key];
 
                 this.markersOriginals[key] = $.extend({}, item.appOptions);
                 this.markersOriginals[key].gps = item.getPosition();
             }
+            this.pathOriginals = [];
             for (var key in this.paths) {
                 var item = this.paths[key];
                 var path = item.getPath();
+                var s = this.getMarkerInPosition(path.getAt(0));
+                var e = this.getMarkerInPosition(path.getAt(1));
                 this.pathOriginals[key] = {
-                    start: this.getMarkerInPosition(path.getAt(0)).appOptions.propertyId,
-                    end: this.getMarkerInPosition(path.getAt(1)).appOptions.propertyId
+                    start: (s?s.appOptions.propertyId:null),
+                    end: (e ? e.appOptions.propertyId : null)
                 };
             }
-
-            this.registerEvents();
-            this.detectCollisions();
         }
-
-        /*  public createMarker(markerOptions, additional = {}) {
-         var marker = super.createMarker(markerOptions, additional);
-
-         if(marker.appOptions) {
-         alert('aaaa');
-         marker.appOptionsOriginal = $.extend({}, marker.appOptions);
-         }
-         return marker;
-         }*/
 
         private registerEvents() {
             var _this = this;
@@ -322,7 +357,7 @@ module Mapping {
                         //remove
 
                         var path = this.getPathBetween(item.original.startNode, item.original.endNode);
-
+                        if(!path) continue;
                         path.setPath([]);
                         path.setMap(null);
                         var pathIndex = this.paths.indexOf(path);
@@ -525,10 +560,18 @@ module Mapping {
 
         private getPathBetween(sP, eP) {
             if(!(sP instanceof google.maps.LatLng)) {
-                sP = this.findNodeWithId(sP).getPosition();
+                sP = this.findNodeWithId(sP);
+                if(!sP) {
+                    return null;
+                }
+                sP = sP.getPosition();
             }
             if(!(eP instanceof google.maps.LatLng)) {
-                eP = this.findNodeWithId(eP).getPosition();
+                eP = this.findNodeWithId(eP);
+                if(!eP) {
+                    return;
+                }
+                eP = eP.getPosition();
             }
             for (var i = 0; i < this.paths.length; i++) {
                 var line = this.paths[i];

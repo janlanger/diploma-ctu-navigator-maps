@@ -203,6 +203,8 @@ class MetadataPresenter extends SecuredPresenter{
 
         $map->setActiveRevision($this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())));
 
+        $map->setRevisionDictionary($this->getRepository("meta_revision")->fetchPairs(new BaseDatagridQuery(), "id","revision"));
+
         $map->setPathOptions([
             'strokeColor' => '#ff0000',
             'strokeOpacity' => 0.8,
@@ -211,7 +213,6 @@ class MetadataPresenter extends SecuredPresenter{
 
         $map->setSubmitHandler(function (Form $form) {
             $p = new RevisionProcessor(
-                $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())),
                 $this->getRepository('user')->find($this->getUser()->getId()),
                 $this->getRepository('meta_revision'),
                 $this->getRepository("meta_node_properties"),
@@ -222,7 +223,10 @@ class MetadataPresenter extends SecuredPresenter{
                 $this->getRepository('meta_node'),
                 $this->getRepository('meta_path')
             );
-            $p->handle($form);
+            if($p->handle($form)) {
+                $this->flashMessage("Data byla úspěšně uložena. Nezapomeňte novou revizi publikovat.", self::FLASH_SUCCESS);
+                $this->redirect("default");
+            }
         });
 
         return $map;

@@ -37,16 +37,15 @@ class RevisionProcessor extends Object {
 
     private $user;
     /** @var Revision */
-    private $actualRevision = null;
+    private $actualRevision = NULL;
     /** @var Changeset */
-    private $directChangeset = null;
+    private $directChangeset = NULL;
 
-    function __construct($actualRevision, User $user, Dao $revision,
+    function __construct(User $user, Dao $revision,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
     Dao $node, Dao $path)
     {
-        $this->actualRevision = $actualRevision;
         $this->nodePropertiesRepository = $nodeProperties;
         $this->pathPropertiesRepository = $pathProperties;
         $this->changesetRepository = $changeset;
@@ -62,17 +61,19 @@ class RevisionProcessor extends Object {
     public function handle(Form $form) {
 
         $values = $form->getValues();
-        $changes = json_decode($values['custom_changes'], true);
+        $changes = json_decode($values['custom_changes'], TRUE);
+
+        $this->actualRevision = $this->revisionRepository->find($values['revision']);
 
         $this->processNewChanges($changes);
 
 
         /** @var $changesets Changeset[] */
-        $changesets = $this->changesetRepository->fetchAssoc(new ActiveProposals(null, $this->actualRevision),'id');
+        $changesets = $this->changesetRepository->fetchAssoc(new ActiveProposals(NULL, $this->actualRevision),'id');
 
         $changesetsToApply = [];
 
-        if($this->directChangeset != null) {
+        if($this->directChangeset != NULL) {
             $this->directChangeset->setState(Changeset::STATE_APPROVED);
             $changesetsToApply[$this->directChangeset->id] = $this->directChangeset;
         }
@@ -83,9 +84,13 @@ class RevisionProcessor extends Object {
                 if($action == "approve") {
                     $changesetsToApply[$id] = $changesets[$id];
                     $changesets[$id]->setState(Changeset::STATE_APPROVED);
+                    $changesets[$id]->setProcessedBy($this->user);
+                    $changesets[$id]->setProcessedDate(new \DateTime());
                 }
                 if($action == "reject") {
                     $changesets[$id]->setState(Changeset::STATE_REJECTED);
+                    $changesets[$id]->setProcessedBy($this->user);
+                    $changesets[$id]->setProcessedDate(new \DateTime());
                 }
             }
         }
@@ -103,6 +108,7 @@ class RevisionProcessor extends Object {
             //saves rejections
             $this->changesetRepository->save();
         }
+        return true;
     }
 
     private function processNewChanges($changes) {
@@ -112,7 +118,7 @@ class RevisionProcessor extends Object {
         foreach ($changes as $part => $p) {
             foreach ($p as $key => $section) {
                 foreach ($section as $id => $node) {
-                    if ($node == null) {
+                    if ($node == NULL) {
                         unset($changes[$part][$key][$id]);
                     }
                 }
@@ -121,7 +127,7 @@ class RevisionProcessor extends Object {
 
         if($this->hasChanges($changes)) {
             /** @var $changeset Changeset */
-            $this->directChangeset = $changeset = $this->changesetRepository->createNew(null, [
+            $this->directChangeset = $changeset = $this->changesetRepository->createNew(NULL, [
                 'state' => Changeset::STATE_NEW,
                 'againstRevision' => $this->actualRevision,
                 'comment' => "",
@@ -171,67 +177,67 @@ class RevisionProcessor extends Object {
             $nodes = [];
 
             foreach($changes['nodes']['added'] as $id => $node) {
-                $nodesAdd[$id] = $this->nodePropertiesRepository->createNew(null, [
+                $nodesAdd[$id] = $this->nodePropertiesRepository->createNew(NULL, [
                     'gpsCoordinates' => $node['position'],
                     'type' => $node['type'],
-                    'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : null),
-                    'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : null),
-                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : null,
-                    'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : null,
-                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : null,
+                    'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
+                    'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
+                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                    'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
+                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
                 ]);
 
-                $nodes[] = $this->nodeChangeRepository->createNew(null, [
+                $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
                     'properties' => $nodesAdd[$id],
-                    'original' => null,
-                    'wasDeleted' => false
+                    'original' => NULL,
+                    'wasDeleted' => FALSE
                 ]);
             }
 
 
             foreach ($changes['nodes']['changed'] as $node) {
-                $item = $this->nodePropertiesRepository->createNew(null, [
+                $item = $this->nodePropertiesRepository->createNew(NULL, [
                     'gpsCoordinates' => $node['position'],
                     'type' => $node['type'],
-                    'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : null),
-                    'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : null),
-                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : null,
-                    'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : null,
-                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : null,
+                    'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
+                    'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
+                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                    'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
+                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
                 ]);
 
-                $nodes[] = $this->nodeChangeRepository->createNew(null, [
+                $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
                     'properties' => $item,
                     'original' => $dbNodeProperties[$node['propertyId']],
-                    'wasDeleted' => false
+                    'wasDeleted' => FALSE
                 ]);
             }
 
 
             foreach ($changes['nodes']['deleted'] as $nodeId) {
-                $nodes[] = $this->nodeChangeRepository->createNew(null, [
+                $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
-                    'properties' => null,
+                    'properties' => NULL,
                     'original' => $dbNodeProperties[$nodeId],
-                    'wasDeleted' => true
+                    'wasDeleted' => TRUE
                 ]);
             }
 
             $paths = [];
 
             foreach($changes['paths']['added'] as $path) {
-                $item = $this->pathPropertiesRepository->createNew(null, [
+                $item = $this->pathPropertiesRepository->createNew(NULL, [
                     "startNode" => (isset($path['start']['propertyId'])?$dbNodeProperties[$path['start']['propertyId']] : $nodesAdd[$path['start']['id']]),
                     "endNode" => (isset($path['end']['propertyId']) ? $dbNodeProperties[$path['end']['propertyId']] : $nodesAdd[$path['end']['id']]),
                 ]);
 
-                $paths[] = $this->pathChangeRepository->createNew(null, [
+                $paths[] = $this->pathChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
                     'properties' => $item,
-                    'original' => null,
-                    'wasDeleted' => false,
+                    'original' => NULL,
+                    'wasDeleted' => FALSE,
                 ]);
             }
 
@@ -244,11 +250,11 @@ class RevisionProcessor extends Object {
                     }
                 }
 
-                $paths[] = $this->pathChangeRepository->createNew(null, [
+                $paths[] = $this->pathChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
-                    'properties' => null,
+                    'properties' => NULL,
                     'original' => $p,
-                    'wasDeleted' => true,
+                    'wasDeleted' => TRUE,
                 ]);
             }
 
@@ -276,7 +282,7 @@ class RevisionProcessor extends Object {
 
     private function cloneRevision(Revision $revision) {
         /** @var $newRevision Revision */
-        $newRevision = $this->revisionRepository->createNew(null, array(
+        $newRevision = $this->revisionRepository->createNew(NULL, array(
             'floor' => $revision->getFloor(),
             'user' => $this->user,
         ));
@@ -285,7 +291,7 @@ class RevisionProcessor extends Object {
 
 
         foreach($revision->nodes as $node) {
-            $nodes[] = $this->nodeRepository->createNew(null, array(
+            $nodes[] = $this->nodeRepository->createNew(NULL, array(
                 'revision' => $newRevision,
                 'properties' => $node->properties
             ));
@@ -294,7 +300,7 @@ class RevisionProcessor extends Object {
         $paths = $newRevision->getPaths();
 
         foreach($revision->paths as $path) {
-            $paths[] = $this->pathRepository->createNew(null, array(
+            $paths[] = $this->pathRepository->createNew(NULL, array(
                 'revision' => $newRevision,
                 'properties' => $path->properties
             ));
@@ -308,7 +314,6 @@ class RevisionProcessor extends Object {
 
     private function applyChanges(Revision $revision, array $changes) {
 
-        dump(count($revision->paths));
 
         usort($changes, function(Changeset $a, Changeset $b) {
             //sorts the array by submitted date (we need to replace changes made by previous proposal)
@@ -324,9 +329,10 @@ class RevisionProcessor extends Object {
         $toChangeNodes = [];
 
         foreach($changes as $change) {
+            $change->setInRevision($revision);
             foreach($change->nodes as $node) {
-                if($node->original == null) {
-                    $revision->nodes[] = $this->nodeRepository->createNew(null, ["revision" => $revision, "properties"=>$node->properties]);
+                if($node->original == NULL) {
+                    $revision->nodes[] = $this->nodeRepository->createNew(NULL, ["revision" => $revision, "properties"=>$node->properties]);
                 }
                 else {
                     if(isset($toChangeNodes[$node->original->id])) {
@@ -345,32 +351,31 @@ class RevisionProcessor extends Object {
             if($node->wasDeleted) {
                 $revision->nodes->remove($key);
             } else {
-                $revision->nodes->set($key, $this->nodeRepository->createNew(null, ["revision" => $revision, "properties" => $node->properties]));
+                $revision->nodes->set($key, $this->nodeRepository->createNew(NULL, ["revision" => $revision, "properties" => $node->properties]));
                 $changesMap[$node->original->id] = $key;
             }
         }
         foreach ($changes as $change) {
             foreach ($change->paths as $path) {
-                if ($path->original == null) {
-                    $revision->paths[] = $this->pathRepository->createNew(null, ["revision" => $revision, "properties" => $path->properties]);
+                if ($path->original == NULL) {
+                    $revision->paths[] = $this->pathRepository->createNew(NULL, ["revision" => $revision, "properties" => $path->properties]);
                 } else {
                     $revision->paths->remove($this->findKeyByPropertiesId($revision->paths, $path->original));
                 }
             }
         }
 
-        dump($changesMap);
 
         //change paths reference to new properties ids
         foreach ($revision->paths as $key => $path) {
-            $c = false;
+            $c = FALSE;
             foreach([$path->properties->startNode, $path->properties->endNode] as $node) {
                 if(isset($changesMap[$node->id])) {
-                    $c = true;
+                    $c = TRUE;
                 }
             }
             if($c) {
-                $path->properties = $this->pathPropertiesRepository->createNew(null, array(
+                $path->properties = $this->pathPropertiesRepository->createNew(NULL, array(
                     "startNode" => isset($changesMap[$path->properties->startNode->id])?
                             $revision->nodes->get($changesMap[$path->properties->startNode->id])->properties :
                             $path->properties->startNode,
@@ -408,8 +413,8 @@ class RevisionProcessor extends Object {
             }
         }
 
-        return $this->nodeChangeRepository->createNew(null, array(
-            'properties' => $this->nodePropertiesRepository->createNew(null, $merged),
+        return $this->nodeChangeRepository->createNew(NULL, array(
+            'properties' => $this->nodePropertiesRepository->createNew(NULL, $merged),
             'original' => $original
         ));
     }

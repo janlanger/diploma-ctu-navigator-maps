@@ -1,4 +1,8 @@
-
+<div class="pull-right">
+    {form revisionChanger, class=>"form-inline"}
+        {label against}<b>Pracovat proti revizi: </b>{/label}{input against, class=>'input-mini', 'id'=>"revision-changer"}
+    {/form}
+</div>
 {control mapEditor, size=>[$mapWidth, $mapHeight]}
 
 <script type="text/javascript" src="{$baseUri}/js/typescript/proposalEditor.js"></script>
@@ -50,8 +54,53 @@
 
 
     var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
+
+    $(document).ready(function() {
+        $("#revision-changer").change(function(event) {
+            var value = $(this).val();
+            $(this).parent("form").ajaxSubmit(function(responseText, statusText, xhr) {
+                var newPoints = [];
+                var newPaths = [];
+                if(responseText.nodes != undefined) {
+
+                    for(var i=0; i<responseText.nodes.length; i++) {
+                        var item = responseText.nodes[i];
+                        if(!item) continue;
+                        var pointInfo = {};
+                        pointInfo.appOptions = $.extend({}, item);
+
+                        var p = item.position.split(",");
+                        pointInfo.position = {
+                            lat: p[0],
+                            lng: p[1]
+                        };
+                        pointInfo.icon = mapping.getMarkerIcon(item.type);
+                        pointInfo.draggable = true;
+                        pointInfo.title = item.title;
+
+                        newPoints.push(pointInfo);
+                    }
+                }
+
+                if (responseText.paths != undefined) {
+
+                    for (var i = 0; i < responseText.paths.length; i++) {
+                        var item = responseText.paths[i];
+                        if (!item) continue;
+                        var pathInfo = {
+                            start: { lat: item.start[0], lng: item.start[1]},
+                            end: { lat: item.end[0], lng: item.end[1]}
+                        };
+
+                        newPaths.push(pathInfo);
+                    }
+                }
+                mapping.setNewData(newPoints, newPaths, value);
+            });
+        });
+    });
 </script>
-<h4>Návrhy</h4></h4>
+<h4>Návrhy</h4>
 <div class="alert alert-info">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     Aplikace návrhů při zpracování probíhá v pořadí podle času zaslání návrhu, <strong>od nejstarších po nejnovější</strong>. Pokud provedete nějaké změny přímo v zde, <strong>aplikují se jako poslední</strong>.
@@ -83,6 +132,7 @@
 {/foreach}
 </table>
     {input custom_changes, style=> 'width:100%;height:200px', class=>'hide', id=>'custom_changes'}
+    {input revision, id=>'revision-field'}
     {input send, id => 'proposal-send'}
 {/form}
 <div id="modalTemplate" class="modal hide fade" tabindex="-1" aria-labelledby="modal-header" aria-hidden="true">
