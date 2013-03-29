@@ -285,14 +285,14 @@ class MetadataPresenter extends SecuredPresenter{
             }
         };
 
-        $grid->addColumn("comment", 'Komentáře');
+        $grid->addColumn("comment", 'Komentáře', 0);
         $grid['comment']->formatCallback[] = function($value, $data) {
             $r = "";
             if($value != "") {
-                $r .= Html::el("span class=badge")->setHtml("Uživatel")->addTitle($value);
+                $r .= (string)Html::el("span class=badge")->setText("Uživatel")->setTitle($value);
             }
             if ($data['admin_comment'] != "") {
-                $r .= Html::el("span class=badge badge-info")->setHtml("Admin")->addTitle($data['admin_comment']);
+                $r .= ((string) Html::el("span class='badge badge-info'")->setText("Admin")->setTitle($data['admin_comment']));
             }
 
             return $r;
