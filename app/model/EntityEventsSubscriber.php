@@ -16,6 +16,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\NoResultException;
 use Maps\Model\Floor\Plan;
+use Maps\Model\Metadata\Revision;
 
 class EntityEventsSubscriber implements  EventSubscriber {
 
@@ -28,6 +29,18 @@ class EntityEventsSubscriber implements  EventSubscriber {
             try {
                 $lastRevision = $q->getSingleScalarResult();
                 $entity->revision =  $lastRevision+1;
+            } catch (NoResultException $e) {
+                $entity->setRevision(1);
+            }
+        }
+
+        if ($entity instanceof Revision) {
+            $q = $args->getEntityManager()->createQuery("SELECT p.revision FROM Maps\\Model\\Metadata\\Revision p WHERE p.floor=:floor ORDER by p.revision DESC");
+            $q->setMaxResults(1);
+            $q->setParameter('floor', $entity->floor);
+            try {
+                $lastRevision = $q->getSingleScalarResult();
+                $entity->revision = $lastRevision + 1;
             } catch (NoResultException $e) {
                 $entity->setRevision(1);
             }
