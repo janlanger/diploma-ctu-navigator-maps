@@ -67,13 +67,13 @@ class Changeset extends BaseEntity {
     private $in_revision;
     /**
      * @var string
-     * @Column(type="string", length=80)
+     * @Column(type="string", length=80, nullable=true)
      */
     private $comment;
 
     /**
      * @var string
-     * @column(type="string", length=80)
+     * @column(type="string", length=80, nullable=true)
      */
     private $admin_comment;
 
