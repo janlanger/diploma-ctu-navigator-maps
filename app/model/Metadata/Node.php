@@ -23,7 +23,7 @@ class Node extends BaseEntity implements \JsonSerializable {
     /**
      * @var Revision
      * @ManyToOne(targetEntity="Revision", inversedBy="nodes")
-     * @JoinColumn(name="revision_id", referencedColumnName="id", nullable=false)
+     * @JoinColumn(name="revision_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $revision;
 
@@ -84,7 +84,7 @@ class Node extends BaseEntity implements \JsonSerializable {
             'room' => $this->properties->getRoom(),
             'fromFloor' => $this->properties->getFromFloor(),
             'toFloor' => $this->properties->getToFloor(),
-            'toBuilding' => ($this->properties->getToBuilding() == null ? null : $this->properties->getToBuilding()->id),
+            'toBuilding' => ($this->properties->getToBuilding() == NULL ? NULL : $this->properties->getToBuilding()->id),
         ];
     }
 }
