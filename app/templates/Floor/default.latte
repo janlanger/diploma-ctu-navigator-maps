@@ -9,7 +9,7 @@
         <ul style="list-style-type: none">
             <li style="font-size: 20px; margin-bottom: 10px;">{$floor->floorNumber}. nadzemní podlaží</li>
             <li>Aktivní revize plánu: <b>{if $plan}{$plan->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
-            <li>Aktivní revize metadat: <b>{if $metadata}{$metadata->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
+            <li>Aktivní revize metadat: <b>{if $metadata}{$metadata->revision} z {$metadata->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
             <li n:if="isset($unprocessedProposals)"><br>
                 Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>
             </li>
@@ -20,7 +20,7 @@
         <ul style="list-style-type: none">
             <li style="margin-bottom: 10px;"><a n:href="edit?id=$floor->id" class="btn btn-info">Upravit základní data</a></li>
             <li style="margin-bottom: 10px;"><a n:href="Plan:default?floor=$floor->id" class="btn btn-warning">Spravovat plán</a></li>
-            <li style="margin-bottom: 10px;"><a n:if="$unprocessedProposals > 0" n:href="Metadata:default?floor=$floor->id" class="btn btn-danger">Spravovat revize metadat</a></li>
+            <li style="margin-bottom: 10px;"><a n:if="$user->isAllowed('Metadata','default')" n:href="Metadata:default?floor=$floor->id" class="btn btn-danger">Spravovat revize metadat</a></li>
             <li><a n:href="Metadata:proposal?floor=$floor->id" class="btn btn-primary">Vytvořit návrh</a></li>
         </ul>
     </div>
