@@ -94,7 +94,7 @@ module Mapping {
                     icon:item.icon,
                     title:item.title
                 });
-                if(typeof item.appOptions != "object") {
+                if(item.appOptions != undefined && typeof item.appOptions != "object") {
                     marker.appOptions = JSON.parse(item.appOptions);
                 } else {
                     marker.appOptions = item.appOptions;
