@@ -56,7 +56,7 @@ module Mapping {
             if(this.options.points && this.options.points.length > 0) {
                 this.loadMarkers(this.options.points);
             }
-            if(this.options.customLayers && this.options.customLayers.length > 0) {
+            if(this.options.customLayers && !$.isEmptyObject(this.options.customLayers)) {
                 this.loadCustomLayers(this.options.customLayers);
             }
             if(this.options.paths && this.options.paths.length > 0) {

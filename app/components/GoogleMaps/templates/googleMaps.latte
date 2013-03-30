@@ -28,7 +28,7 @@
         });
     {/foreach}
 
-    var customLayers = [];
+    var customLayers = {};
     {foreach $customLayers as $title => $path}
         customLayers[{$title}] = {$baseUri}+"/"+{$path};
     {/foreach}
