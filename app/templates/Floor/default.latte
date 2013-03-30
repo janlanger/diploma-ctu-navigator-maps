@@ -1,5 +1,5 @@
-{block #pageTitle}Detail podlaží č. {$floor->floorNumber}{if $floor->name} - {$floor->name}{/if}{/block}
-{block #breadcrumbs}{if $floor->name!=""}{$floor->name}{else}Podlaží č. {$floor->floorNumber}{/if}{/block}
+{block #pageTitle}Detail podlaží {$floor->readableName}{/block}
+{block #breadcrumbs}{$floor->readableName}{/block}
 {block #content}
 
 <h3>{$building->name}, {$building->address}</h3>
@@ -26,5 +26,11 @@
     </div>
 </div>
 <hr>
+<div class="alert alert-error" n:ifset="$showPlanWarning">
+    Toto podlaží nemá publikovány žádné mapové podklady.
+</div>
+<div class="alert alert-error" n:ifset="$showMetadataWarning">
+    Toto podlaží nemá publikovány žádná metadata.
+</div>
 <h4>Aktuálně publikovaný plán a metadata:</h4>
 {control map, size=>['100%','700px']}
