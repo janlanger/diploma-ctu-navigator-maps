@@ -10,7 +10,6 @@
 namespace Maps\Model\Floor;
 
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Maps\Model\BaseEntity;
 
 /**
@@ -19,15 +18,15 @@ use Maps\Model\BaseEntity;
  * @Entity
  * @Table(name="floor_plans",
  * indexes={
- *  @Index(columns={"published"})
+ * @Index(columns={"published"})
  * },
  * uniqueConstraints={
- *      @UniqueConstraint(columns={"floor_id", "revision"})
+ * @UniqueConstraint(columns={"floor_id", "revision"})
  *  })
  *
  */
 
-class Plan extends BaseEntity{
+class Plan extends BaseEntity {
     /**
      * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", inversedBy="nodes")
      * @JoinColumn(name="floor_id", referencedColumnName="id")
@@ -36,10 +35,10 @@ class Plan extends BaseEntity{
     /** @Column(type="integer") */
     private $revision = 1;
     /** @Column(type="boolean") */
-    private $published = false;
+    private $published = FALSE;
 
     /** @Column(type="boolean") */
-    private $inPublishQueue = false;
+    private $inPublishQueue = FALSE;
 
     /**
      * @ManyToOne(targetEntity="Maps\Model\User\User")
@@ -58,13 +57,21 @@ class Plan extends BaseEntity{
     private $published_date;
 
 
-
     /** @Column(type="string",length=100, nullable=true) */
     private $reference_topLeft;
     /** @Column(type="string",length=100, nullable=true) */
     private $reference_topRight;
     /** @Column(type="string",length=100, nullable=true) */
     private $reference_bottomRight;
+
+    /** @Column(type="string",length=100, nullable=true) */
+    private $bounding_SW;
+    /** @Column(type="string",length=100, nullable=true) */
+    private $bounding_NE;
+    /** @Column(type="integer", nullable=true) */
+    private $maxZoom;
+    /** @Column(type="integer", nullable=true) */
+    private $minZoom;
 
     public function __construct() {
         $this->added_date = new \DateTime();
@@ -174,9 +181,35 @@ class Plan extends BaseEntity{
         return $this->sourceFilePage;
     }
 
+    public function setBoundingNE($bounding_NE) {
+        $this->bounding_NE = $bounding_NE;
+    }
 
+    public function getBoundingNE() {
+        return $this->bounding_NE;
+    }
 
+    public function setBoundingSW($bounding_SW) {
+        $this->bounding_SW = $bounding_SW;
+    }
 
+    public function getBoundingSW() {
+        return $this->bounding_SW;
+    }
 
+    public function setMaxZoom($maxZoom) {
+        $this->maxZoom = $maxZoom;
+    }
 
+    public function getMaxZoom() {
+        return $this->maxZoom;
+    }
+
+    public function setMinZoom($minZoom) {
+        $this->minZoom = $minZoom;
+    }
+
+    public function getMinZoom() {
+        return $this->minZoom;
+    }
 }
