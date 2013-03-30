@@ -30,10 +30,10 @@ class PlanPresenter extends SecuredPresenter {
     public $floor;
 
     /** @var Floor */
-    private $floorEntity = null;
+    private $floorEntity = NULL;
 
     private function getFloor() {
-        if($this->floorEntity == null) {
+        if($this->floorEntity == NULL) {
             $this->floorEntity = $this->getRepository('floor')->find($this->floor);
         }
         return $this->floorEntity;
@@ -58,7 +58,7 @@ class PlanPresenter extends SecuredPresenter {
     public function actionAdd() {
 
         $this['formOne']->bindEntity($this->getRepository('plan')
-            ->createNew(null, [
+            ->createNew(NULL, [
                 'floor'=>$this->getFloor(),
                 'user'=>$this->getRepository('user')->find($this->getUser()->getId())
             ]));
@@ -75,7 +75,7 @@ class PlanPresenter extends SecuredPresenter {
         if($form->isSubmitted()) {
             $plan = $this->getRepository('plan')->find($id);
             $form->bindEntity($this->getRepository('plan')
-                ->createNew(null, ['floor'=>$plan->floor,
+                ->createNew(NULL, ['floor'=>$plan->floor,
                     'user'=>$this->getRepository('user')->find($this->getUser()->getId()),
                     'sourceFile'=>$plan->sourceFile,
                     'sourceFilePage'=>$plan->sourceFilePage,
@@ -90,12 +90,12 @@ class PlanPresenter extends SecuredPresenter {
     public function handlePublish($id) {
         /** @var $plan Plan */
         $plan = $this->getRepository('plan')->find($id);
-        if($plan->getReferenceTopLeft() == null || $plan->getReferenceTopRight() == null ||
-            $plan->getReferenceBottomRight() == null) {
+        if($plan->getReferenceTopLeft() == NULL || $plan->getReferenceTopRight() == NULL ||
+            $plan->getReferenceBottomRight() == NULL) {
             $this->flashMessage('Tato verze ('.$plan->getRevision().') nemá nastaveny všechny referenční body, nelze ji publikovat.', self::FLASH_ERROR);
             $this->redirect('this');
         }
-        $plan->setInPublishQueue(true);
+        $plan->setInPublishQueue(TRUE);
 
         $this->getRepository('plan')->getEntityManager()->flush();
 
@@ -104,8 +104,9 @@ class PlanPresenter extends SecuredPresenter {
     }
 
     public function handleRender() {
+        set_time_limit(180);
         //load all plans in queue
-        $plans = $this->getRepository('plan')->findBy(['inPublishQueue'=>true, 'published'=>false]);
+        $plans = $this->getRepository('plan')->findBy(['inPublishQueue'=>TRUE, 'published'=>FALSE]);
         $repository = $this->getRepository('plan');
 
         //each
@@ -114,12 +115,12 @@ class PlanPresenter extends SecuredPresenter {
             $q = new DeactivatePlansOfFloorQuery($plan->floor);
             $q->getQuery($repository)->execute();
             //set queued plan as active
-            $plan->setPublished(true);
+            $plan->setPublished(TRUE);
             $plan->setPublishedDate(new \DateTime());
-            $plan->setInPublishQueue(false);
+            $plan->setInPublishQueue(FALSE);
+            //generate plan
+            $this->getContext()->tiles->generateTiles($plan);
         }
-        //generate plan
-        $this->getContext()->tiles->generateTiles($plan);
         $repository->getEntityManager()->flush();
 
         $this->redirect('default');
