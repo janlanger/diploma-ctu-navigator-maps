@@ -78,7 +78,7 @@ class FloorPresenter extends SecuredPresenter {
         $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
         $this->template->metadata = $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($floor));
 
-        $proposal = $this->getRepository('meta_changeset')->fetchOne(new CountUnprocessedProposals($metadata));
+        $proposal = $this->getRepository('meta_changeset')->fetchOne(new CountUnprocessedProposals($floor));
         if (!empty($proposal)) {
             $this->template->unprocessedProposals = array_shift($proposal);
         }

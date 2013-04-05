@@ -10,17 +10,18 @@
 namespace Maps\Model\Metadata\Queries;
 
 
+use Maps\Model\Metadata\Changeset;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
 class CountUnprocessedProposals extends QueryObjectBase {
 
-    private $metadata;
+    private $floor;
 
 
 
-    public function __construct($metadata) {
-        $this->metadata = $metadata;
+    public function __construct($floor) {
+        $this->floor = $floor;
     }
 
 
@@ -31,7 +32,10 @@ class CountUnprocessedProposals extends QueryObjectBase {
      */
     protected function doCreateQuery(IQueryable $repository) {
         return $repository->createQueryBuilder("c")->select("count(c.id)")
-            ->where("c.against_revision = :revision")
-            ->setParameter("revision", $this->metadata);
+            ->join("c.against_revision", "r")
+            ->where("r.floor = :floor")
+            ->andWhere("c.state = :state")
+            ->setParameter("floor", $this->floor)
+                ->setParameter("state", Changeset::STATE_NEW);
     }
 }
