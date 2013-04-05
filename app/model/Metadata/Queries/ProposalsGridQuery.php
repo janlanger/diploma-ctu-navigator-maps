@@ -27,7 +27,7 @@ class ProposalsGridQuery extends QueryObjectBase {
      * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
      */
     protected function doCreateQuery(IQueryable $repository) {
-        return $repository->createQueryBuilder("c")->select("c, u.name AS author, r2.revision, u2.name")
+        return $repository->createQueryBuilder("c")->select("c, u.name AS author, r2.revision AS r2_revision, u2.name AS u2_name")
                 ->innerJoin("c.submitted_by", "u")
                 ->join("c.against_revision", 'r')
                 ->leftJoin("c.in_revision", 'r2')
