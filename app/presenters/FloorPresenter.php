@@ -91,7 +91,10 @@ class FloorPresenter extends SecuredPresenter {
         //$form->addHidden('building');
 
         $form->addSubmit('ok', 'Uložit');
-        $form->setRedirect('Building:detail?id=' . $this->getBuilding()->id);
+        $form->onComplete[] = function($entity) use ($form) {
+            $form->setRedirect('Floor:default?id=' . $entity->id);
+        };
+
     }
 
     public function createComponentMap($name) {
