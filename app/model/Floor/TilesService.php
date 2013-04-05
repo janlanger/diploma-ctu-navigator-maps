@@ -73,7 +73,7 @@ class TilesService extends Object {
     }
 
     private function translateImage() {
-        $translated = dirname($this->sourceFile).'/'.md5(basename($this->sourceFile)).'.png';
+        $translated = dirname($this->sourceFile).'/'.md5(basename($this->sourceFile)).'.tif';
         $this->wrapper->translate(
             $this->sourceFile,
             $translated,

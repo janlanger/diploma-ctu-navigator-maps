@@ -11,6 +11,7 @@ namespace Maps\Components\GoogleMaps;
 
 
 use Maps\Components\ImageMagick;
+use Nette\Diagnostics\Debugger;
 use Nette\Image;
 use Nette\Object;
 
@@ -31,7 +32,7 @@ class GDALWrapper extends Object {
 
     public function translate($source, $destination, $topLeft, $topRight, $bottomRight) {
         $image = new ImageMagick($source);
-        $command= 'gdal_translate -of PNG';
+        $command= 'gdal_translate -of GTiff';
         $topLeft = explode(",", $topLeft);
         $topRight = explode(",", $topRight);
         $bottomRight = explode(",", $bottomRight);
@@ -42,18 +43,23 @@ class GDALWrapper extends Object {
         $command.= ' -gcp '.$image->getWidth().' 0 '.((double)$topRight[1]).' '.((double)$topRight[0]);
         $command.= ' -gcp '.$image->getWidth().' '.$image->getHeight().' '.((double)$bottomRight[1]).' '.((double)$bottomRight[0]);
         $command.= ' '.escapeshellarg($source).' '.escapeshellarg($destination);
+
         $this->execute($command);
     }
 
     public function generate($source, $destinationDir, $minZoom = 16, $maxZoom = 21) {
-        $this->execute('echo %GDAL_DATA%');
-        $this->execute('gdal2tiles -s EPSG:4326 -g AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk -z '.$minZoom.'-'.$maxZoom.' '.escapeshellarg($source).' '.escapeshellarg($destinationDir));
+        $this->execute('gdal2tiles -s EPSG:4326 -w none -z '.$minZoom.'-'.$maxZoom.' '.escapeshellarg($source).' '.escapeshellarg($destinationDir));
     }
 
     private function execute($command) {
         exec($command.' 2>&1', $out, $status);
-
-     //   dump( $out, $status);
-     //   echo $command;
+        try {
+            if($status != 0) {
+                throw new \RuntimeException("Shell command returned $status. Command $command");
+            }
+        } catch (\RuntimeException $e) {
+            Debugger::log($e);
+            throw $e;
+        }
     }
 }
