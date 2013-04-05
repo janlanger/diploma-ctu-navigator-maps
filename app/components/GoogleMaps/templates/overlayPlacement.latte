@@ -35,7 +35,7 @@
             var rect = map.getDiv().getBoundingClientRect();
             var x = rect.left;
             var y = rect.top;
-            var overlay = new Overlay({$baseUri}+{$overlayImage|image:'png',false,1000,null}, x, y);
+            var overlay = new Overlay({$baseUri}+"/"+{$overlayImage|image:'png',false,1000,null}, x, y);
             overlay.setMap(map);
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
                     new OpacityWidget(overlay));
