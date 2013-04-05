@@ -152,43 +152,11 @@ class FloorPresenter extends SecuredPresenter {
         if ($metadata != NULL) {
             $nodes = $metadata->nodes;
 
-            $types = [
-                'entrance' => 'Vchod',
-                'stairs' => 'Schodiště',
-                'elevator' => 'Výtah',
-                'passage' => 'Průchod',
-                'lecture' => 'Učebna',
-                'office' => 'Kancelář',
-                'study' => 'Studovna',
-                'auditorium' => 'Posluchárna',
-                'cafeteria' => 'Kantýna',
-                'restroom-men' => 'WC muži',
-                'restroom-women' => 'WC ženy',
-                'cloakroom' => 'Šatna',
-                'other' => '',
-                'restriction' => 'Zákaz vstupu',
-            ];
-
             /** @var $node Node */
             foreach ($nodes as $node) {
-                $title = [];
-                if (isset($types[$node->properties->type])) {
-                    if ($types[$node->properties->type]) {
-                        $title[] = $types[$node->properties->type];
-                    }
-
-                    if ($node->properties->getName() != "") {
-                        $title[] = $node->properties->getName();
-                    }
-
-                    if ($node->properties->getRoom() != "") {
-                        $title[] = $node->properties->getRoom();
-                    }
-
-                }
                 $map->addPoint($node->properties->getPosition(), [
                     'draggable' => FALSE,
-                    'title' => (!empty($title) ? implode(" - ", $title) : NULL),
+                    'title' => $node->properties->readableTitle,
                     'type' => $node->properties->type,
                 ]);
             }
