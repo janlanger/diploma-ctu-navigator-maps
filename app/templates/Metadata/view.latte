@@ -1,0 +1,8 @@
+{block #pageTitle}Správa metadat - podlaží {$floor->name}{/block}
+{block #breadcrumbs}Revize {$revision->revision}{/block}
+
+{block #content}
+<a class="btn btn-warning" data-confirm="Touto akcí publikujete tuto revizi uživatelům. Chcete pokračovat?" n:href="publish!?id=$revision->id">Publikovat revizi</a>
+<br><br>
+{control viewMap, size=>['100%', '700px']}
+

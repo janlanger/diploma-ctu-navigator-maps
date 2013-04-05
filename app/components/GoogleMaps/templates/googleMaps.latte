@@ -13,7 +13,7 @@
         points.push({
             {ifset $pointsTypes}
             icon: {
-                url: {$baseUri}+"/"+{$iconsBasePath}+"/"+{=isset($pointsTypes[$point['type']]['url'])?$pointsTypes[$point['type']]['url']:$point['type']."png"}
+                url: {$baseUri}+"/"+{$iconsBasePath}+"/"+{=isset($pointsTypes[$point['type']]['url'])?$pointsTypes[$point['type']]['url']:$point['type'].".png"}
                 {ifset $pointsTypes[$point['type']]['anchor']}, anchor: new google.maps.Point({$pointsTypes[$point['type']]['anchor'][0]}, {$pointsTypes[$point['type']]['anchor'][1]}){/ifset}
             },
             {/ifset}

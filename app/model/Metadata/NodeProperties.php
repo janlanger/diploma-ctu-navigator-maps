@@ -114,13 +114,56 @@ class NodeProperties extends BaseEntity {
         return [
             'id' => $this->id,
             'type' => $this->type,
-            "toBuilding" => ($this->to_building != null?$this->to_building->id: null),
+            "toBuilding" => ($this->to_building != NULL?$this->to_building->id: NULL),
             "gpsCoordinates" => $this->gps_coordinates,
             "name" => $this->name,
             "room" => $this->room,
             "fromFloor" => $this->from_floor,
             "toFloor" => $this->to_floor,
         ];
+    }
+
+    public function getReadableTitle() {
+        $types = [
+            'entrance' => 'Vchod',
+            'stairs' => 'Schodiště',
+            'elevator' => 'Výtah',
+            'passage' => 'Průchod',
+            'lecture' => 'Učebna',
+            'office' => 'Kancelář',
+            'study' => 'Studovna',
+            'auditorium' => 'Posluchárna',
+            'cafeteria' => 'Kantýna',
+            'restroom-men' => 'WC muži',
+            'restroom-women' => 'WC ženy',
+            'cloakroom' => 'Šatna',
+            'other' => '',
+            'default' => '',
+            'restriction' => 'Zákaz vstupu',
+        ];
+        if(!array_key_exists($this->type, $types)) {
+            return NULL;
+        }
+        $title = $types[$this->type];
+        if(in_array($this->type, ['lecture','auditorium','cafeteria','office']) && $this->room != "") {
+            $title.=" - ".$this->room;
+        }
+        if($this->name != "") {
+            if($title != "") {
+                $title .= ": ";
+            }
+            $title.=$this->name;
+        }
+        if($this->type == 'stairs' && $this->to_floor != "") {
+            $title.=" do ".$this->to_floor;
+        }
+        if ($this->type == 'elevator' && $this->to_floor != "" && $this->from_floor != "") {
+            $title .= " ". $this->from_floor. "-" . $this->to_floor;
+        }
+        if($this->type == "passage" && $this->to_building != NULL) {
+            $title .= " do ".$this->to_building->name;
+        }
+        return $title;
     }
 
 }
