@@ -35,7 +35,7 @@ class Changeset extends BaseEntity {
     /**
      * @var Revision
      * @ManyToOne(targetEntity="Revision")
-     * @JoinColumn(name="against_revision", referencedColumnName="id", nullable=false)
+     * @JoinColumn(name="against_revision", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $against_revision;
     /**

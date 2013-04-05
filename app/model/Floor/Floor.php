@@ -21,7 +21,7 @@ class Floor extends BaseEntity {
     /** @Column(type="integer") */
     private $floor_number;
     /** 
-     * @ManyToOne(targetEntity="Maps\Model\Building\Building", cascade={"all"})
+     * @ManyToOne(targetEntity="Maps\Model\Building\Building", cascade={"persist"})
      * @JoinColumn(name="building_id", referencedColumnName="id")
      */
     private $building;

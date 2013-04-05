@@ -18,7 +18,8 @@
     </div>
     <div class="span6">
         <ul style="list-style-type: none">
-            <li style="margin-bottom: 10px;"><a n:href="edit?id=$floor->id" class="btn btn-info">Upravit základní data</a></li>
+            <li style="margin-bottom: 10px;"><a n:href="edit?id=$floor->id" class="btn btn-info">Upravit základní data</a>
+                <a n:href="delete!?id=$floor->id" data-confirm="Opravdu chcete smazat data tohoto podlaží, včetně zadaných plánů a metadata?" class="btn btn-small btn-danger">Smazat</a> </li>
             <li style="margin-bottom: 10px;"><a n:href="Plan:default?floor=$floor->id" class="btn btn-warning">Spravovat plán</a></li>
             <li style="margin-bottom: 10px;"><a n:if="$user->isAllowed('Metadata','default')" n:href="Metadata:default?floor=$floor->id" class="btn btn-danger">Spravovat revize metadat</a></li>
             <li><a n:href="Metadata:proposal?floor=$floor->id" class="btn btn-primary">Vytvořit návrh</a></li>

@@ -10,6 +10,7 @@ use Maps\Model\Floor\Path;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\CountUnprocessedProposals;
 use Maps\Model\Persistence\BaseFormProcessor;
+use Nette\Diagnostics\Debugger;
 use Nette\NotImplementedException;
 
 /**
@@ -57,6 +58,19 @@ class FloorPresenter extends SecuredPresenter {
 
         $this['form']->bindEntity($entity);
 
+    }
+
+    public function handleDelete($id) {
+        $entity = $this->getRepository('floor')->find($id);
+
+        try {
+            $this->getRepository('floor')->delete($entity);
+            $this->flashMessage('Záznamy byly úspěšně smazány.', self::FLASH_SUCCESS);
+        } catch (\Exception $e) {
+            $this->flashMessage('Záznamy nebyly smazány.', self::FLASH_ERROR);
+            Debugger::log($e);
+        }
+        $this->redirect("Building:detail?id=".$this->building);
     }
 
     public function actionDefault($id) {

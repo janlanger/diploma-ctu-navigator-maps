@@ -29,7 +29,7 @@ use Maps\Model\BaseEntity;
 class Plan extends BaseEntity {
     /**
      * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", inversedBy="nodes")
-     * @JoinColumn(name="floor_id", referencedColumnName="id")
+     * @JoinColumn(name="floor_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $floor;
     /** @Column(type="integer") */
