@@ -8,12 +8,9 @@
         <div class="well">
             <p class="lead">{$building->address}</p>
             <ul>
-                <li><strong>Podlaží:</strong> {$building->floorCount}</li>
+                <li><strong>Celkem podlaží:</strong> {$building->floorCount}</li>
                 <li><strong>Prefix místností:</strong> {$building->roomPrefix}</li>
             </ul>
-            <div class="pull-left">
-                <!--a n:href="kosApi?id={$building->id}" class="btn btn-warning">KOS API - data o místnostech</a-->
-            </div>
             <div class="pull-right">
                 <a n:href="edit?id={$building->id}" class="btn btn-primary">Upravit</a>
                 <a n:href="delete!?id={$building->id}" class="btn btn-danger" data-confirm="Opravdu chcete tuto budovu úplně odstranit?">Odstranit</a>

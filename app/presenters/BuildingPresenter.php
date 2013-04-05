@@ -43,17 +43,6 @@ class BuildingPresenter extends SecuredPresenter {
         $this->redirect('default');
     }
 
-    public function actionKosApi($id) {
-        $this->template->building = $this->getRepository('building')->find($id);
-        $this->template->rooms = $this->getRepository('room')->findBy(['building'=>$id]);
-        $q = new \Maps\Model\KosApi\LastCommunicationQuery();
-        $log = $q->fetch($this->getRepository('kosapiLog'), \Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-
-        if(!empty($log)) {
-            $this->template->log = $log;
-        }
-    }
-
     public function createComponentBuildingsGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
         $query = new \Maps\Model\BaseDatagridQuery();
@@ -93,7 +82,7 @@ class BuildingPresenter extends SecuredPresenter {
 
         /** @var $entity \Maps\Model\Building\Building */
         $entity = $this->getRepository("building")->find($this->getParameter('id'));
-        if($entity->getGpsCoordinates() != null) {
+        if($entity->getGpsCoordinates() != NULL) {
             $map->setCenter($entity->getGpsCoordinates());
             $map->addPoint($entity->getGpsCoordinates());
         }
@@ -115,13 +104,13 @@ class BuildingPresenter extends SecuredPresenter {
         $form->addText('floorCount','Počet podlaží')
             ->addRule(\Maps\Components\Forms\Form::NUMERIC)
             ->setRequired();
-        $form->addText('roomPrefix','Prefix místností', null, 10)
+        $form->addText('roomPrefix','Prefix místností', NULL, 10)
             ->setRequired();
         $form->addText('gpsCoordinates', "GPS souřadnice")
             ->setRequired();
         $form->addSubmit('send','Odeslat');
         $id = $this->getParameter('id');
-        if($id == null) {
+        if($id == NULL) {
             $form->setRedirect("default");
         } else {
             $form->setRedirect("detail?id=".$id);
@@ -130,20 +119,33 @@ class BuildingPresenter extends SecuredPresenter {
     
     public function createComponentPlansGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $q = new \Maps\Model\Floor\PlanDatagridQuery($this->getParameter('id'));
+        $q = new \Maps\Model\Floor\FloorsDatagridQuery($this->getParameter('id'));
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('floor')));
         $datasource->setMapping([
-            'id' => 'b.id',
-            'floor_number' => 'b.floor_number',
-            'name' => 'b.name',
-            'version' => 'b.version',
+            'id' => 'f.id',
+            'floor_number' => 'f.floor_number',
+            'name' => 'f.name',
+            'plan' => 'plan',
+            'metadata' => 'metadata'
         ]);
         $grid->setDataSource($datasource);
         
-        $grid->addColumn('floor_number', 'Podlaží');
+        $grid->addColumn('floor_number', 'Nadzemní podlaží');
         $grid->addColumn('name', 'Jméno');
-        $grid->addColumn('version', 'Verze');
-    //    $grid->addCheckboxColumn('actual_version','Pouze poslední');
+        $plan = $grid->addColumn('plan', 'Plán');
+
+        $revisionFnc = function($value, $data) {
+            if ($value != NULL) {
+                return "<span class='label label-success'><i class='icon-ok icon-white'>&nbsp;</i> verze $value</span>";
+            } else {
+                return "<span class='label label-important'><i class='icon-remove icon-white'>&nbsp;</i></span>";
+            }
+        };
+
+        $plan->formatCallback[] = $revisionFnc;
+
+        $m = $grid->addColumn('metadata', 'Metadata');
+        $m->formatCallback[] = $revisionFnc;
         
         $grid->addActionColumn('a', 'Akce');
         $grid->keyName = 'id';
