@@ -12,28 +12,19 @@ namespace Maps\Model\Metadata;
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
+use Maps\Model\Metadata\Queries\NodePropertiesQuery;
+use Maps\Model\Metadata\Queries\PathPropertiesByNodes;
 use Maps\Model\User\User;
 use Maps\Tools\Mixed;
 
 class ProposalProcessor {
 
     /** @var Revision */
-    private $actualRevision = null;
-
-    private $dbNodes = [];
-    private $dbPaths = [];
-
-    private $nodesAdd = [];
-    private $nodesChange = [];
-    private $nodesDelete = [];
-
-    private $pathAdd = [];
-    private $pathChange = [];
-    private $pathDelete = [];
+    private $actualRevision = NULL;
 
     private $nodePropertiesRepository;
     /** @var \Maps\Model\Dao */
-    private $pathPropertiesRpository;
+    private $pathPropertiesRepository;
     /** @var Dao */
     private $changesetRepository;
     /** @var Dao */
@@ -41,14 +32,15 @@ class ProposalProcessor {
 
     private $user;
 
+    private $changeset;
+
 
     function __construct($actualRevision, User $user,
                          Dao $nodeProperties, Dao $pathProperties,
-                         Dao $changeset, Dao $nodeChange, Dao $pathChange)
-    {
+                         Dao $changeset, Dao $nodeChange, Dao $pathChange) {
         $this->actualRevision = $actualRevision;
         $this->nodePropertiesRepository = $nodeProperties;
-        $this->pathPropertiesRpository = $pathProperties;
+        $this->pathPropertiesRepository = $pathProperties;
         $this->changesetRepository = $changeset;
         $this->nodeChangeRepository = $nodeChange;
         $this->pathChangeRepository = $pathChange;
@@ -57,203 +49,187 @@ class ProposalProcessor {
 
 
     public function handle(Form $form) {
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             return;
         }
 
 
-
         $values = $form->getValues();
-        $definition = json_decode($values['definition']);
+        $changes = json_decode($values['definition'], TRUE);
 
+        //remove null shitty things...
 
-
-        $sentPaths = $definition->paths;
-        $sentNodes = $definition->nodes;
-
-        if($this->actualRevision != null) {
-            $this->dbNodes = Mixed::mapAssoc($this->actualRevision->getNodes(), 'id');
-            $this->dbPaths = Mixed::mapAssoc($this->actualRevision->getPaths(), 'id');
+        foreach ($changes as $part => $p) {
+            foreach ($p as $key => $section) {
+                foreach ($section as $id => $node) {
+                    if ($node == NULL) {
+                        unset($changes[$part][$key][$id]);
+                    }
+                }
+            }
         }
 
-        /** @var $changeset Changeset */
-        $changeset = $this->changesetRepository->createNew(null, [
-            'state' => Changeset::STATE_NEW,
-            'againstRevision' => $this->actualRevision,
-            'comment' => $values['comment'],
-            'submittedBy' => $this->user,
-        ]);
+        if ($this->hasChanges($changes)) {
 
-        $this->processNodes($sentNodes);
+            /** @var $changeset Changeset */
+            $this->changeset = $this->changesetRepository->createNew(NULL, [
+                'state' => Changeset::STATE_NEW,
+                'againstRevision' => $this->actualRevision,
+                'comment' => $values['comment'],
+                'submittedBy' => $this->user,
+            ]);
 
-        $nodesDB = [];
+            $this->processChanges($changes);
 
-        foreach($this->nodesAdd as $i=>$node) {
-            $nodesDB[] = $this->nodeChangeRepository->createNew(null, [
-                'changeset' => $changeset,
-                'properties' => $node,
+            $this->nodeChangeRepository->getEntityManager()->flush();
+        }
+    }
+
+    private function processChanges($changes) {
+
+        //load needed nodes properties for relations
+
+        $nodePropertiesIds = [];
+
+        foreach ($changes['nodes']['changed'] as $node) {
+            $nodePropertiesIds[] = $node['propertyId'];
+        }
+        $nodePropertiesIds = array_merge($nodePropertiesIds, $changes['nodes']['deleted']);
+
+
+        foreach ($changes['paths']['added'] as $path) {
+            if (isset($path['start']['propertyId'])) {
+                $nodePropertiesIds[] = $path['start']['propertyId'];
+            }
+            if (isset($path['end']['propertyId'])) {
+                $nodePropertiesIds[] = $path['end']['propertyId'];
+            }
+        }
+
+        $pathNodeIds = [];
+
+        foreach ($changes['paths']['deleted'] as $path) {
+            $nodePropertiesIds[] = $path['start'];
+            $nodePropertiesIds[] = $path['end'];
+
+            $pathNodeIds[] = [$path['start'], $path['end']];
+        }
+
+        $nodePropertiesIds = array_unique($nodePropertiesIds, SORT_NUMERIC);
+
+        if (count($nodePropertiesIds) > 0) {
+            $dbNodeProperties = $this->nodePropertiesRepository->fetchAssoc(new NodePropertiesQuery($nodePropertiesIds), 'id');
+        }
+        else {
+            $dbNodeProperties = [];
+        }
+
+        $dbPathProperties = $this->pathPropertiesRepository->fetchAssoc(new PathPropertiesByNodes($pathNodeIds), 'id');
+
+        //load end
+
+
+        $nodesAdd = [];
+
+        $nodes = [];
+
+        foreach ($changes['nodes']['added'] as $id => $node) {
+            $nodesAdd[$id] = $this->nodePropertiesRepository->createNew(NULL, [
+                'gpsCoordinates' => $node['position'],
+                'type' => $node['type'],
+                'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
+                'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
+                'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
+                'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
+            ]);
+
+            $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
+                'changeset' => $this->changeset,
+                'properties' => $nodesAdd[$id],
+                'original' => NULL,
+                'wasDeleted' => FALSE
             ]);
         }
 
-        foreach($this->nodesChange as $id=>$node) {
-            $nodesDB[] = $this->nodeChangeRepository->createNew(null, [
-                'changeset' => $changeset,
-                'properties' => $node,
-                'original' => $this->dbNodes[$id]
+
+        foreach ($changes['nodes']['changed'] as $node) {
+            $item = $this->nodePropertiesRepository->createNew(NULL, [
+                'gpsCoordinates' => $node['position'],
+                'type' => $node['type'],
+                'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
+                'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
+                'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
+                'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
             ]);
-        }
 
-        foreach($this->nodesDelete as $item) {
-            $nodesDB[] = $this->nodeChangeRepository->createNew(null, [
-                'changeset' => $changeset,
-                'wasDeleted' => true,
-                'original' => $item,
-            ]);
-        }
-
-        $this->processPaths($sentPaths, $sentNodes);
-
-        $pathsDB = [];
-
-        foreach($this->pathAdd as $item) {
-            $pathsDB[] = $this->pathChangeRepository->createNew(null, [
-                'changeset' => $changeset,
+            $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
+                'changeset' => $this->changeset,
                 'properties' => $item,
+                'original' => $dbNodeProperties[$node['propertyId']],
+                'wasDeleted' => FALSE
             ]);
         }
 
-        foreach($this->pathChange as $id=>$item) {
-            $pathsDB[] = $this->pathChangeRepository->createNew(null, [
-                'changeset' => $changeset,
+
+        foreach ($changes['nodes']['deleted'] as $nodeId) {
+            $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
+                'changeset' => $this->changeset,
+                'properties' => NULL,
+                'original' => $dbNodeProperties[$nodeId],
+                'wasDeleted' => TRUE
+            ]);
+        }
+
+        $paths = [];
+
+        foreach ($changes['paths']['added'] as $path) {
+            $item = $this->pathPropertiesRepository->createNew(NULL, [
+                "startNode" => (isset($path['start']['propertyId']) ? $dbNodeProperties[$path['start']['propertyId']] : $nodesAdd[$path['start']['id']]),
+                "endNode" => (isset($path['end']['propertyId']) ? $dbNodeProperties[$path['end']['propertyId']] : $nodesAdd[$path['end']['id']]),
+            ]);
+
+            $paths[] = $this->pathChangeRepository->createNew(NULL, [
+                'changeset' => $this->changeset,
                 'properties' => $item,
-                'original' => $this->dbPaths[$id],
+                'original' => NULL,
+                'wasDeleted' => FALSE,
             ]);
         }
 
-        foreach($this->pathDelete as $item) {
-            $pathsDB[] = $this->pathChangeRepository->createNew(null, [
-                'changeset' => $changeset,
-                'wasDeleted' => true,
-                'original' => $item,
+        $deletedPaths = [];
+
+        foreach ($changes['paths']['deleted'] as $path) {
+            foreach ($dbPathProperties as $p) {
+                if ($p->startNode->id == $path['start'] && $p->endNode->id == $path['end']) {
+                    break;
+                }
+            }
+
+            $paths[] = $this->pathChangeRepository->createNew(NULL, [
+                'changeset' => $this->changeset,
+                'properties' => NULL,
+                'original' => $p,
+                'wasDeleted' => TRUE,
             ]);
         }
 
-        $this->nodeChangeRepository->add($nodesDB);
-        $this->pathChangeRepository->add($pathsDB);
-        $this->nodeChangeRepository->getEntityManager()->flush();
+        $this->nodeChangeRepository->add($nodes);
+        $this->pathChangeRepository->add($paths);
     }
 
-    private function processNodes($nodes) {
-        $unprocessedNodes = array_flip(array_keys($this->dbNodes));
-        foreach($nodes as $node) {
-            if(!isset($node->id) || !isset($this->dbNodes[$node->id])) {
-                //add
-                if($node == null) continue;
-                $this->nodesAdd[] = $this->nodePropertiesRepository->createNew(null, array(
-                    'gpsCoordinates' => $node->position,
-                    'type' => $node->type,
-                    'name' => (isset($node->name) && trim($node->name) != "" ? $node->name : null),
-                    'room' => (isset($node->room) && trim($node->room) != "" ? $node->room : null),
-                    'fromFloor' => isset($node->fromFloor) && trim($node->fromFloor) != "" ? $node->fromFloor : null,
-                    'toFloor' => isset($node->toFloor) && trim($node->toFloor) != "" ? $node->toFloor : null,
-                    'toBuilding' => isset($node->toBuilding) && trim($node->toBuilding) != "" ? $node->toBuilding : null,
-                ));
-                $node->addedId = count($this->nodesAdd) -1;
-            } else {
-                //change
-                $entityChanged = false;
-                $entity = $this->dbNodes[$node->id]->properties;
+    private function hasChanges($changes) {
+        $nodes = $changes['nodes'];
+        $paths = $changes['paths'];
 
-                foreach($node as $key=>$value) {
-                    if(in_array($key, ['id','state','propertyId'])) continue;
-                    $getMethod = "get".ucfirst($key);
-                    if(trim($value) == "") $value = null;
-                    if($value != $entity->$getMethod()) {
-                        $entityChanged = true;
-                    }
-                }
+        return ((isset($nodes['added']) && !empty($nodes['added'])) ||
+                (isset($nodes['changed']) && !empty($nodes['changed'])) ||
+                (isset($nodes['deleted']) && !empty($nodes['deleted'])) ||
+                (isset($paths['added']) && !empty($paths['added'])) ||
+                (isset($paths['deleted']) && !empty($paths['deleted']))
+        );
 
-                if($entityChanged) {
-                    $this->nodesChange[$node->id] = $this->nodePropertiesRepository->createNew(null, [
-                        'gpsCoordinates' => $node->position,
-                        'type' => $node->type,
-                        'name' => (isset($node->name) && trim($node->name) != "" ? $node->name : null),
-                        'room' => (isset($node->room) && trim($node->room) != "" ? $node->room : null),
-                        'fromFloor' => isset($node->fromFloor) && trim($node->fromFloor) != "" ? $node->fromFloor : null,
-                        'toFloor' => isset($node->toFloor) && trim($node->toFloor) != "" ? $node->toFloor : null,
-                        'toBuilding' => isset($node->toBuilding) && trim($node->toBuilding) != "" ? $node->toBuilding : null,
-                    ]);
-                }
-                unset($unprocessedNodes[$node->id]);
-            }
-        }
-
-        foreach($unprocessedNodes as $id =>$foo) {
-            $this->nodesDelete[] = $this->dbNodes[$id];
-        }
-    }
-
-    private function processPaths($paths, $nodes) {
-        $unprocessedPaths = array_flip(array_keys($this->dbPaths));
-        foreach($paths as $path) {
-            $updated = false;
-            if(isset($nodes[$path->startNode]->id) && isset($nodes[$path->endNode]->id)) {
-                //oba maji id - jsou z db - zkus najit zaklade id bodu
-                $entity = $this->findPathWithNodes($nodes[$path->startNode]->propertyId, $nodes[$path->endNode]->propertyId);
-                if($entity != null) {
-                    if($entity instanceof Path) {
-                        unset($unprocessedPaths[$entity->id]);
-                        $entity = $entity->getProperties();
-                    }
-                    if(round($entity->length,5) != round($path->length,5)) {
-                        $this->pathChange[$entity->id] = $this->pathPropertiesRpository->createNew(null, [
-                            'startNode' => $entity->startNode,
-                            'endNode' => $entity->endNode,
-                            'length' => $path->length
-                        ]);
-                    }
-                    $updated = true;
-
-                }
-            }
-            if(!$updated) {
-                $begin = $this->getNodeWithPathId($path->startNode, $nodes);
-                $end = $this->getNodeWithPathId($path->endNode, $nodes);
-                if($begin == null || $end == null) {
-                    continue; // not ended with markers on both sides
-                }
-                $this->pathAdd[] = $this->pathPropertiesRpository->createNew(null, [
-                    "startNode" => $begin,
-                    "endNode" => $end,
-                    "length" => $path->length,
-                ]);
-            }
-        }
-        foreach($unprocessedPaths as $id => $foo) {
-            $this->pathDelete[] = $this->dbPaths[$id];
-        }
-    }
-
-    private function findPathWithNodes($f, $s) {
-        foreach($this->dbPaths as $id => $path) {
-            if(($f == $path->properties->startNode->id && $s == $path->properties->endNode->id) ||
-                ($s == $path->properties->startNode->id && $f == $path->properties->endNode->id)) {
-                return $path;
-            }
-        }
-
-        foreach($this->pathAdd as $path) {
-            if(($f == $path->startNode->id && $s == $path->endNode->id) ||
-                ($s == $path->startNode->id && $f == $path->endNode->id)) {
-                return $path;
-            }
-        }
-        return null;
-    }
-
-    private function getNodeWithPathId($nodeId, $nodes)
-    {
-        return (isset($nodes[$nodeId]->addedId)? $this->nodesAdd[$nodes[$nodeId]->addedId]:$this->dbNodes[$nodes[$nodeId]->id]->properties);
     }
 
 }

@@ -53,12 +53,6 @@ module Mapping {
         }
 
         public registerUIEvents() {
-            /*       $("#switcher-add").click(()=> {
-             this.editor.State = Mapping.Events.STATE_ADD;
-             });
-             $("#switcher-detail").click(()=> {
-             this.editor.State = Mapping.Events.STATE_DETAIL;
-             });*/
             var _this = this;
             $("a[id^='marker-']").click(function (event) {
                 event.preventDefault();
@@ -125,14 +119,11 @@ module Mapping {
         private previousPosition:google.maps.LatLng = null;
 
         public markerDragStart(event:google.maps.MouseEvent, marker:google.maps.Marker) {
-            //    if(this.editor.State == Mapping.Events.STATE_DETAIL) {
             this.editor.AdditionState = Mapping.Events.ADD_INCATIVE;
             this.previousPosition = marker.getPosition();
-            //    }
         }
 
         public markerDragEnd(event:google.maps.MouseEvent, marker:google.maps.Marker) {
-            //   if(this.editor.State == Mapping.Events.STATE_DETAIL) {
             if (this.previousPosition != undefined) {
                 for (var i = 0; i < this.editor.paths.length; i++) {
                     var line = this.editor.paths[i];
@@ -148,7 +139,6 @@ module Mapping {
 
                 }
             }
-            //   }
         }
 
         // --- line clicked
@@ -167,39 +157,13 @@ module Mapping {
             caller.getPath().setAt(1, event.latLng);
 
             this.enableTemporaryLine(event.latLng);
-            //   }
         }
 
         public pathRightClicked(event:google.maps.MouseEvent, caller:google.maps.Polyline) {
-            //if(this.editor.State == Mapping.Events.STATE_DETAIL) {
             this.editor.AdditionState = Mapping.Events.ADD_INCATIVE;
             this.editor.openPathInfoWindow(event.latLng, caller);
-            //}
         }
 
-        // --- UI events
-
-        public onEditorStateChange(newState) {
-            /*this.editor.AdditionState = Mapping.Events.ADD_INCATIVE;
-
-             $("#switcher-add").removeClass("btn-primary");
-             $("#switcher-detail").removeClass("btn-primary");
-             $("#switcher-"+newState).addClass("btn-primary");
-
-             $("div[id^='toolbar-']").hide();
-             $("#toolbar-"+newState).show();
-
-             for(var i=0; i<this.editor.markers.length; i++) {
-             if(!this.editor.markers[i]) continue;
-             this.editor.markers[i].setDraggable(newState == Mapping.Events.STATE_DETAIL);
-             }
-             if(newState == Mapping.Events.STATE_ADD) {
-             this.editor.map.setOptions({draggableCursor:'crosshair'});
-             }
-             else {
-             this.editor.map.setOptions({draggableCursor:'hand'});
-             }*/
-        }
 
         public onAdditionStateChange(newState) {
             if (newState == Mapping.Events.ADD_INCATIVE) {
@@ -212,31 +176,104 @@ module Mapping {
             $("#marker-" + newType).addClass("btn-primary");
         }
 
-        public submitHandler(event, textElement) {
-            var field = $("#" + textElement);
-            var markerFields = [];
-            for (var i = 0; i < this.editor.markers.length; i++) {
-                if (this.editor.markers[i] == null) continue;
-                var x = {
-                    position: this.editor.markers[i].getPosition().lat() + "," + this.editor.markers[i].getPosition().lng()
-                };
-
-                if (this.editor.markers[i].appOptions != null) {
-                    this.editor.markers[i].appOptions.position = undefined;
-                    $.extend(x, this.editor.markers[i].appOptions, x);
+        public newSubmitHandler(event, textElement) {
+            //event.preventDefault();
+            var addedNodes = [];
+            var changedNodes = [];
+            var deletedNodes = [];
+            var checked = [];
+            for (var key in this.editor.markers) {
+                var original = this.editor.markersOriginals[key];
+                var item = this.editor.markers[key];
+                item.appOptions.gps = item.getPosition();
+                if (!original && item.getMap() != null) {
+                    //added
+                    addedNodes[key] = item.appOptions;
+                    addedNodes[key].position = item.getPosition().lat() + "," + item.getPosition().lng();
+                    addedNodes[key].gps = undefined;
                 }
-                markerFields[i] = x;
+
+                if (original && item.getMap() != null && !this.optionsEquals(original, item.appOptions)) {
+                    changedNodes[item.appOptions.propertyId] = $.extend({}, item.appOptions);
+                    changedNodes[item.appOptions.propertyId].position = item.getPosition().lat() + "," + item.getPosition().lng();
+                    changedNodes[item.appOptions.propertyId].gps = undefined;
+                }
+                checked[key] = true;
             }
-            var lineFields = [];
-            for (var i = 0; i < this.editor.paths.length; i++) {
-                if (!this.editor.paths[i]) continue;
-                lineFields.push({
-                    startNode: this.editor.markers.indexOf(this.editor.getMarkerInPosition(this.editor.paths[i].getPath().getAt(0))),
-                    endNode: this.editor.markers.indexOf(this.editor.getMarkerInPosition(this.editor.paths[i].getPath().getAt(1))),
-                    length: google.maps.geometry.spherical.computeLength(this.editor.paths[i].getPath())
-                });
+
+            for (var key in this.editor.markersOriginals) {
+                // deleted directly
+                if (checked[key]) continue;
+                deletedNodes.push(this.editor.markersOriginals[key].propertyId);
             }
-            field.val(JSON.stringify({ nodes: markerFields, paths: lineFields}));
+
+            var addedPaths = [];
+            var deletedPaths = [];
+
+            var checked = [];
+
+            for (var key in this.editor.pathOriginals) {
+
+                var original = this.editor.pathOriginals[key];
+                var start = this.editor.findNodeWithId(original.start);
+                var end = this.editor.findNodeWithId(original.end);
+
+                checked[key] = true;
+
+                if (!start || !end) {
+                    //deleted
+                    deletedPaths[key] = original;
+                    continue;
+                }
+                var path = this.editor.getPathBetween(start.getPosition(), end.getPosition());
+                if (!path) {
+                    deletedPaths[key] = original;
+                    if (this.editor.paths[key] && this.editor.paths[key].getPath().length > 0) {
+                        // path was changed, not deleted - delete and add
+                        checked[key] = false;
+                    }
+                }
+            }
+
+            for (var key in this.editor.paths) {
+                if (checked[key]) continue;
+                if (!this.editor.paths[key] || this.editor.paths[key].getPath().length < 2) continue;
+                var start = this.editor.markers[this.editor.getMarkerIndexInPosition(this.editor.paths[key].getPath().getAt(0))];
+                var end = this.editor.markers[this.editor.getMarkerIndexInPosition(this.editor.paths[key].getPath().getAt(1))];
+                addedPaths[key] = {
+                    start: $.extend(start.appOptions, {id: this.editor.markers.indexOf(start), position: start.getPosition().lat() + "," + start.getPosition().lng()}),
+                    end: $.extend(end.appOptions, {id: this.editor.markers.indexOf(end), position: end.getPosition().lat() + "," + end.getPosition().lng()})
+                };
+            }
+            $("#" + textElement).val(JSON.stringify({
+                nodes: {
+                    added: addedNodes,
+                    changed: changedNodes,
+                    deleted: deletedNodes
+                },
+                paths: {
+                    added: addedPaths,
+                    deleted: deletedPaths
+                }
+            }));
+        }
+
+        private optionsEquals(obj1, obj2) {
+            for (var i in obj1) {
+                if (obj1.hasOwnProperty(i)) {
+                    if (!obj2.hasOwnProperty(i)) return false;
+                    if (i != "gps" && obj1[i] != obj2[i]) return false;
+                    if (i == "gps" && obj1[i] != null && obj1[i].equals != undefined && !obj1[i].equals(obj2[i])) return false;
+                }
+            }
+            for (var i in obj2) {
+                if (obj2.hasOwnProperty(i)) {
+                    if (!obj1.hasOwnProperty(i)) return false;
+                    if (i != "gps" && obj1[i] != obj2[i]) return false;
+                    if (i == "gps" && obj2[i] != null && obj2[i].equals != undefined && !obj2[i].equals(obj1[i])) return false;
+                }
+            }
+            return true;
         }
 
         // --- temporary line handle

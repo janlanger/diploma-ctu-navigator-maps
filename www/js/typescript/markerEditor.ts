@@ -16,6 +16,9 @@ module Mapping {
         private additionState:string;
         private activeMarkerType:string = 'intersection';
 
+        public markersOriginals = [];
+        public pathOriginals = [];
+
         /*   get State():string {
          return this.editorState;
          }*/
@@ -48,6 +51,7 @@ module Mapping {
         public initialize() {
 
             super.initialize();
+
             //parse definition field and ad its information to options
             this.map.setOptions({draggableCursor: 'crosshair'});
 
@@ -55,6 +59,7 @@ module Mapping {
             if (defintion) {
                 this.parseDefinition(defintion);
             }
+            this.initOriginals();
             this.eventHandler = new Mapping.Events(this, this.options.temporaryPathOptions);
 
             this.eventHandler.registerMapEvents();
@@ -74,8 +79,31 @@ module Mapping {
             //  this.State = Mapping.Events.STATE_ADD;
             this.ActiveMarkerType = 'intersection';
             $("#" + this.options.submitElement).click((event) => {
-                this.eventHandler.submitHandler(event, this.options.definitionElement)
+                //event.preventDefault();
+                this.eventHandler.newSubmitHandler(event, this.options.definitionElement)
+                //return false;
             });
+        }
+
+        private initOriginals() {
+            this.markersOriginals = [];
+            for (var key in this.markers) {
+                var item = this.markers[key];
+
+                this.markersOriginals[key] = $.extend({}, item.appOptions);
+                this.markersOriginals[key].gps = item.getPosition();
+            }
+            this.pathOriginals = [];
+            for (var key in this.paths) {
+                var item = this.paths[key];
+                var path = item.getPath();
+                var s = this.getMarkerInPosition(path.getAt(0));
+                var e = this.getMarkerInPosition(path.getAt(1));
+                this.pathOriginals[key] = {
+                    start: (s ? s.appOptions.propertyId : null),
+                    end: (e ? e.appOptions.propertyId : null)
+                };
+            }
         }
 
         private parseDefinition(definition) {
@@ -260,6 +288,42 @@ module Mapping {
             }
 
             delete this.markers[index];
+        }
+
+        public findNodeWithId(id, additionalSource = null) {
+            var r = null;
+            for (var i = 0; i < this.markers.length; i++) {
+                if (this.markers[i] && (this.markers[i].appOptions.propertyId == id ||
+                    (this.markers[i].appOptions.propertyId == undefined && this.markers[i].appOptions.id == id))) {
+                    return this.markers[i];
+                }
+            }
+        }
+
+        public getPathBetween(sP, eP) {
+            if (!(sP instanceof google.maps.LatLng)) {
+                sP = this.findNodeWithId(sP);
+                if (!sP) {
+                    return null;
+                }
+                sP = sP.getPosition();
+            }
+            if (!(eP instanceof google.maps.LatLng)) {
+                eP = this.findNodeWithId(eP);
+                if (!eP) {
+                    return;
+                }
+                eP = eP.getPosition();
+            }
+            for (var i = 0; i < this.paths.length; i++) {
+                var line = this.paths[i];
+                if (!line) continue;
+                var path = line.getPath();
+                if (path.length < 2) continue;
+                if (path.getAt(0).equals(sP) && path.getAt(1).equals(eP)) {
+                    return line;
+                }
+            }
         }
 
     }
