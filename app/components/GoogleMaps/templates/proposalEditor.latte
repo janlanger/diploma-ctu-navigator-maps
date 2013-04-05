@@ -113,7 +113,7 @@
         <th><img src="{$baseUri}/images/icons/Delete_16x16.png" title="Zamítnout"></th>
         <th>Zadáno</th>
         <th>Vytvořil</th>
-        <th>Komentář</th>
+        <th>Váš komentář</th>
         <th>&nbsp;</th>
     </tr>
     <tr n:if="empty($proposals)">
@@ -126,7 +126,7 @@
         <td>{input proposal$proposal->id:reject, class=>'reject'}</td>
         <td>{$proposal->submittedDate|date:"d.m.Y H:i"}</td>
         <td>{$proposal->submittedBy->name}</td>
-        <td>{$proposal->comment}</td>
+        <td>{input proposaltext$proposal->id}</td>
         <td><a href="#">Detail návrhu</a></td>
     </tr>
 {/foreach}

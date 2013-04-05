@@ -93,6 +93,10 @@ class RevisionProcessor extends Object {
                     $changesets[$id]->setProcessedBy($this->user);
                     $changesets[$id]->setProcessedDate(new \DateTime());
                 }
+                if(isset($values['proposaltext'.$id]) && $values['proposaltext'.$id] != "") {
+                    $changesets[$id]->setAdminComment($values['proposaltext'.$id]);
+                }
+
             }
         }
 
