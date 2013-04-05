@@ -22,6 +22,7 @@ use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
+use Maps\Model\Metadata\Queries\RevisionDictionary;
 use Maps\Model\Metadata\Queries\RevisionGridQuery;
 use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Maps\Model\Metadata\Revision;
@@ -98,9 +99,10 @@ class MetadataPresenter extends SecuredPresenter {
 
 
         $form->onSuccess[] = function (Form $form) {
+            $user = $this->getRepository('user')->find($this->getUser()->getId());
+            $revision = $this->getOrCreateActiveRevision($user);
             $x = new ProposalProcessor(
-                $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())),
-                $this->getRepository('user')->find($this->getUser()->getId()),
+                $revision, $user,
                 $this->getRepository("meta_node_properties"),
                 $this->getRepository("meta_path_properties"),
                 $this->getRepository('meta_changeset'),
@@ -153,7 +155,7 @@ class MetadataPresenter extends SecuredPresenter {
 
         $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
         if ($plan != NULL) {
-            $map->addCustomTilesLayer($this->getFloor()->name, $this->getContext()->tiles->getTilesBasePath($plan));
+            $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
     }
 
@@ -193,7 +195,7 @@ class MetadataPresenter extends SecuredPresenter {
 
         $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
         if ($plan != NULL) {
-            $map->addCustomTilesLayer($this->getFloor()->name, $this->getContext()->tiles->getTilesBasePath($plan));
+            $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
 
         $map->setProposalRepository($this->getRepository('meta_changeset'));
@@ -216,10 +218,9 @@ class MetadataPresenter extends SecuredPresenter {
             'default' => ['anchor' => [8, 8], 'legend' => 'Ostatní'],
         ]);
         $map->setNodeIconBase('images/markers/types');
+        $map->setActiveRevision($this->getOrCreateActiveRevision());
 
-        $map->setActiveRevision($this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor())));
-
-        $map->setRevisionDictionary($this->getRepository("meta_revision")->fetchPairs(new BaseDatagridQuery(), "id", "revision"));
+        $map->setRevisionDictionary($this->getRepository("meta_revision")->fetchPairs(new RevisionDictionary($this->getFloor()), "id", "revision"));
 
         $map->setPathOptions([
             'strokeColor' => '#ff0000',
@@ -228,8 +229,10 @@ class MetadataPresenter extends SecuredPresenter {
         ]);
 
         $map->setSubmitHandler(function (Form $form) {
+            $user = $this->getRepository('user')->find($this->getUser()->getId());
+            $revision = $this->getOrCreateActiveRevision($user);
             $p = new RevisionProcessor(
-                $this->getRepository('user')->find($this->getUser()->getId()),
+                $revision, $user,
                 $this->getRepository('meta_revision'),
                 $this->getRepository("meta_node_properties"),
                 $this->getRepository("meta_path_properties"),
@@ -353,5 +356,27 @@ class MetadataPresenter extends SecuredPresenter {
             return $value;
         };
 
+    }
+
+    private function getOrCreateActiveRevision($user = NULL) {
+        static $revision;
+        if($revision != null) {
+            return $revision;
+        }
+        if($user == NULL) {
+            $user = $this->getRepository('user')->find($this->getUser()->getId());
+        }
+        $revision = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor()));
+
+        if ($revision == NULL) {
+            $revision = $this->getRepository('meta_revision')->createNew(NULL, array(
+                'floor' => $this->getFloor(),
+                'user' => $user,
+                'published' => TRUE,
+                'publishedDate' => new \DateTime(),
+            ));
+            $this->getRepository('meta_revision')->add($revision);
+        }
+        return $revision;
     }
 }

@@ -61,22 +61,23 @@ class ProposalEditor extends Control {
 
 
     public function render() {
+        if($this->activeRevision != null) {
+            $nodes = $this->activeRevision->nodes;
 
-        $nodes = $this->activeRevision->nodes;
+            foreach ($nodes as $node) {
+                $this->addPoint($node->properties->gpsCoordinates, [
+                    "draggable" => TRUE,
+                    "title" => $this->getNodeTitle($node->properties),
+                    "type" => $node->properties->type,
+                    "appOptions" => json_encode($node),
+                ]);
+            }
 
-        foreach ($nodes as $node) {
-            $this->addPoint($node->properties->gpsCoordinates, [
-                "draggable" => TRUE,
-                "title" => $this->getNodeTitle($node->properties),
-                "type" => $node->properties->type,
-                "appOptions" => json_encode($node),
-            ]);
-        }
+            $paths = $this->activeRevision->paths;
 
-        $paths = $this->activeRevision->paths;
-
-        foreach ($paths as $path) {
-            $this->addPath($path->properties->startNode->gpsCoordinates, $path->properties->endNode->gpsCoordinates);
+            foreach ($paths as $path) {
+                $this->addPath($path->properties->startNode->gpsCoordinates, $path->properties->endNode->gpsCoordinates);
+            }
         }
 
         $template = $this->createTemplate();
@@ -111,7 +112,7 @@ class ProposalEditor extends Control {
 
     private function getProposals() {
         static $items;
-        if($items == NULL) {
+        if($items == NULL && $this->activeRevision != NULL) {
             $items = $this->proposalRepository->fetchAssoc(new ActiveProposals(NULL, $this->activeRevision), 'id');
         }
         if($items == NULL) {
@@ -204,7 +205,7 @@ class ProposalEditor extends Control {
         $form = new Form();
 
         $form->addSelect("against",NULL, $this->revisionDictionary)
-        ->setDefaultValue($this->activeRevision->id);
+            ->setDefaultValue($this->activeRevision->id);
 
         $form->onSuccess[] = function($form) {
             $id = $form->values['against'];

@@ -43,11 +43,12 @@ class RevisionProcessor extends Object {
 
     private $changedKeys = [];
 
-    function __construct(User $user, Dao $revision,
+    function __construct(Revision $activeRevision, User $user, Dao $revision,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
     Dao $node, Dao $path)
     {
+        $this->actualRevision = $activeRevision;
         $this->nodePropertiesRepository = $nodeProperties;
         $this->pathPropertiesRepository = $pathProperties;
         $this->changesetRepository = $changeset;
@@ -64,8 +65,6 @@ class RevisionProcessor extends Object {
 
         $values = $form->getValues();
         $changes = json_decode($values['custom_changes'], TRUE);
-
-        $this->actualRevision = $this->revisionRepository->find($values['revision']);
 
         $this->processNewChanges($changes);
 
@@ -168,7 +167,11 @@ class RevisionProcessor extends Object {
 
             $nodePropertiesIds = array_unique($nodePropertiesIds, SORT_NUMERIC);
 
-            $dbNodeProperties = $this->nodePropertiesRepository->fetchAssoc(new NodePropertiesQuery($nodePropertiesIds), 'id');
+            if(count($nodePropertiesIds) > 0) {
+                $dbNodeProperties = $this->nodePropertiesRepository->fetchAssoc(new NodePropertiesQuery($nodePropertiesIds), 'id');
+            } else {
+                $dbNodeProperties = [];
+            }
 
             $dbPathProperties = $this->pathPropertiesRepository->fetchAssoc(new PathPropertiesByNodes($pathNodeIds), 'id');
 
