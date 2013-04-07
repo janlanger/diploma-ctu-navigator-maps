@@ -196,9 +196,9 @@ class UserPanel extends Control implements IBarPanel
 		$form->addRadioList('user', NULL, $this->getCredentialsRadioData())
 			->setAttribute('class', 'onClickSubmit');
 
-		$form->addSubmit('send', 'Log in');
+		$form->addSubmit('send', 'Log in')->htmlId = "frmlogin-send";
 
-		$form->onSubmit[] = callback($this, 'onLoginSubmitted');
+		$form->onSuccess[] = callback($this, 'onLoginSubmitted');
 		return $form;
 	}
 

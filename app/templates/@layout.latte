@@ -51,7 +51,7 @@
                         <div class="nav-collapse">
                             <ul class="nav" id="menu" role="navigation">
                                 <li><a n:href="Building:">Budovy</a></li>
-                                <li class="dropdown">
+                                <li class="dropdown" n:if="$user->isAllowed('User')">
                                     <a id="dropMenu1" href="#" class="dropdown-toggle" role="button" data-toggle="dropdown">Uživatelé <b class="caret"></b></a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropMenu1">
                                         <li><a n:href="User:">Uživatelské účty</a></li>

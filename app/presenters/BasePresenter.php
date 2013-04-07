@@ -3,6 +3,7 @@ namespace Maps\Presenter;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
 use Nette\Latte\Macros\MacroSet;
+use Nette\Security\Diagnostics\UserPanel;
 
 /**
  * Base presenter for all application presenters.
@@ -18,6 +19,11 @@ abstract class BasePresenter extends Presenter {
     protected function startup() {
         parent::startup();
         new \DebugPanel\PresenterLinkPanel($this);
+        if($this->getUser()->isLoggedIn()) {
+            $p = \Panel\UserPanel::register();
+            $p->addCredentials("admin",'lalalalappp');
+            $p->addCredentials('user', 'lalalalappp');
+        }
     }
 
     public function formatTemplateFiles() {
