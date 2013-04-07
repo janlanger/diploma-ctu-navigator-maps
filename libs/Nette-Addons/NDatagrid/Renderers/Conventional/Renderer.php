@@ -572,8 +572,8 @@ class Conventional extends Nette\Object implements IRenderer
 						$action->generateLink(array($primary => $data[$primary]));
 						$this->onActionRender($html, $data);
 						$value .= $html->render() . ' ';
-					} else
-						$value .= Html::el('span')->setText($this->dataGrid->translate($action->getHtml()->title))->render() . ' ';
+					} //else
+				//		$value .= Html::el('span')->setText($this->dataGrid->translate($action->getHtml()->title))->render() . ' ';
 				}
 				$cell->addClass('actions');
 
