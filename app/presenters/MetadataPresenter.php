@@ -381,7 +381,7 @@ class MetadataPresenter extends SecuredPresenter {
         };
 
 
-        $grid['date']->addDefaultSorting('asc');
+        $grid['date']->addDefaultSorting('desc');
 
 
     }

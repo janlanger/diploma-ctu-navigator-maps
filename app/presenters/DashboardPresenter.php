@@ -44,7 +44,7 @@ class DashboardPresenter extends SecuredPresenter
 
         $states = [Changeset::STATE_NEW => 'Nový', Changeset::STATE_APPROVED => 'Přijatý', Changeset::STATE_REJECTED => 'Odmítnutý', Changeset::STATE_WITHDRAWN => 'Zrušený'];
 
-        $grid->addDateColumn("date", 'Odesláno dne', "%d.%m.%Y %H:%M");
+        $grid->addDateColumn("date", 'Odesláno dne', "%d.%m.%Y %H:%M")->addDefaultSorting('desc');
 
         $grid->addColumn("state", "Stav návrhu")
                 ->addSelectboxFilter($states, TRUE, FALSE);
