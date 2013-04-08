@@ -1,22 +1,29 @@
 <div id="toolbar-add">
     <p><strong>Levé tlačítko</strong> - přidání bodu, napojení cesty; <strong>Tažení</strong> - přesun bodu; <strong>Pravé tlačítko</strong> - úprava
         vlastností, odstranění bodu/cesty</p>
+</div>
 
-    <div class="btn-group" n:inner-foreach="$pointsTypes as $type=>$title">
-        <a href="#" class="btn" id="marker-{$type}" title="{$title['legend']}">
-            {if is_file(WWW_DIR."/".$iconsBasePath."/".$type.".png")}
-                <img src="{$baseUri}/{$iconsBasePath}/{$type}.png">
-            {else}
-                {$title['legend']}
-            {/if}
-        </a>
-    </div>
+<div class="btn-group" id="buttons" n:inner-foreach="$pointsTypes as $type=>$title">
+    <a href="#" class="btn" id="marker-{$type}" title="{$title['legend']}">
+        {if is_file(WWW_DIR."/".$iconsBasePath."/".$type.".png")}
+            <img src="{$baseUri}/{$iconsBasePath}/{$type}.png">
+        {else}
+            {$title['legend']}
+        {/if}
+    </a>
 </div>
 <br clear="all">
-<div id="tip-line"></div>
-
-<div id="map_canvas" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
-
+<div style="width: {!$mapWidth}; height: {$mapHeight}; padding: 0px 5px 10px; border-right: 1px solid rgb(160, 165, 132);
+        border-left: 1px solid rgb(160, 165, 132); border-bottom: 4px solid rgb(160, 165, 132);" id="map_box">
+    <div id="map_canvas" class="" style="width: 100%;height: 100%; margin: auto"></div>
+</div>
+<br clear="all">
+<div class="pull-right">Ovládání bodů: <select id="position-select">
+        <option value="top">Nahoře</option>
+        <option value="right" selected="selected">Vpravo</option>
+        <option value="bottom">Dole</option>
+    </select>
+</div>
 <div id="innerForm">
     {form form}
         <div id="form-type" style="margin-bottom: 5px; margin-top: 10px;">{input type}</div>
@@ -46,6 +53,7 @@
         var w = $("#form-room input").outerWidth();
         $("#form-room input").css('width', w - 15 - $("#form-room span").outerWidth());
         $("#innerForm").hide();
+
     });
 
     var points = [];
@@ -118,7 +126,12 @@
         submitElement: {$submit->control->id},
         {/ifset}
         markerTypes: {$pointsTypes},
-        iconsBasePath: {$baseUri}+"/" +{$iconsBasePath}
+        iconsBasePath: {$baseUri}+"/" +{$iconsBasePath},
+        customControls: [
+            { element:document.getElementById('buttons'), position: google.maps.ControlPosition.RIGHT_CENTER}
+        ],
+        resizableBox: { element: document.getElementById("map_box"), options: { minHeight: 270, minWidth: 300}},
+        positionSelect: document.getElementById('position-select')
     };
     {if !isset($overiden)}
     var editor = new Mapping.MarkerEditor(document.getElementById('map_canvas'), editorOptions);

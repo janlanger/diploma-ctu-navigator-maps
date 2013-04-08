@@ -53,7 +53,7 @@
     editorOptions.collisions = {$collisions};
 
 
-    var mapping = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
+    var editor = new Mapping.ProposalEditor(document.getElementById('map_canvas'), editorOptions);
 
     $(document).ready(function() {
         $("#revision-changer").change(function(event) {

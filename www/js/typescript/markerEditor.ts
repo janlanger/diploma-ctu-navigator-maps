@@ -83,6 +83,66 @@ module Mapping {
                 this.eventHandler.newSubmitHandler(event, this.options.definitionElement)
                 //return false;
             });
+
+            if (this.options.customControls) {
+
+
+                /*$.each(this.options.customControls, (index, item) => {
+                    index = this.map.controls[item.position].push(item.element);
+                });*/
+                if(this.options.customControls.length == 1) {
+                    var item = this.options.customControls[0];
+                    var prevPosition = item.position;
+                    var index = this.map.controls[item.position].push(item.element) -1;
+                    var _this = this;
+                    $(this.options.positionSelect).change(function(event) {
+                        _this.map.controls[prevPosition].removeAt(index);
+                        var newPosition;
+                        switch($(this).val()) {
+                            case 'top':
+                                newPosition = google.maps.ControlPosition.TOP_CENTER;
+                                $(item.element).removeClass('btn-group-vertical');
+                                break;
+                            case 'bottom':
+                                newPosition = google.maps.ControlPosition.BOTTOM_CENTER;
+                                $(item.element).removeClass('btn-group-vertical');
+                                break;
+                            default:
+                                newPosition = google.maps.ControlPosition.RIGHT_CENTER;
+                                $(item.element).addClass('btn-group-vertical');
+                                break;
+                        }
+
+                        index = _this.map.controls[newPosition].push(item.element) - 1;
+                        prevPosition = newPosition;
+                    });
+                    $(this.options.positionSelect).trigger('change');
+                }
+            }
+
+            if (this.options.resizableBox) {
+                var center;
+                var options = {
+                    start: () => {
+                        center = this.map.getCenter();
+                    },
+                    stop: () => {
+
+                        google.maps.event.trigger(this.map, "resize");
+                        if (center) {
+                            this.map.setCenter(center);
+                        }
+                    },
+                    handles: "e,w,s,se,sw",
+                    resize: function (event, ui) {
+                        $(this).css({
+                            'left': parseInt(ui.position.left, 10) + ((ui.originalSize.width - ui.size.width)) / 2
+                        });
+                    }
+                };
+
+                $(this.options.resizableBox.element).resizable($.extend(options, this.options.resizableBox.options));
+            }
         }
 
         private initOriginals() {
