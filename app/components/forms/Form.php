@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Components\Forms;
+use DependentSelectBox\JsonDependentSelectBox;
 use Nette\Application\UI\Form AS AppForm;
 use Maps\Presenter\BasePresenter;
 use Kdyby\BootstrapFormRenderer\BootstrapRenderer;
@@ -93,6 +94,19 @@ class Form extends AppForm {
 
     public function addOptionList($name, $label = NULL, array $items = NULL) {
         return $this[$name] = new OptionList($label, $items);
+    }
+
+    /**
+     * @param $name
+     * @param $caption
+     * @param $parent
+     * @param $callback
+     * @return JsonDependentSelectBox
+     */
+    public function addDependedSelect($name, $caption, $parent, $callback, $autoselect = TRUE) {
+        $s = new JsonDependentSelectBox($caption, $parent, $callback);
+        $s->autoSelectRootFirstItem = $autoselect;
+        return $this[$name] = $s;
     }
 
 
