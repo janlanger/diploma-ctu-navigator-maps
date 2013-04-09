@@ -61,7 +61,7 @@ class BuildingPresenter extends SecuredPresenter {
         $grid->addColumn("id","ID#");
         $grid->addColumn("name","Budova")->addFilter();
         $grid->addColumn("address","Adresa")->addFilter();
-        $grid->addColumn("proposals", "Návrhů")->formatCallback[] = function($value, $data) {
+        $grid->addColumn("proposals", "Nové návrhy")->formatCallback[] = function($value, $data) {
             if($value > 0) {
                 return Html::el("span", ['class'=>'label label-warning'])->setText($value);
             }
@@ -135,7 +135,8 @@ class BuildingPresenter extends SecuredPresenter {
             'floor_number' => 'f.floor_number',
             'name' => 'f.name',
             'plan' => 'plan',
-            'metadata' => 'metadata'
+            'metadata' => 'metadata',
+            'proposals' => 'proposals',
         ]);
         $grid->setDataSource($datasource);
         
@@ -155,10 +156,16 @@ class BuildingPresenter extends SecuredPresenter {
 
         $m = $grid->addColumn('metadata', 'Metadata');
         $m->formatCallback[] = $revisionFnc;
+        $grid->addColumn("proposals", "Nové návrhy")->formatCallback[] = function ($value, $data) {
+            if ($value > 0) {
+                return Html::el("span", ['class' => 'label label-warning'])->setText($value);
+            }
+            return $value;
+        };
         
         $grid->addActionColumn('a', 'Akce');
         $grid->keyName = 'id';
-        $grid->addAction('Detail', 'Floor:default?building='.$this->getParameter('id'));
+        $grid->addAction('Detail podlaží', 'Floor:default?building='.$this->getParameter('id'));
         $grid['floor_number']->addDefaultSorting('asc');
     }
 }

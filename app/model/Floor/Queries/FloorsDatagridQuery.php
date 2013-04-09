@@ -25,10 +25,12 @@ class FloorsDatagridQuery extends QueryObjectBase {
     
     protected function doCreateQuery(\Maps\Model\Persistence\IQueryable $repository) {
         return $repository->createQueryBuilder("f")
-                ->select("f,p.revision AS plan, m.revision AS metadata")
+                ->select("f,p.revision AS plan, m.revision AS metadata, count(c.id) as proposals")
                 ->leftJoin("Maps\\Model\\Floor\\Plan","p", Expr\Join::WITH, 'p.floor = f AND p.published = TRUE' )
                 ->leftJoin("Maps\\Model\\Metadata\\Revision", "m", Expr\Join::WITH, 'm.floor = f AND m.published = TRUE')
+                ->leftJoin("Maps\\Model\\Metadata\\Changeset", "c", Expr\Join::WITH, 'c.against_revision = m AND c.state = \'new\' ')
                 ->where("f.building = ?1")
+                ->groupBy("f.id")
                 ->setParameter(1, $this->building_id);
 
     }    
