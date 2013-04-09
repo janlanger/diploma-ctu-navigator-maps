@@ -33,8 +33,6 @@ class PathProperties extends BaseEntity {
      */
     private $endNode;
 
-    private $length;
-
     /**
      * @param \Maps\Model\Metadata\NodeProperties $endNode
      */
@@ -49,16 +47,6 @@ class PathProperties extends BaseEntity {
     public function getEndNode()
     {
         return $this->endNode;
-    }
-
-    public function setLength($length)
-    {
-        $this->length = $length;
-    }
-
-    public function getLength()
-    {
-        return $this->length;
     }
 
     /**

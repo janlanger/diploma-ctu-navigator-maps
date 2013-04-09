@@ -12,6 +12,7 @@ namespace Maps\Model\Metadata\Queries;
 
 use Maps\Model\Dao;
 use Maps\Model\Metadata\Changeset;
+use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Revision;
 use Maps\Model\User\User;
 use Maps\Tools\Mixed;
@@ -107,6 +108,7 @@ class RevisionProcessor extends Object {
             $this->applyChanges($newRevision, $changesetsToApply);
 
             $this->autoCloseChangesets($changesets, $this->changedKeys);
+            $this->countPathsLength($newRevision);
 
             $this->nodeRepository->add($newRevision->nodes);
             $this->pathRepository->add($newRevision->paths);
@@ -470,6 +472,45 @@ class RevisionProcessor extends Object {
                 $changeset->setProcessedDate(new \DateTime());
             }
         }
+    }
+
+    private function countPathsLength(Revision $revision) {
+        foreach($revision->getPaths() as $path) {
+            /** @var $path Path */
+            $path->setLength(($this->computeDistance(
+                $path->getProperties()->getStartNode()->getGpsCoordinates(),
+                $path->getProperties()->getEndNode()->getGpsCoordinates()
+            )));
+        }
+    }
+
+    /**
+     * @param $one string GPS
+     * @param $two string GPS
+     * @return float distance between points in meters
+     */
+    private function computeDistance($one, $two) {
+        $one = explode(",", $one);
+        $two = explode(",", $two);
+
+        $lat1 = (float) $one[0];
+        $lng1 = (float) $one[1];
+
+        $lat2 = (float) $two[0];
+        $lng2 = (float) $two[1];
+
+        $R = 6371; // km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $lat1 = deg2rad($lat1);
+        $lat2 = deg2rad($lat2);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+                sin($dLng / 2) * sin($dLng / 2) * cos($lat1) * cos($lat2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $d = $R * $c;
+
+        return $d*1000;
     }
 
 }

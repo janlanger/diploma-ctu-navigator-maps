@@ -33,6 +33,12 @@ class Path extends BaseEntity {
     private $properties;
 
     /**
+     * @var float
+     * @Column(type="float", nullable=true)
+     */
+    private $length;
+
+    /**
      * @param \Maps\Model\Metadata\PathProperties $properties
      */
     public function setProperties($properties)
@@ -63,6 +69,21 @@ class Path extends BaseEntity {
     {
         return $this->revision;
     }
+
+    /**
+     * @param float $length
+     */
+    public function setLength($length) {
+        $this->length = $length;
+    }
+
+    /**
+     * @return float
+     */
+    public function getLength() {
+        return $this->length;
+    }
+
 
 
 
