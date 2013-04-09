@@ -66,7 +66,18 @@ abstract class BasePresenter extends Presenter {
 
 
     public function addBreadcrumb($link, $title) {
-        $this->breadcrumbs[] = ['link'=>$link, 'title'=>$title];
+        $trimed = trim($link, '/ ');
+        if(strrpos($trimed, "?") !== false) {
+            $trimed = substr($trimed,0,strrpos($trimed, "?")- strlen($trimed));
+        }
+        $parts = explode(":", $trimed);
+        $action = array_pop($parts);
+        if($action == "") {
+            $action = "default";
+        }
+        $presenter = implode(":", $parts);
+
+        $this->breadcrumbs[] = ['link'=>($this->getUser()->isAllowed($presenter, $action)?$link:null), 'title'=>$title];
     }
 
 

@@ -70,25 +70,15 @@
                 </div></div>
             <div class="container" style="margin-top: 10px;">
 
-                <div id="container" class="row-fluid">     
-                   {* <div class="span3">
-                        <ul class="nav nav-stacked nav-pills">
-                            <li class="active">
-                                <a href="#">Home</a> 
-                            </li>
-                            <li>
-                                <a href="#">About</a> 
-                            </li>
-                        </ul>
-                    </div> *}
-                   {* <div class="span9">*}
+                <div id="container" class="row-fluid">
                         <h1 n:ifset="#pageTitle">{include #pageTitle}</h1>
-                        <div class="breadcrumb" n:if="!empty($breadcrumbs)">
-                            {foreach  $breadcrumbs as $item}
-                                <a n:tag-if="isset($item['link']) && !is_null($item['link'])" n:href="$item['link']">{$item['title']}</a>{sep} / {/sep}
-                            {/foreach}
-                            {ifset #breadcrumbs}/ {include #breadcrumbs}{else}/ {include #pageTitle}{/ifset}
-                        </div>
+                        <ul class="breadcrumb" n:if="!empty($breadcrumbs)">
+                                <li n:foreach="$breadcrumbs as $item">
+                                    <a n:tag-if="isset($item['link']) && !is_null($item['link'])" n:href="$item['link']">{$item['title']}</a>
+                                    <span class="divider">/</span>
+                                </li>
+                                <li class="active">{ifset #breadcrumbs}{include #breadcrumbs}{else}{include #pageTitle}{/ifset}</li>
+                        </ul>
                         <ul n:ifset="#secondaryNav" class="nav nav-pills">
                             {include #secondaryNav}
                         </ul>

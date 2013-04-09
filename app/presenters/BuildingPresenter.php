@@ -16,7 +16,7 @@ class BuildingPresenter extends SecuredPresenter {
     protected function beforeRender()
     {
         if($this->getView() != 'default') {
-            $this->addBreadcrumb(':Building:','Budovy');
+            $this->addBreadcrumb('Building:','Budovy');
         }
         parent::beforeRender();
     }
