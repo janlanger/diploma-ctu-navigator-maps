@@ -172,7 +172,10 @@ class MetadataPresenter extends SecuredPresenter {
                 $this->getRepository('meta_path_change')
             );
             $x->handle($form);
-            $this->redirect("Floor:default?id=".$this->getFloor()->id.'&building='.$this->getFloor()->getBuilding()->id);
+            if($this->getUser()->isInRole('admin'))
+                $this->redirect("Floor:default?id=".$this->getFloor()->id.'&building='.$this->getFloor()->getBuilding()->id);
+            else
+                $this->redirect('Dashboard:default');
         };
     }
 
