@@ -2,6 +2,8 @@
 namespace Maps\Presenter;
 use Maps\Model\Building\BuildingFormProcessor;
 use DataGrid\DataSources\Doctrine\QueryBuilder;
+use Maps\Model\Building\Queries\BuildingDatagridQuery;
+use Nette\Utils\Html;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -45,12 +47,13 @@ class BuildingPresenter extends SecuredPresenter {
 
     public function createComponentBuildingsGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $query = new \Maps\Model\BaseDatagridQuery();
+        $query = new BuildingDatagridQuery();
         $ds = new QueryBuilder($query->getQueryBuilder($this->getContext()->em->getRepository('Maps\Model\Building\Building')));
         $ds->setMapping([
             'id'=>'b.id',
             'name'=>'b.name',
             'address'=>'b.address',
+            'proposals' => 'change_count'
         ]);
 
         $grid->setDataSource($ds);
@@ -58,6 +61,12 @@ class BuildingPresenter extends SecuredPresenter {
         $grid->addColumn("id","ID#");
         $grid->addColumn("name","Budova")->addFilter();
         $grid->addColumn("address","Adresa")->addFilter();
+        $grid->addColumn("proposals", "Návrhů")->formatCallback[] = function($value, $data) {
+            if($value > 0) {
+                return Html::el("span", ['class'=>'label label-warning'])->setText($value);
+            }
+            return $value;
+        };
 
         $grid['id']->addDefaultSorting('asc');
         $grid->keyName = "id";
