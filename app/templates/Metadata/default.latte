@@ -2,15 +2,12 @@
 {block #breadcrumbs}Metadata{/block}
 
 {block #content}
-    <h3>{$building->name}, {$building->address}</h3>
 
 <h3>Revize</h3>
 {control revisionGrid}
 <hr>
 
 <h3>Návrhy změn</h3>
-<ul class="nav nav-pills">
-    <li><a n:href="approval">Zpracovat návrhy/upravit data</a></li>
-</ul>
+    <a class="btn btn-info" n:href="approval">Zpracovat návrhy/upravit data</a>
 
 {control proposalGrid}
