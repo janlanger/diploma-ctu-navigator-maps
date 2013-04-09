@@ -3,7 +3,7 @@
         vlastností, odstranění bodu/cesty</p>
 </div>
 
-<div class="btn-group" id="buttons" n:inner-foreach="$pointsTypes as $type=>$title">
+<div class="btn-group hide" id="buttons" n:inner-foreach="$pointsTypes as $type=>$title">
     <a href="#" class="btn" id="marker-{$type}" title="{$title['legend']}">
         {if is_file(WWW_DIR."/".$iconsBasePath."/".$type.".png")}
             <img src="{$baseUri}/{$iconsBasePath}/{$type}.png">
@@ -18,7 +18,7 @@
     <div id="map_canvas" class="" style="width: 100%;height: 100%; margin: auto"></div>
 </div>
 <br clear="all">
-<div class="pull-right">Ovládání bodů: <select id="position-select">
+<div class="pull-right">Umístění ovládacího panelu: <select id="position-select">
         <option value="top">Nahoře</option>
         <option value="right" selected="selected">Vpravo</option>
         <option value="bottom">Dole</option>

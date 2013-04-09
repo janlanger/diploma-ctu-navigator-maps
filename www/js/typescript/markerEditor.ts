@@ -93,6 +93,9 @@ module Mapping {
                 if(this.options.customControls.length == 1) {
                     var item = this.options.customControls[0];
                     var prevPosition = item.position;
+                    google.maps.event.addListenerOnce(this.map, 'idle', function() {
+                        $(item.element).removeClass('hide');
+                    })
                     var index = this.map.controls[item.position].push(item.element) -1;
                     var _this = this;
                     $(this.options.positionSelect).change(function(event) {
