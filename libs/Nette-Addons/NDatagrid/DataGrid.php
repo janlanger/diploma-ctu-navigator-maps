@@ -763,12 +763,14 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
             $html->setHtml(Html::el('img')->src('/images/icons/'.$icons[$html->title])->title($html->title));
     }
 
-    public function bootstrapClasses(Html $html, $data) {
+    public function bootstrapClasses(Html $html, $data, $destination) {
         $bootstrapMap = [
             'Upravit' => 'btn-success',
             'Smazat' => 'btn-danger',
             'Zobrazit' => 'btn-info',
             'Detail' => 'btn-warning',
+            'Detail podlaží' => 'btn-warning',
+            'Publikovat' => 'btn-danger'
         ];
         $html->addClass('btn btn-mini '.(isset($bootstrapMap[$html->title])?$bootstrapMap[$html->title]:""));
     }
