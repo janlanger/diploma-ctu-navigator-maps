@@ -1,5 +1,9 @@
 {
-    "hash": "88e8c3a9fe199b1b0e78b2bb83e5b95a",
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "7fc91295e8cfed2c7e3a00c9ab7db357",
     "packages": [
         {
             "name": "doctrine/common",
@@ -55,7 +59,7 @@
                 {
                     "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "https://github.com/schmittjoh",
+                    "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -257,12 +261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Kdyby/Curl.git",
-                "reference": "ddd60a1ddb8313248aedf64bb21dcf456c09b0d4"
+                "reference": "6b88406fb03b8037c60298a82caa24760420080f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/ddd60a1ddb8313248aedf64bb21dcf456c09b0d4",
-                "reference": "ddd60a1ddb8313248aedf64bb21dcf456c09b0d4",
+                "url": "https://api.github.com/repos/Kdyby/Curl/zipball/6b88406fb03b8037c60298a82caa24760420080f",
+                "reference": "6b88406fb03b8037c60298a82caa24760420080f",
                 "shasum": ""
             },
             "require": {
@@ -300,7 +304,7 @@
                 "http",
                 "nette"
             ],
-            "time": "2013-03-07 08:44:30"
+            "time": "2013-04-06 10:58:08"
         },
         {
             "name": "nella/console",
@@ -492,16 +496,16 @@
         },
         {
             "name": "nextras/forms",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextras/forms.git",
-                "reference": "c14424a8b77d7cbae3e07f50923078db8eaec40a"
+                "reference": "v1.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextras/forms/zipball/c14424a8b77d7cbae3e07f50923078db8eaec40a",
-                "reference": "c14424a8b77d7cbae3e07f50923078db8eaec40a",
+                "url": "https://api.github.com/repos/nextras/forms/zipball/v1.0.0",
+                "reference": "v1.0.0",
                 "shasum": ""
             },
             "require": {
@@ -535,21 +539,21 @@
                 "form",
                 "nette"
             ],
-            "time": "2013-03-04 18:27:47"
+            "time": "2013-02-18 12:08:36"
         },
         {
             "name": "symfony/console",
-            "version": "v2.2.0",
+            "version": "v2.2.1",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "v2.2.0"
+                "reference": "v2.2.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/v2.2.0",
-                "reference": "v2.2.0",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/v2.2.1",
+                "reference": "v2.2.1",
                 "shasum": ""
             },
             "require": {
@@ -582,7 +586,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2013-03-01 06:43:14"
+            "time": "2013-03-19 20:48:08"
         }
     ],
     "packages-dev": [
@@ -595,8 +599,7 @@
     "stability-flags": {
         "kdyby/curl": 20,
         "nella/doctrine": 20,
-        "nella/console": 20,
-        "nextras/forms": 20
+        "nella/console": 20
     },
     "platform": {
         "php": ">=5.3"

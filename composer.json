@@ -1,5 +1,13 @@
 {
-
+    "name": "navigator/maps",
+    "description": "map managmenet system fot CTU Navigator",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Jan Langer",
+            "email": "langeja1@fit.cvut.cz"
+        }
+    ],
     "require": {
         "php" : ">=5.3",
         "nette/nette": "2.0.*",
@@ -8,6 +16,6 @@
         "doctrine/orm": "2.*",
         "nella/doctrine": "dev-master",
         "nella/console": "dev-master",
-        "nextras/forms": "@dev"
+        "nextras/forms": "1.*"
     }
 }
