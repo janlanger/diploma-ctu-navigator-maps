@@ -155,7 +155,7 @@ class RevisionProcessor extends Object {
 
             foreach ($changes['nodes']['changed'] as $node) {
                 $nodePropertiesIds[] = $node['propertyId'];
-                if (isset($node['other']) && !empty($node['other'])) {
+                if (isset($node['other']) && !empty($node['other']) && isset($node['other']['propertyId'])) {
                     $nodePropertiesIds[] = $node['other']['propertyId'];
                 }
             }
@@ -248,20 +248,22 @@ class RevisionProcessor extends Object {
                 ]);
 
                 if (isset($node['other']) && !empty($node['other'])) {
-                    $paths[] = $this->pathChangeRepository->createNew(NULL, array(
-                        'changeset' => $changeset,
-                        'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
-                            'isFloorExchange' => TRUE,
-                            'destinationFloor' => $this->nodeRepository->findOneBy(['properties' => $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
-                            'startNode' => $item,
-                            'endNode' => $dbNodeProperties[$node['other']['propertyId']]
-                        ))
-                    ));
+                    if(isset($node['other']['propertyId'])) {
+                        $paths[] = $this->pathChangeRepository->createNew(NULL, array(
+                            'changeset' => $changeset,
+                            'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
+                                'isFloorExchange' => TRUE,
+                                'destinationFloor' => $this->nodeRepository->findOneBy(['properties' => $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
+                                'startNode' => $item,
+                                'endNode' => $dbNodeProperties[$node['other']['propertyId']]
+                            ))
+                        ));
+                    }
                     if(isset($node['other']['pathProperty'])) {
                         $paths[] = $this->pathChangeRepository->createNew(NULL, array(
                             'changeset' => $changeset,
                             'original' => $this->pathPropertiesRepository->find($node['other']['pathProperty']),
-                            'wasDeleted' => true,
+                            'wasDeleted' => TRUE,
                         ));
                     }
                 }

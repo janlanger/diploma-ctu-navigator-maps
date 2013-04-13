@@ -66,6 +66,15 @@ module Mapping {
                     }
 
                 });
+            });
+            $(".modal-footer .btn-danger", modal).click(() => {
+                if(window.confirm("Opravdu odstranit?")) {
+                    modal.modal('hide');
+                    callback({
+                        deleted: true
+                    });
+                }
+
             })
         }
 

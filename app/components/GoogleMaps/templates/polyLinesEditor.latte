@@ -32,7 +32,7 @@
             <span class="add-on" n:if="$roomPrefix != ''">{$roomPrefix}</span>
             {input room, 'title'=>'Číslo místnosti'}
         </div>
-        <div id="form-other" style="margin-bottom: 5px;"><div></div><a href="#">Vybrat cílový bod / cílové body</a></div>
+        <div id="form-other" style="margin-bottom: 5px;"><div></div><a href="#">Vybrat/upravit cílový bod</a></div>
 
     {input otherNode}
     {input save, 'class'=>'btn btn-primary'}
@@ -156,8 +156,10 @@
 
     </div>
     <div class="modal-footer">
+        <a href="#" class="btn btn-primary pull-left">Uložit</a>
+        <a href="#" class="btn btn-danger pull-left">Odstranit cíl</a>
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Storno</a>
-        <a href="#" class="btn btn-primary">Uložit</a>
+
     </div>
 
 </div>

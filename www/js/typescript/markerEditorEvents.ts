@@ -378,6 +378,9 @@ module Mapping {
         }
 
         public onOtherNodeSelected(original:google.maps.Marker, html, returned) {
+            if(returned.deleted) {
+                return returned;
+            }
             if(!returned.marker) return;
             return {
                 propertyId: returned.marker.appOptions.propertyId,

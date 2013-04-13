@@ -267,6 +267,11 @@ module Mapping {
                     (selected) => {
                         var other = this.eventHandler.onOtherNodeSelected(marker, html, selected);
                         if(!$.isEmptyObject(other)) {
+                            if(other.deleted) {
+                                marker.appOptions.x.propertyId = undefined;
+                                $("#form-other div", html).html("");
+                                return;
+                            }
                             var info = other;
                             marker.appOptions.x = other;
                             $("#form-other div", html).text("Cíl: bod #"+ info.propertyId + ", patro "+info.floor.name + (typeSelect.val() == "passage"?" budova "+info.building.name:""));
@@ -312,8 +317,11 @@ module Mapping {
                 marker.appOptions.x = marker.appOptions.other;
                 if(marker.appOptions.x) {
                     var info = marker.appOptions.x;
+                    if(info.reverse) {
+                        otherNode.hide();
+                    }
                     $("#form-other div", html).html("Cíl: bod #" + info.propertyId + ", patro " + info.floor.name + (typeSelect.val() == "passage" ? " budova " + info.building.name : "") +
-                        (info.reverse ? " <br><b>Definováno v opačném směru, neupravujte!</b>" : ""));
+                        (info.reverse ? " <br><b>Definováno v opačném směru, nelze upravit!</b>" : ""));
                 }
             }
             return html[0];
