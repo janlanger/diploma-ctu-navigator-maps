@@ -312,7 +312,8 @@ module Mapping {
                 marker.appOptions.x = marker.appOptions.other;
                 if(marker.appOptions.x) {
                     var info = marker.appOptions.x;
-                    $("#form-other div", html).text("Cíl: bod #" + info.propertyId + ", patro " + info.floor.name + (typeSelect.val() == "passage" ? " budova " + info.building.name : ""));
+                    $("#form-other div", html).html("Cíl: bod #" + info.propertyId + ", patro " + info.floor.name + (typeSelect.val() == "passage" ? " budova " + info.building.name : "") +
+                        (info.reverse ? " <br><b>Definováno v opačném směru, neupravujte!</b>" : ""));
                 }
             }
             return html[0];

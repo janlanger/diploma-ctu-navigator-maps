@@ -157,14 +157,15 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
                     if($path->properties->endNode->id == $point['appOptions']['propertyId']) {
                         $node = $path->properties->startNode;
                     }
-                    if($node !== NULL) {
-
+                    if($node !== NULL && isset($point['appOptions']['toFloor'])) {
                         $this->points[$id]['appOptions']['other'] = [
                             'propertyId' => $node->id,
+                            'reverse' => ($node == $path->properties->startNode),
                             'pathProperty' => $path->properties->id,
-                            'floor' => ['id' => $path->properties->destinationFloor->id, 'name'=>$path->properties->destinationFloor->readableName],
-                            'building' => ['id' => $path->properties->destinationFloor->building->id, 'name' => $path->properties->destinationFloor->building->name],
+                            'floor' => ['id' => $point['appOptions']['toFloor']->id, 'name'=> $point['appOptions']['toFloor']->readableName],
+                            'building' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name],
                         ];
+                        unset($this->points[$id]['appOptions']['toFloor']);
                         break;
                     }
                 }

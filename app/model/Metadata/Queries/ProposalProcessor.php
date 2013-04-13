@@ -139,9 +139,6 @@ class ProposalProcessor {
                 'type' => $node['type'],
                 'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
                 'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
-                'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
-                'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
-                'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
             ]);
 
             $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
@@ -159,9 +156,6 @@ class ProposalProcessor {
                 'type' => $node['type'],
                 'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
                 'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
-                'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
-                'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
-                'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
             ]);
 
             $nodes[] = $this->nodeChangeRepository->createNew(NULL, [

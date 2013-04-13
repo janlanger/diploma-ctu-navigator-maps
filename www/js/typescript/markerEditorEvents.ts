@@ -341,6 +341,9 @@ module Mapping {
             marker.appOptions.type = $("select[name=type]", html).val();
             if(marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
                 if(marker.appOptions.x) {
+                    if(!marker.appOptions.other) {
+                        marker.appOptions.other = {};
+                    }
                     $.extend(marker.appOptions.other, marker.appOptions.other, marker.appOptions.x);
                     marker.appOptions.x = null;
                 }
@@ -375,6 +378,7 @@ module Mapping {
         }
 
         public onOtherNodeSelected(original:google.maps.Marker, html, returned) {
+            if(!returned.marker) return;
             return {
                 propertyId: returned.marker.appOptions.propertyId,
                 floor: returned.floorInfo,
