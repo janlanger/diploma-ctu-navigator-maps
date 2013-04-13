@@ -13,7 +13,7 @@ $(function () {
 
 // prolínací efekt při updatu snippetu
 jQuery.extend({
-	nette: {
+	nette: $.extend($.nette, {
 		updateSnippet: function (id, html) {
 			$("#" + id).fadeTo("fast", 0.3, function () {
 				$(this).html(html).fadeTo("fast", 1);
@@ -22,7 +22,7 @@ jQuery.extend({
 		},
 	
 		registerAfterUpdate: function() { }
-	}
+	})
 });
 
 // skrývání flash zpráviček

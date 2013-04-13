@@ -96,3 +96,7 @@ div.list-row:hover{
     border: 1px solid #AAA;
     box-shadow: 0px 2px 4px grey;
 }
+
+#map_canvas-modal img {
+    max-width: none
+}

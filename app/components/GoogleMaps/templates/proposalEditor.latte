@@ -74,7 +74,7 @@
                             lat: p[0],
                             lng: p[1]
                         };
-                        pointInfo.icon = mapping.getMarkerIcon(item.type);
+                        pointInfo.icon = editor.getMarkerIcon(item.type);
                         pointInfo.draggable = true;
                         pointInfo.title = item.title;
 
@@ -95,7 +95,7 @@
                         newPaths.push(pathInfo);
                     }
                 }
-                mapping.setNewData(newPoints, newPaths, value);
+                editor.setNewData(newPoints, newPaths, value);
             });
         });
     });
