@@ -334,7 +334,12 @@ module Mapping {
                 marker.appOptions = {};
             }
             marker.appOptions.name = $("input[name='name']", html).val();
-            marker.appOptions.room = roomPrefix + $("input[name='room']", html).val();
+            var room = $("input[name='room']", html).val().trim();
+            if(room != "") {
+                marker.appOptions.room = roomPrefix + $("input[name='room']", html).val();
+            } else {
+                marker.appOptions.room = "";
+            }
             marker.appOptions.fromFloor = $("input[name='fromFloor']", html).val();
             marker.appOptions.toFloor = $("input[name='toFloor']", html).val();
             marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();
