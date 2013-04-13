@@ -161,12 +161,12 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
                         $this->points[$id]['appOptions']['other'] = [
                             'propertyId' => $node->id,
+                            'pathProperty' => $path->properties->id,
                             'floor' => ['id' => $path->properties->destinationFloor->id, 'name'=>$path->properties->destinationFloor->readableName],
                             'building' => ['id' => $path->properties->destinationFloor->building->id, 'name' => $path->properties->destinationFloor->building->name],
                         ];
+                        break;
                     }
-
-
                 }
             }
         }

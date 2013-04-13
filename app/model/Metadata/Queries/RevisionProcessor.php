@@ -264,6 +264,13 @@ class RevisionProcessor extends Object {
                             'endNode' => $dbNodeProperties[$node['other']['propertyId']]
                         ))
                     ));
+                    if(isset($node['other']['pathProperty'])) {
+                        $paths[] = $this->pathChangeRepository->createNew(NULL, array(
+                            'changeset' => $changeset,
+                            'original' => $this->pathPropertiesRepository->find($node['other']['pathProperty']),
+                            'wasDeleted' => true,
+                        ));
+                    }
                 }
             }
 
@@ -515,10 +522,14 @@ class RevisionProcessor extends Object {
     private function countPathsLength(Revision $revision) {
         foreach($revision->getPaths() as $path) {
             /** @var $path Path */
-            $path->setLength(($this->computeDistance(
-                $path->getProperties()->getStartNode()->getGpsCoordinates(),
-                $path->getProperties()->getEndNode()->getGpsCoordinates()
-            )));
+            if($path->getProperties()->isFloorExchange()) {
+                $path->setLength(0);
+            } else {
+                $path->setLength(($this->computeDistance(
+                    $path->getProperties()->getStartNode()->getGpsCoordinates(),
+                    $path->getProperties()->getEndNode()->getGpsCoordinates()
+                )));
+            }
         }
     }
 
