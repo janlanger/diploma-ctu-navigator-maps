@@ -220,6 +220,7 @@ class RevisionProcessor extends Object {
                         'changeset' => $changeset,
                         'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
                             'isFloorExchange' => TRUE,
+                            'destinationFloor' => $this->nodeRepository->findOneBy(['properties'=> $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
                             'startNode' => $nodesAdd[$id],
                             'endNode' => $dbNodeProperties[$node['other']['propertyId']]
                         ))
@@ -258,6 +259,7 @@ class RevisionProcessor extends Object {
                         'changeset' => $changeset,
                         'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
                             'isFloorExchange' => TRUE,
+                            'destinationFloor' => $this->nodeRepository->findOneBy(['properties' => $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
                             'startNode' => $item,
                             'endNode' => $dbNodeProperties[$node['other']['propertyId']]
                         ))
