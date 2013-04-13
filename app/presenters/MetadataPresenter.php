@@ -25,6 +25,7 @@ use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\Node;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
+use Maps\Model\Metadata\Queries\FloorExchangePaths;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
 use Maps\Model\Metadata\Queries\RevisionDictionary;
 use Maps\Model\Metadata\Queries\RevisionGridQuery;
@@ -124,7 +125,9 @@ class MetadataPresenter extends SecuredPresenter {
 
         /** @var $path Path */
         foreach ($paths as $path) {
-            $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+            if (!$path->getProperties()->isFloorExchange()) {
+                $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+            }
         }
 
     }
@@ -245,10 +248,12 @@ class MetadataPresenter extends SecuredPresenter {
         $pathArray = [];
 
         foreach ($paths as $path) {
-            $pathArray[] = [
-                'startNode' => $findNodeId($path->properties->startNode),
-                'endNode' => $findNodeId($path->properties->endNode),
-            ];
+            if (!$path->getProperties()->isFloorExchange()) {
+                $pathArray[] = [
+                    'startNode' => $findNodeId($path->properties->startNode),
+                    'endNode' => $findNodeId($path->properties->endNode),
+                ];
+            }
         }
 
         return json_encode(['nodes' => $nodes, 'paths' => $pathArray]);
@@ -318,6 +323,7 @@ class MetadataPresenter extends SecuredPresenter {
                 $this->redirect("default");
             }
         });
+
 
         return $map;
     }
@@ -552,7 +558,9 @@ class MetadataPresenter extends SecuredPresenter {
 
             /** @var $path Path */
             foreach ($paths as $path) {
-                $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+                if(!$path->getProperties()->isFloorExchange()) {
+                    $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+                }
             }
         }
 

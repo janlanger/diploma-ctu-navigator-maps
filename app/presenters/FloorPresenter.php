@@ -171,7 +171,8 @@ class FloorPresenter extends SecuredPresenter {
 
             /** @var $path Path */
             foreach ($paths as $path) {
-                $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+                if(!$path->properties->isFloorExchange())
+                    $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
             }
         }
 

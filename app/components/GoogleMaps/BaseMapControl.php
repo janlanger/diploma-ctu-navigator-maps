@@ -1,5 +1,7 @@
 <?php
 namespace Maps\Components\GoogleMaps;
+use Maps\Model\Metadata\Queries\FloorByNodePropertiesId;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -20,6 +22,15 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     private $pathOptions;
     private $paths = [];
+    private $floorExchangePaths;
+
+    public function setFloorExchangePaths($floorExchangePaths) {
+        $this->floorExchangePaths = $floorExchangePaths;
+    }
+
+    public function getFloorExchangePaths() {
+        return $this->floorExchangePaths;
+    }
 
 
     private $types;
@@ -134,6 +145,31 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         if($this->apiKey == NULL) {
             throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
         }
+        if(!empty($this->floorExchangePaths)) {
+
+
+            foreach($this->floorExchangePaths as $path) {
+                foreach($this->points as $id => $point) {
+                    $node = NULL;
+                    if($path->properties->startNode->id == $point['appOptions']['propertyId']) {
+                        $node = $path->properties->endNode;
+                    }
+                    if($path->properties->endNode->id == $point['appOptions']['propertyId']) {
+                        $node = $path->properties->startNode;
+                    }
+                    if($node !== NULL) {
+
+                        $this->points[$id]['appOptions']['other'] = [
+                            'propertyId' => $node->id,
+                            'floor' => ['id' => $path->properties->destinationFloor->id, 'name'=>$path->properties->destinationFloor->readableName],
+                            'building' => ['id' => $path->properties->destinationFloor->building->id, 'name' => $path->properties->destinationFloor->building->name],
+                        ];
+                    }
+
+
+                }
+            }
+        }
         $template->apiKey = $this->apiKey;
 
         $template->mapWidth = "200px";
@@ -153,6 +189,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         $template->iconsBasePath = $this->nodeIconBase;
 
         $template->customLayers = $this->customLayers;
+
 
         return $template;
     }

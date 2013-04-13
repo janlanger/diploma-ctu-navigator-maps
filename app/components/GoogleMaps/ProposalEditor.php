@@ -8,6 +8,7 @@ use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
 use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Queries\ActiveProposals;
+use Maps\Model\Metadata\Queries\FloorExchangePaths;
 use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Nette\Application\UI\Control;
 
@@ -34,6 +35,8 @@ class ProposalEditor extends Control {
         $mapComponent = $this->getMapComponent();
         if(method_exists($mapComponent, $name)) {
             call_user_func_array(array($mapComponent, $name), $arguments);
+        } else {
+            parent::__call($name, $arguments);
         }
     }
 
@@ -61,23 +64,31 @@ class ProposalEditor extends Control {
 
 
     public function render() {
-        if($this->activeRevision != null) {
+        if($this->activeRevision != NULL) {
             $nodes = $this->activeRevision->nodes;
 
+            $nodeIds = [];
             foreach ($nodes as $node) {
                 $this->addPoint($node->properties->gpsCoordinates, [
                     "draggable" => TRUE,
                     "title" => $this->getNodeTitle($node->properties),
                     "type" => $node->properties->type,
-                    "appOptions" => json_encode($node),
+                    "appOptions" => $node->jsonSerialize(),
                 ]);
+                if(in_array($node->properties->getType(), ['elevator','stairs','passage'])) {
+                    $nodeIds[] = $node->properties->id;
+                }
             }
 
             $paths = $this->activeRevision->paths;
 
             foreach ($paths as $path) {
-                $this->addPath($path->properties->startNode->gpsCoordinates, $path->properties->endNode->gpsCoordinates);
+                if (!$path->getProperties()->isFloorExchange()) {
+                    $this->addPath($path->properties->startNode->gpsCoordinates, $path->properties->endNode->gpsCoordinates);
+                }
             }
+            $floorExchange = $this->getPresenter()->context->em->getRepository('Maps\\Model\\Metadata\\Path')->fetchAssoc(new FloorExchangePaths($nodeIds, $this->activeRevision), 'id');
+            $this->setFloorExchangePaths($floorExchange);
         }
 
         $template = $this->createTemplate();

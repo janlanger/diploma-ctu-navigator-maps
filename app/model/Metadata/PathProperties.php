@@ -36,9 +36,32 @@ class PathProperties extends BaseEntity {
 
     /**
      * @var bool
-     * @column(type="boolean",  options={"default" = false})
+     * @column(type="boolean")
      */
     private $isFloorExchange = FALSE;
+
+    /**
+     * @var Floor
+     * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", fetch="EAGER" )
+     * @JoinColumn(name="destinationFloor", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private $destinationFloor = NULL;
+
+    /**
+     * @param \Maps\Model\Metadata\Floor $destinationFloor
+     */
+    public function setDestinationFloor($destinationFloor) {
+        $this->destinationFloor = $destinationFloor;
+    }
+
+    /**
+     * @return \Maps\Model\Metadata\Floor
+     */
+    public function getDestinationFloor() {
+        return $this->destinationFloor;
+    }
+
+
 
     /**
      * @param \Maps\Model\Metadata\NodeProperties $endNode
