@@ -1,8 +1,7 @@
-{if empty($points)}
-    <div class="alert alert-error">
-        Podlaží nemá zadaná žádná metadata.
-    </div>
-{else}
+<div class="alert alert-error hide">
+    Podlaží nemá zadaná žádná metadata.
+</div>
+
 <div id="map_canvas-modal" style="width: {$mapWidth}; height: {$mapHeight}; margin: auto"></div>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
@@ -67,5 +66,3 @@ ModalMapInit = (function() {
 
 
 </script>
-
-{/if}

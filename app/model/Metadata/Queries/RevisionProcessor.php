@@ -67,6 +67,7 @@ class RevisionProcessor extends Object {
         $values = $form->getValues();
         $changes = json_decode($values['custom_changes'], TRUE);
 
+
         $this->processNewChanges($changes);
 
 

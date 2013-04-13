@@ -26,6 +26,14 @@ module Mapping {
             $("#floors-submit", x).click((event) => {
                 event.preventDefault();
                 $("#floors-submit", x).ajaxSubmit((payload) => {
+                    var data = payload.data;
+                    if (!data || ($.isEmptyObject(data.points))) {
+                        this.noMapData(modal);
+                        return;
+                    }
+
+                    $(".alert", modal).addClass('hide');
+                    $("#map_canvas-modal", modal).removeClass('hide');
                     this.setNewData(payload.data, this.map);
                 })
             })
@@ -35,9 +43,22 @@ module Mapping {
                 show: true
             });
             modal.on('shown', () => {
+                if(!ModalMapInit) {
+                    this.noMapData(modal);
+
+                }
                 var data = ModalMapInit();
+
                 this.map = new Mapping.BasicMap(data.element, data.options);
                 this.map.initialize();
+
+                if (!data || ($.isEmptyObject(data.options.points))) {
+                    this.noMapData(modal);
+                    return;
+                }
+
+                $(".alert", modal).addClass('hide');
+                $("#map_canvas-modal", modal).removeClass('hide');
                 this.registerMarkerClickHandler(this.map.markers);
                 this.highlightPropertyId(propertyId);
             });
@@ -93,14 +114,14 @@ module Mapping {
             var bodypaddings = parseInt(body.css("padding-top")) + parseInt(body.css("padding-bottom"));
 
             var height = $(window).height() - headerheight - bodypaddings - footerHeight - 10;
-            if($(window).height() < 700) {
+            if($(window).height() < 750) {
                 modal.css("top", '1%');
             }
             else {
                 modal.css("top", '10%');
             }
-            if(height < 310) {
-                height = 310;
+            if(height < 320) {
+                height = 300;
             }
             body.css("max-height", height+"px");
         }
@@ -209,12 +230,18 @@ module Mapping {
 
         private highlightPropertyId(id) {
             if(id == null) return;
-                var r = null;
-                for (var i = 0; i < this.map.markers.length; i++) {
-                    if (this.map.markers[i] && (this.map.markers[i].appOptions.propertyId == id)) {
-                        google.maps.event.trigger(this.map.markers[i], 'click');
-                    }
+            var r = null;
+            for (var i = 0; i < this.map.markers.length; i++) {
+                if (this.map.markers[i] && (this.map.markers[i].appOptions.propertyId == id)) {
+                    google.maps.event.trigger(this.map.markers[i], 'click');
                 }
             }
         }
+        private noMapData(modal) {
+            $(".alert", modal).removeClass('hide');
+            $("#map_canvas-modal", modal).addClass('hide');
+        }
+    }
+
+
 }
