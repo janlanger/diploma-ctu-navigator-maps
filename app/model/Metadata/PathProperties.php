@@ -33,6 +33,13 @@ class PathProperties extends BaseEntity {
      */
     private $endNode;
 
+
+    /**
+     * @var bool
+     * @column(type="boolean",  options={"default" = false})
+     */
+    private $isFloorExchange = FALSE;
+
     /**
      * @param \Maps\Model\Metadata\NodeProperties $endNode
      */
@@ -63,6 +70,21 @@ class PathProperties extends BaseEntity {
     public function getStartNode()
     {
         return $this->startNode;
+    }
+
+
+    /**
+     * @param boolean $isFloorExchange
+     */
+    public function setIsFloorExchange($isFloorExchange) {
+        $this->isFloorExchange = $isFloorExchange;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFloorExchange() {
+        return $this->isFloorExchange;
     }
 
     public function toArray() {

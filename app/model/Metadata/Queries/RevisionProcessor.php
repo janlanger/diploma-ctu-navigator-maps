@@ -147,8 +147,17 @@ class RevisionProcessor extends Object {
 
             $nodePropertiesIds = [];
 
+            foreach ($changes['nodes']['added'] as $node) {
+                if(isset($node['other']) && !empty($node['other'])) {
+                    $nodePropertiesIds[] = $node['other']['propertyId'];
+                }
+            }
+
             foreach ($changes['nodes']['changed'] as $node) {
                 $nodePropertiesIds[] = $node['propertyId'];
+                if (isset($node['other']) && !empty($node['other'])) {
+                    $nodePropertiesIds[] = $node['other']['propertyId'];
+                }
             }
             $nodePropertiesIds = array_merge($nodePropertiesIds, $changes['nodes']['deleted']);
 
@@ -189,16 +198,33 @@ class RevisionProcessor extends Object {
 
             $nodes = [];
 
+            $floorIntersections = [];
+
+
+            $paths = [];
+
             foreach($changes['nodes']['added'] as $id => $node) {
                 $nodesAdd[$id] = $this->nodePropertiesRepository->createNew(NULL, [
                     'gpsCoordinates' => $node['position'],
                     'type' => $node['type'],
                     'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
                     'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
-                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                    /*'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
                     'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
-                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
+                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,*/
                 ]);
+
+                if(isset($node['other']) && !empty($node['other'])) {
+                    $paths[] = $this->pathChangeRepository->createNew(NULL, array(
+                        'isFloorExchange' => TRUE,
+                        'changeset' => $changeset,
+                        'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
+                            'isFloorExchange' => TRUE,
+                            'startNode' => $nodesAdd[$id],
+                            'endNode' => $dbNodeProperties[$node['other']['propertyId']]
+                        ))
+                    ));
+                }
 
                 $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
@@ -215,9 +241,9 @@ class RevisionProcessor extends Object {
                     'type' => $node['type'],
                     'name' => (isset($node['name']) && trim($node['name']) != "" ? $node['name'] : NULL),
                     'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
-                    'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
+                    /*'fromFloor' => isset($node['fromFloor']) && trim($node['fromFloor']) != "" ? $node['fromFloor'] : NULL,
                     'toFloor' => isset($node['toFloor']) && trim($node['toFloor']) != "" ? $node['toFloor'] : NULL,
-                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,
+                    'toBuilding' => isset($node['toBuilding']) && trim($node['toBuilding']) != "" ? $node['toBuilding'] : NULL,*/
                 ]);
 
                 $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
@@ -226,6 +252,17 @@ class RevisionProcessor extends Object {
                     'original' => $dbNodeProperties[$node['propertyId']],
                     'wasDeleted' => FALSE
                 ]);
+
+                if (isset($node['other']) && !empty($node['other'])) {
+                    $paths[] = $this->pathChangeRepository->createNew(NULL, array(
+                        'changeset' => $changeset,
+                        'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
+                            'isFloorExchange' => TRUE,
+                            'startNode' => $item,
+                            'endNode' => $dbNodeProperties[$node['other']['propertyId']]
+                        ))
+                    ));
+                }
             }
 
 
@@ -238,7 +275,6 @@ class RevisionProcessor extends Object {
                 ]);
             }
 
-            $paths = [];
 
             foreach($changes['paths']['added'] as $path) {
                 $item = $this->pathPropertiesRepository->createNew(NULL, [
