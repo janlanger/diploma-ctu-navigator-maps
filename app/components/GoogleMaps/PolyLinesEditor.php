@@ -77,11 +77,9 @@ class PolyLinesEditor extends BaseMapControl {
             ->setPrompt('-- Typ --');
 
         $form->addText('name','Název');
-        $form->addText('room','Číslo místnosti'); //TODO: suggest input
-        $form->addText('fromFloor','Z podlaží (nejnižší)'); //TODO: select ze známých pater
-        $form->addText('toFloor','Do podlaží');
-        $form->addSelect('toBuilding','Do budovy', $this->buildings)
-            ->setPrompt('-- Do budovy --');
+        $form->addText('room','Číslo místnosti');
+        $form->addHidden('otherNode', null);
+
         $form->addButton('save','Uložit');
         $form->addButton('delete','Odstranit bod');
 

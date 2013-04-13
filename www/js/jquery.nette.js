@@ -15,6 +15,7 @@ jQuery.extend({
 
 		success: function (payload) {
 			// redirect
+            if(!$.isPlainObject(payload)) return;
 			if (payload.redirect) {
 				window.location.href = payload.redirect;
 				return;
@@ -26,6 +27,9 @@ jQuery.extend({
 					jQuery.nette.updateSnippet(i, payload.snippets[i]);
 				}
 			}
+            if($.dependentselectbox != undefined) {
+                $.dependentselectbox.hideSubmits();
+            }
 		}
 	}
 });

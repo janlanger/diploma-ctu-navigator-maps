@@ -184,5 +184,8 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         }
     }
 
+    public function getPathOptions() {
+        return $this->pathOptions;
+    }
 
 }

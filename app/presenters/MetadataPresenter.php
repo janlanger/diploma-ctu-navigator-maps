@@ -10,8 +10,10 @@
 namespace Maps\Presenter;
 use DataGrid\DataGrid;
 use DataGrid\DataSources\Doctrine\QueryBuilder;
+use DependentSelectBox\JsonDependentSelectBox;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\BasicMap;
+use Maps\Components\GoogleMaps\ModalMap;
 use Maps\Components\GoogleMaps\PolyLinesEditor;
 use Maps\Components\GoogleMaps\ProposalEditor;
 use Maps\Model\BaseDatagridQuery;
@@ -20,6 +22,7 @@ use Maps\Model\Dao;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Metadata\Changeset;
+use Maps\Model\Metadata\Node;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
@@ -27,6 +30,8 @@ use Maps\Model\Metadata\Queries\RevisionDictionary;
 use Maps\Model\Metadata\Queries\RevisionGridQuery;
 use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Maps\Model\Metadata\Revision;
+use Nette\Application\Responses\JsonResponse;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Utils\Html;
 
 class MetadataPresenter extends SecuredPresenter {
@@ -256,6 +261,7 @@ class MetadataPresenter extends SecuredPresenter {
         $map->setCenter($this->getFloor()->getBuilding()->gpsCoordinates);
         $map->setZoomLevel(20);
         $map->setRoomPrefix($this->getFloor()->getBuilding()->roomPrefix);
+        $map->setBuildingsDictionary($this->getRepository('building')->fetchPairs(new DictionaryQuery()));
 
 
         $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
@@ -443,5 +449,113 @@ class MetadataPresenter extends SecuredPresenter {
             $this->getRepository('meta_revision')->add($revision);
         }
         return $revision;
+    }
+
+    public function renderModalMap($coords = NULL){
+        JsonDependentSelectBox::tryJsonResponse($this);
+       if($this->getHttpRequest()->isAjax() && !$this['modalForm']->isSubmitted()) {
+            $this->invalidateControl('modal');
+        }
+    }
+
+    public function createComponentModalForm($name) {
+        $form = new Form($this, $name);
+
+        $form->addSelect("building", 'Budova', $this->getRepository('building')->fetchPairs(new DictionaryQuery()))
+            ->setDefaultValue($this->getFloor()->getBuilding()->id);
+        $form->addDependedSelect('floor', 'Podlaží', $form['building'], callback($this, 'getFloorDictionary'), FALSE)
+            ->setDefaultValue($this->getFloor()->id);
+        $form->addSubmit('ok', 'Načíst podlaží')
+            ->setHtmlId('floors-submit')
+            ->onClick[] = function(SubmitButton $button) {
+            $payload = $this['modalMap']->getPayload();
+            $this->payload->data = $payload;
+            $this->sendPayload();
+        };
+        return $form;
+    }
+
+    public function getFloorDictionary(Form $form) {
+        static $cache = [];
+        $values = $form->getValues();
+
+        $r = [];
+
+        if ($values['building'] > 0) {
+            if(isset($cache[$values['building']])) {
+                return $cache[$values['building']];
+            }
+            $r = $cache[$values['building']] = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\DictionaryQuery($values['building']), 'id', 'name');
+            if ($r == NULL) {
+                $r = array();
+            }
+        }
+        return $r;
+    }
+
+    public function createComponentModalMap() {
+        $map = new ModalMap();
+        $floor = $this->getRepository('floor')->find($this['modalForm']['floor']->getValue());
+
+        $map->setApiKey($this->getContext()->parameters['google']['apiKey']);
+        if($this->getParameter('coords') != NULL) {
+            $map->setCenter($this->getParameter('coords'));
+        } else {
+            $map->setCenter($floor->getBuilding()->gpsCoordinates);
+        }
+        $map->setZoomLevel(20);
+        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
+        if ($plan != NULL) {
+            $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
+        }
+
+        $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($floor));
+
+        if ($metadata != NULL) {
+            $map->setNodeTypes([
+                'intersection' => ['anchor' => [4, 4], 'legend' => 'Křižovatka'],
+                'entrance' => ['anchor' => [8, 8], 'legend' => 'Vchod'],
+                'stairs' => ['anchor' => [8, 8], 'legend' => 'Schodiště'],
+                'elevator' => ['anchor' => [8, 8], 'legend' => 'Výtah'],
+                'passage' => ['anchor' => [8, 8], 'legend' => 'Průchod'],
+                'lecture' => ['anchor' => [8, 8], 'legend' => 'Učebna'],
+                'auditorium' => ['anchor' => [8, 8], 'legend' => 'Posluchárna'],
+                'office' => ['anchor' => [8, 8], 'legend' => 'Kancelář'],
+                'study' => ['anchor' => [8, 8], 'legend' => 'Studovna'],
+                'cafeteria' => ['anchor' => [8, 8], 'legend' => 'Kantýna'],
+                'restroom-men' => ['anchor' => [8, 8], 'legend' => 'WC muži'],
+                'restroom-women' => ['anchor' => [8, 8], 'legend' => 'WC ženy'],
+                'cloakroom' => ['anchor' => [8, 8], 'legend' => 'Šatna'],
+                'restriction' => ['anchor' => [8, 8], 'legend' => 'Zákaz vstupu'],
+                'default' => ['anchor' => [8, 8], 'legend' => 'Ostatní'],
+            ]);
+            $map->setNodeIconBase('images/markers/types');
+            $nodes = $metadata->nodes;
+
+            /** @var $node Node */
+            foreach ($nodes as $node) {
+                $map->addPoint($node->properties->gpsCoordinates, [
+                    "draggable" => FALSE,
+                    "title" => $node->getProperties()->getReadableTitle(),
+                    "type" => $node->properties->type,
+                    "appOptions" => json_encode($node),
+                ]);
+            }
+
+            $paths = $metadata->paths;
+
+            $map->setPathOptions([
+                'strokeColor' => '#aa0000',
+                'strokeOpacity' => 0.5,
+                'strokeWeight' => 1.5
+            ]);
+
+            /** @var $path Path */
+            foreach ($paths as $path) {
+                $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+            }
+        }
+
+        return $map;
     }
 }

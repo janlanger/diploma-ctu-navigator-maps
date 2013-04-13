@@ -228,41 +228,52 @@ module Mapping {
             return {url: url, anchor: new google.maps.Point(this.options.markerTypes[type].anchor[0], this.options.markerTypes[type].anchor[1])};
         }
 
+        public readableNodeType(index) {
+            if (this.options.markerTypes[index]) {
+                return this.options.markerTypes[index].legend;
+            }
+            return index;
+        }
+
+
         public openMarkerInfoWindow(marker:google.maps.Marker) {
             var window = new google.maps.InfoWindow();
-            var html = $("#innerForm form").clone();
-            //infobox size
+            var content = this.createMarkerForm($("#innerForm form"), marker, window);
+
+            window.setContent(content);
+            google.maps.event.addListener(window, 'domready', function () {
+                $("select[name=type]", content).trigger('change');
+            });
+            window.open(this.map, marker);
+        }
+
+        private createMarkerForm(element, marker:google.maps.Marker, window:google.maps.InfoWindow) {
+            var html = element.clone(true, true);
+            var _this = this;
+
+            //infobox size - we have to show only 3 element to make gmaps infobox correctly sized
             $("div[id^=form-]", html).hide();
-            $("div[id^=form-]:lt(3)", html).show();
+            $("div[id^=form-]:lt(4)", html).show();
+
+
             //events registration
             var typeSelect = $("select[name=type]", html);
-            typeSelect.change(function (event) {
-                //hide everything
-                $("div[id^=form-]", html).hide();
-                $("#form-type", html).show();
-                switch (this.value) {
-                    case 'elevator':
-                        $("#form-fromFloor", html).show();
-                    case 'stairs':
-                        $("#form-toFloor", html).show();
-                        break;
-                    case 'passage':
-                        $("#form-toFloor", html).show();
-                        $("#form-toBuilding", html).show();
-                        break;
-                    case 'lecture':
-                    case 'auditorium':
-                    case 'office':
-                    case 'study':
-                        $("#form-room", html).show();
-                    case 'cafeteria':
-                    case 'entrance':
-                    case 'other':
-                    case 'default':
-                        $("#form-name", html).show();
-                        break;
-                }
+            typeSelect.change(function(event) {
+                _this.eventHandler.onTypeChange(this.value, html);
             });
+
+            var otherNode = $("#form-other a", html).click((event)  => {
+                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, marker, typeSelect.val(),
+                    (selected) => {
+                        var other = this.eventHandler.onOtherNodeSelected(marker, html, selected);
+                        if(!$.isEmptyObject(other)) {
+                            var info = other;
+                            marker.appOptions.x = other;
+                            $("#form-other div", html).text("Cíl: bod #"+ info.propertyId + ", patro "+info.floor.name + (typeSelect.val() == "passage"?" budova "+info.building.name:""));
+                        }
+                    }
+            )});
+
             var room = $("input[name=room]", html);
             room.attr('autocomplete', 'off');
             room.typeahead({
@@ -278,20 +289,12 @@ module Mapping {
                     return item.replace(this.options.roomPrefix, "");
                 }
             });
-            $("input[name=save]", html).click(() => {
-                if (!marker.appOptions) {
-                    marker.appOptions = {};
-                }
-                marker.appOptions.name = $("input[name='name']", html).val();
-                marker.appOptions.room = this.options.roomPrefix + $("input[name='room']", html).val();
-                marker.appOptions.fromFloor = $("input[name='fromFloor']", html).val();
-                marker.appOptions.toFloor = $("input[name='toFloor']", html).val();
-                marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();
-                marker.appOptions.type = $("select[name=type]", html).val();
 
-                marker.setIcon(this.getMarkerIcon(marker.appOptions.type));
-                window.close()
+            $("input[name=save]", html).click(() => {
+                this.eventHandler.onMarkerWindowSave(event, marker, this.options.roomPrefix, html);
+                window.close();
             });
+
             $("input[name=delete]", html).click((event) => {
                 this.removeNode(marker);
                 window.close();
@@ -306,12 +309,16 @@ module Mapping {
                 $("input[name='toFloor']", html).val(marker.appOptions.toFloor);
                 $("select[name='toBuilding']", html).val(marker.appOptions.toBuilding);
                 $("select[name=type]", html).val(marker.appOptions.type);
+                marker.appOptions.x = marker.appOptions.other;
+                if(marker.appOptions.x) {
+                    var info = marker.appOptions.x;
+                    $("#form-other div", html).text("Cíl: bod #" + info.propertyId + ", patro " + info.floor.name + (typeSelect.val() == "passage" ? " budova " + info.building.name : ""));
+                }
             }
-            window.setContent(html[0]);
-            google.maps.event.addListener(window, 'domready', function () {
-                typeSelect.trigger('change');
-            });
-            window.open(this.map, marker);
+            return html[0];
+
+
+
         }
 
         public openPathInfoWindow(position:google.maps.LatLng, line:google.maps.Polyline) {

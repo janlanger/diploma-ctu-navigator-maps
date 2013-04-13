@@ -1,0 +1,17 @@
+{block pageTitle}Modální mapa{/block}
+{block #content}
+{snippet modal}
+    <script type="text/javascript" src="{$baseUri}/js/jquery.nette.dependentselectbox.js"></script>
+    {snippet form}
+        {form modalForm, class=>"form-inline"}
+            {input building}
+            {input building_submit, class=>"hide"}
+            {input floor}
+            {input ok}
+        {/form}
+    {/snippet}
+
+    {snippet map}
+        {control modalMap, size=>['100%','400px']}
+    {/snippet}
+{/snippet}

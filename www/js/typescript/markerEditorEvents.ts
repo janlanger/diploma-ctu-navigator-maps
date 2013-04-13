@@ -302,6 +302,89 @@ module Mapping {
             }
         }
 
+        //---------- marker Window events
+
+        public onTypeChange(value, html) {
+            //hide everything
+            $("div[id^=form-]", html).hide();
+            $("#form-type", html).show();
+            switch (value) {
+                case 'elevator':
+                case 'passage':
+                case 'stairs':
+                    $("#form-other", html).show();
+                    break;
+                case 'lecture':
+                case 'auditorium':
+                case 'office':
+                case 'study':
+                    $("#form-room", html).show();
+                case 'cafeteria':
+                case 'entrance':
+                case 'other':
+                case 'restriction':
+                case 'default':
+                    $("#form-name", html).show();
+                    break;
+            }
+        }
+
+        public onMarkerWindowSave(event, marker:google.maps.Marker, roomPrefix:string, html) {
+            if (!marker.appOptions) {
+                marker.appOptions = {};
+            }
+            marker.appOptions.name = $("input[name='name']", html).val();
+            marker.appOptions.room = roomPrefix + $("input[name='room']", html).val();
+            marker.appOptions.fromFloor = $("input[name='fromFloor']", html).val();
+            marker.appOptions.toFloor = $("input[name='toFloor']", html).val();
+            marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();
+            marker.appOptions.type = $("select[name=type]", html).val();
+            if(marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
+                if(marker.appOptions.x) {
+                    marker.appOptions.other = marker.appOptions.x;
+                    marker.appOptions.x = null;
+                }
+            }
+
+            marker.setIcon(this.editor.getMarkerIcon(marker.appOptions.type));
+        }
+
+        public onOtherNodeSelection(event, destination:string, marker:google.maps.Marker, type, callback) {
+            event.preventDefault();
+
+            var data = {coords: marker.getPosition().lat() + "," + marker.getPosition().lng()};
+            var destProperty;
+            if(marker.appOptions.x) {
+                var info = marker.appOptions.x;
+                data.floor = info.floor.id;
+                data.building = info.building.id;
+                destProperty = info.propertyId;
+            }
+
+            $.get(destination, data,  (payload, textStatus, XMLHttpRequest) => {
+                if (payload.redirect) {
+                    window.location.href = payload.redirect;
+                    return;
+                }
+                var modal = new Mapping.ModalMap(this.editor);
+                modal.open(payload, type, callback, destProperty);
+
+
+
+            });
+        }
+
+        public onOtherNodeSelected(original:google.maps.Marker, html, returned) {
+            return {
+                propertyId: returned.marker.appOptions.propertyId,
+                floor: returned.floorInfo,
+                building: returned.buildingInfo
+            }
+        }
+
+
+
+
 
     }
 }

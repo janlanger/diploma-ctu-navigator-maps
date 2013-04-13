@@ -288,12 +288,7 @@ module Mapping {
             return x[index];
         }
 
-        private readableNodeType(index) {
-            if (this.options.markerTypes[index]) {
-                return this.options.markerTypes[index].legend;
-            }
-            return index;
-        }
+
 
         public handleApproveClick(event, radio, index) {
             radio = $(radio);

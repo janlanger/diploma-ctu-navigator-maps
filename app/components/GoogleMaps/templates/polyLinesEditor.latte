@@ -32,9 +32,9 @@
             <span class="add-on" n:if="$roomPrefix != ''">{$roomPrefix}</span>
             {input room, 'title'=>'Číslo místnosti'}
         </div>
-        <div id="form-toBuilding" style="margin-bottom: 5px">{input toBuilding}</div>
-        <div id="form-fromFloor" style="margin-bottom: 5px">{input fromFloor, 'title'=>'Z podlaží (nejnižší)'}</div>
-        <div id="form-toFloor" style="margin-bottom: 5px">{input toFloor, 'title'=>'Do podlaží'}</div>
+        <div id="form-other" style="margin-bottom: 5px;"><div></div><a href="#">Vybrat cílový bod / cílové body</a></div>
+
+    {input otherNode}
     {input save, 'class'=>'btn btn-primary'}
     {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
     {/form}
@@ -44,6 +44,7 @@
 <script type="text/javascript" src="{$baseUri}/js/typescript/gmaps.js"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/markerEditor.js"></script>
 <script type="text/javascript" src="{$baseUri}/js/typescript/markerEditorEvents.js"></script>
+<script type="text/javascript" src="{$baseUri}/js/typescript/modalMap.js"></script>
 <script type="text/javascript">
 
     $("#innerForm *[title]").each(function () {
@@ -131,10 +132,32 @@
             { element:document.getElementById('buttons'), position: google.maps.ControlPosition.RIGHT_CENTER}
         ],
         resizableBox: { element: document.getElementById("map_box"), options: { minHeight: 270, minWidth: 300}},
-        positionSelect: document.getElementById('position-select')
+        positionSelect: document.getElementById('position-select'),
+        markerSelectorAction: {plink Metadata:modalMap}
     };
     {if !isset($overiden)}
     var editor = new Mapping.MarkerEditor(document.getElementById('map_canvas'), editorOptions);
     {/if}
 
 </script>
+
+<div id="modal" class="modal hide fade" tabindex="-1" aria-labelledby="modal-header" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="modal-header">Výběr cílových bodů</h3>
+    </div>
+    <div class="modal-body">
+        <p>Vyberte budovy a podlaží pro kterou chcete vytvořit návrh:</p>
+
+        <div id="modal-content"></div>
+
+        <div id="modal-info" style="margin-top: 5px;"></div>
+        <div id="modal-info-2" style="margin-top: 5px;"></div>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Storno</a>
+        <a href="#" class="btn btn-primary">Uložit</a>
+    </div>
+
+</div>
