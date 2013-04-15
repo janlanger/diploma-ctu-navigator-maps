@@ -33,7 +33,6 @@ $configurator->addConfig(__DIR__ . '/config/config.local.neon', $configurator::N
 $container = $configurator->createContainer();
 $container->addService('robotLoader', $robot); //needed for presenter tree
 
-
 Nella\Panels\CallbackPanel::register(array(
     '--robotloader' => array(
         'name' => "Rebuild RobotLoader Cache",
@@ -64,5 +63,6 @@ Nella\Panels\CallbackPanel::register(array(
 ));
 $router = $container->application->getRouter();
 $router[] = new Route('index.php', 'Dashboard:default', Route::ONE_WAY);
+$router[] = new \Maps\Core\RestRoute('Api','default','api/1');
 $router[] = new Route('<presenter>/<action>[/<id>]', 'Dashboard:default');
 

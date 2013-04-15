@@ -26,6 +26,9 @@ class Floor extends BaseEntity {
      */
     private $building;
 
+    // TODO!!
+    private $floorHeight = 0;
+
 
     public function getVersion() {
         return $this->version;
@@ -91,7 +94,17 @@ class Floor extends BaseEntity {
             return "č. ".$this->floor_number;
         }
     }
-    
+
+    public function setFloorHeight($floorHeight) {
+        $this->floorHeight = $floorHeight;
+    }
+
+    public function getFloorHeight() {
+        return $this->floorHeight;
+    }
+
+
+
 }
 
 ?>

@@ -18,7 +18,7 @@ class ActiveRevision extends QueryObjectBase {
 
     private $floor;
 
-    function __construct(Floor $floor)
+    function __construct($floor)
     {
         $this->floor = $floor;
     }

@@ -24,7 +24,7 @@ common:
             apiKey: AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk
         api:
             keys:
-                - dfsdfsfd #CTU Navigator core
+                - 123 #CTU Navigator core
 
 
     php:
