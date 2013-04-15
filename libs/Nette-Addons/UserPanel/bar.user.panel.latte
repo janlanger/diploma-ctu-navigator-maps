@@ -36,10 +36,13 @@
 <script type="text/javascript">
 	var form = document.forms['frm-UserPanel-login'];
 	form.elements['frmlogin-send'].parentNode.parentNode.style.display = 'none';
-	$("input.onClickSubmit", form).click(function() {
-        form.submit();
-    })
-	var elements = form.getElementsByTagName('input');console.log(elements);
+    var jQuery;
+    if(jQuery != undefined) {
+	    $("input.onClickSubmit", form).click(function() {
+            form.submit();
+        })
+    }
+	var elements = form.getElementsByTagName('input');
 	/*for (i = 0; i < elements.length; i++) {
 		if (elements[i].getAttribute('class') == 'onClickSubmit') {
 			elements[i].onclick = function () {
