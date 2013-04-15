@@ -129,6 +129,15 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    public function actionPlan($id) {
+        $plan = $this->getRepository('plan')->find($id);
+        if($plan == NULL || !$plan->getPublished()) {
+            throw new BadRequestException("Plan with id $id does not exists.", 404);
+        }
+        $this->sendResponse(new JsonResponse($this->getPlanPayload($plan)));
+
+    }
+
     /********** DATA CONVERSIONS **********/
 
     private function convertCoordinates($c) {
