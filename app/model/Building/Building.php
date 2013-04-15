@@ -1,5 +1,7 @@
 <?php
 namespace Maps\Model\Building;
+use Maps\Model\Floor\Floor;
+
 /**
  * @Entity
  * @table(name="building")
@@ -15,6 +17,11 @@ class Building extends \Maps\Model\BaseEntity{
     private $room_prefix;
     /** @Column(type="string", length=200, nullable=true) */
     private $gps_coordinates;
+    /**
+     * @var Floor[]
+     * @OneToMany(targetEntity="Maps\Model\Floor\Floor", mappedBy="building")
+     */
+    private $floors;
 
     public function setAddress($address) {
         $this->address = $address;
@@ -55,6 +62,18 @@ class Building extends \Maps\Model\BaseEntity{
     public function getRoomPrefix() {
         return $this->room_prefix;
     }
+
+    public function getFloors() {
+        return $this->floors;
+    }
+
+    public function setFloors($floors) {
+        $this->floors = $floors;
+    }
+
+
+
+
 
 
 }

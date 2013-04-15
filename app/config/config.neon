@@ -22,6 +22,9 @@ common:
             collation: utf8_czech_ci
         google:
             apiKey: AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk
+        api:
+            keys:
+                - dfsdfsfd #CTU Navigator core
 
 
     php:
