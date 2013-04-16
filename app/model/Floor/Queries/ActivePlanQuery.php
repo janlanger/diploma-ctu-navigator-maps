@@ -15,10 +15,15 @@ use Maps\Model\Persistence\QueryObjectBase;
 
 class ActivePlanQuery extends QueryObjectBase {
 
-    private $floor;
+    private $floors;
 
-    function __construct($floor) {
-        $this->floor = $floor;
+    function __construct($floors) {
+        if(is_scalar($floors)) {
+            $this->floors = [$floors];
+        } else {
+            $this->floors = $floors;
+        }
+
     }
 
 
@@ -28,8 +33,8 @@ class ActivePlanQuery extends QueryObjectBase {
      */
     protected function doCreateQuery(IQueryable $repository) {
         return $repository->createQueryBuilder("p")->select("p")
-            ->where("p.floor = :floor")
+            ->where("p.floor IN (:floor)")
             ->andWhere("p.published = true")
-            ->setParameter("floor", $this->floor);
+            ->setParameter("floor", $this->floors);
     }
 }
