@@ -12,6 +12,7 @@ namespace Maps\Presenter;
 
 use Maps\Model\Building\Building;
 use Maps\Model\Building\Queries\BuildingWithFloors;
+use Maps\Model\Floor\ActivePlanOfAnyFloor;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\ActivePlansOfFloors;
 use Maps\Model\Floor\Floor;
@@ -129,13 +130,55 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    public function actionFloorNodes($id) {
+        $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($id));
+        if($metadata != NULL) {
+            $nodes = [];
+            /** @var $node Node */
+            foreach ($metadata->getNodes() as $node) {
+                $nodes[] = $this->getNodePayload($node, $id);
+            }
+            $this->sendResponse(new JsonResponse($nodes));
+        }
+        else {
+            throw new BadRequestException("Floor with id $id does not exists or has no metadata.", 404);
+        }
+    }
+
     public function actionPlan($id) {
         $plan = $this->getRepository('plan')->find($id);
         if($plan == NULL || !$plan->getPublished()) {
             throw new BadRequestException("Plan with id $id does not exists.", 404);
         }
         $this->sendResponse(new JsonResponse($this->getPlanPayload($plan)));
+    }
 
+    /**
+     * @deprecated
+     */
+    public function actionPlan_v1($id) {
+        $building = $this->getRepository('building')->fetchOne(new BuildingWithFloors($id));
+        $floorIds = [];
+
+        $floors = [];
+        foreach ($building->getFloors() as $floor) {
+            $floorIds[] = $floor->id;
+            $floors[] = $this->getFloorPayload($floor);
+        }
+        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanOfAnyFloor($floorIds));
+
+        $tilesUrl = $this->getContext()->tiles->getTilesBasePath($plan);
+        $tilesUrl = substr($tilesUrl,0, strrpos($tilesUrl, "/"))."/";
+
+        $payload = [
+            'id' => $building->id,
+            'name' => $building->name,
+            'tiles' => $this->getHttpRequest()->getUrl()->getBaseUrl().$tilesUrl,
+            'maxZoom' => $plan->getMaxZoom(),
+            'minZoom' => $plan->getMinZoom(),
+            'floors' => $floors
+        ];
+        $this->sendResponse(new JsonResponse($payload));
     }
 
     /********** DATA CONVERSIONS **********/
