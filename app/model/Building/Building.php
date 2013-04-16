@@ -1,10 +1,12 @@
 <?php
 namespace Maps\Model\Building;
+use DateTime;
 use Maps\Model\Floor\Floor;
 
 /**
  * @Entity
  * @table(name="building")
+ * @HasLifecycleCallbacks
  */
 class Building extends \Maps\Model\BaseEntity{
     /**  @Column(type="string", length=50) */
@@ -17,11 +19,22 @@ class Building extends \Maps\Model\BaseEntity{
     private $room_prefix;
     /** @Column(type="string", length=200, nullable=true) */
     private $gps_coordinates;
+
+    /**
+     * @var \DateTime
+     * @Column(type="datetime", nullable=false)
+     */
+    private $lastUpdate;
+
     /**
      * @var Floor[]
      * @OneToMany(targetEntity="Maps\Model\Floor\Floor", mappedBy="building")
      */
     private $floors;
+
+    function __construct() {
+        $this->lastUpdate = new DateTime();
+    }
 
     public function setAddress($address) {
         $this->address = $address;
@@ -71,9 +84,25 @@ class Building extends \Maps\Model\BaseEntity{
         $this->floors = $floors;
     }
 
+    /**
+     * @param \DateTime $lastUpdate
+     */
+    public function setLastUpdate($lastUpdate) {
+        $this->lastUpdate = $lastUpdate;
+    }
 
+    /**
+     * @return \DateTime
+     */
+    public function getLastUpdate() {
+        return $this->lastUpdate;
+    }
 
-
-
+    /**
+     * @PreUpdate
+     */
+    public function preUpdate() {
+        $this->lastUpdate = new DateTime();
+    }
 
 }

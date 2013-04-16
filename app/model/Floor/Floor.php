@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Model\Floor;
+use DateTime;
 use Maps\Model\BaseEntity;
 
 /*
@@ -10,12 +11,9 @@ use Maps\Model\BaseEntity;
 /**
  * @Entity
  * @Table(name="floors")
+ * @HasLifecycleCallbacks
  */
 class Floor extends BaseEntity {
-    /**
-     * @Column(type="integer", nullable=false)
-     */
-    private $version = 1;    
     /** @Column(type="string", length=50, nullable=true) */
     private $name;
     /** @Column(type="integer") */
@@ -26,17 +24,22 @@ class Floor extends BaseEntity {
      */
     private $building;
 
-    // TODO!!
+    /**
+     * @var float
+     * @Column(type="float",nullable=false)
+     */
     private $floorHeight = 0;
 
+    /**
+     * @var DateTime
+     * @Column(type="datetime", nullable=false)
+     */
+    private $lastUpdate;
 
-    public function getVersion() {
-        return $this->version;
+    function __construct() {
+        $this->lastUpdate = new DateTime();
     }
 
-    public function setVersion($version) {
-        $this->version = $version;
-    }
 
     public function getName() {
         return $this->name;
@@ -103,7 +106,26 @@ class Floor extends BaseEntity {
         return $this->floorHeight;
     }
 
+    /**
+     * @PreUpdate
+     */
+    public function preUpdate(){
+        $this->lastUpdate = new DateTime();
+    }
 
+    /**
+     * @param \DateTime $lastUpdate
+     */
+    public function setLastUpdate($lastUpdate) {
+        $this->lastUpdate = $lastUpdate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLastUpdate() {
+        return $this->lastUpdate;
+    }
 
 }
 
