@@ -20,6 +20,9 @@ class ActiveRevision extends QueryObjectBase {
 
     function __construct($floor)
     {
+        if(is_scalar($floor)) {
+            $floor = [$floor];
+        }
         $this->floor = $floor;
     }
 
@@ -31,7 +34,7 @@ class ActiveRevision extends QueryObjectBase {
     protected function doCreateQuery(IQueryable $repository)
     {
         return $repository->createQueryBuilder("r")->select("r")
-            ->where("r.floor = :floor")
+            ->where("r.floor IN (:floor)")
             ->andWhere("r.published = true")
             ->setParameter("floor", $this->floor);
     }

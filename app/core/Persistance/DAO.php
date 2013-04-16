@@ -390,7 +390,11 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 
 			$assoc = array();
 			foreach ($result as $item) {
-				$assoc[$meta->getFieldValue($item, $key)] = $item;
+                $itemKey = $meta->getFieldValue($item, $key);
+                if(is_object($itemKey) && method_exists($itemKey, 'getId')) {
+                    $itemKey = $itemKey->getId();
+                }
+				$assoc[$itemKey] = $item;
 			}
 			return $assoc;
 

@@ -241,12 +241,16 @@ class ApiPresenter extends BasePresenter {
             throw new BadRequestException("Building #$id does not exists.", 404);
         }
         $floorIds = [];
-
-        $floors = [];
         foreach ($building->getFloors() as $floor) {
             $floorIds[] = $floor->id;
-            $floors[] = $this->getFloorPayload($floor);
         }
+
+        $metadata = $this->getRepository('meta_revision')->fetchAssoc(new ActiveRevision($floorIds), 'floor');
+        $floors = [];
+        foreach ($building->getFloors() as $floor) {
+            $floors[] = $this->getFloorPayload($floor, [$floor->id => $building->id], isset($metadata[$floor->id])?$metadata[$floor->id]->nodes:NULL);
+        }
+
         $tilesUrl = NULL;
         $plan = NULL;
 
@@ -302,14 +306,24 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
-    private function getFloorPayload(Floor $floor, $plans = []) {
-        return [
+    private function getFloorPayload(Floor $floor, $plans = [], $nodesData = NULL) {
+        $nodes = [];
+        if($nodesData != null) {
+            foreach($nodesData as $node) {
+                $nodes[] = $this->getNodePayload($node, $floor->id);
+            }
+        }
+        $r = [
             'id' => $floor->id,
             'floorName' => $floor->getName(),
             'floor' => $floor->getFloorNumber(),
             'floorHeight' => $floor->getFloorHeight(),
             'plan' => isset($plans[$floor->id]) ? $plans[$floor->id] : NULL,
         ];
+        if(!empty($nodes)) {
+            $r['nodes'] = $nodes;
+        }
+        return $r;
     }
 
     private function getPlanPayload(Plan $plan) {
@@ -329,7 +343,7 @@ class ApiPresenter extends BasePresenter {
         return [
             'id' => $p->id,
             'type' => $p->getType(),
-            'name' => $p->getName(),
+            'name' => is_null($p->getName())?$p->getRoom():$p->getName().(is_null($p->getRoom())?" - ".$p->getRoom():""),
             'room' => $p->getRoom(),
             'fromFloor' => $p->getFromFloor(),
             'toFloor' => ($p->getToFloor() != NULL ? $p->getToFloor()->id : NULL),
