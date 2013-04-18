@@ -84,20 +84,9 @@ class ApiPresenter extends BasePresenter {
                 }
             }
 
-            $plans = $this->getRepository('plan')->fetch(new ActivePlanQuery($floorIds));
-            $planIds = [];
-
-            foreach ($plans as $plan) {
-                if ($plan->getPublishedDate() > $lastUpdate) {
-                    $lastUpdate = $plan->getPublishedDate();
-                }
-                $planIds[$plan->floor->id] = $plan->id;
-            }
-            $this->handleLastModification($lastUpdate);
-
             /** @var $item Building */
             foreach ($result as $item) {
-                $payload[] = $this->getBuildingPayload($item, $planIds);
+                $payload[] = $this->getBuildingPayload($item);
             }
 
             $this->sendResponse(new JsonResponse($payload));
@@ -302,13 +291,14 @@ class ApiPresenter extends BasePresenter {
             'coordinates' => $this->convertCoordinates($item->getGpsCoordinates()),
             'floorNumber' => $item->getFloorCount(),
             'minFloor' => $floors[0]['floor'],
+            'plan' => $item->getId(),
             'floors' => $floors,
         ];
     }
 
     private function getFloorPayload(Floor $floor, $plans = [], $nodesData = NULL) {
         $nodes = [];
-        if($nodesData != null) {
+        if($nodesData != NULL) {
             foreach($nodesData as $node) {
                 $nodes[] = $this->getNodePayload($node, $floor->id);
             }
@@ -317,8 +307,8 @@ class ApiPresenter extends BasePresenter {
             'id' => $floor->id,
             'floorName' => $floor->getName(),
             'floor' => $floor->getFloorNumber(),
-            'floorHeight' => $floor->getFloorHeight(),
-            'plan' => isset($plans[$floor->id]) ? $plans[$floor->id] : NULL,
+            'height' => $floor->getFloorHeight(),
+            'building' => $floor->getBuilding()->id,
         ];
         if(!empty($nodes)) {
             $r['nodes'] = $nodes;
@@ -349,6 +339,7 @@ class ApiPresenter extends BasePresenter {
             'toFloor' => ($p->getToFloor() != NULL ? $p->getToFloor()->id : NULL),
             'coordinates' => $this->convertCoordinates($p->getGpsCoordinates()),
             'floor' => (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId),
+            'building' => (is_null($floorId) ? $node->getRevision()->getFloor()->getBuilding()->id : $floorId),
         ];
     }
 
