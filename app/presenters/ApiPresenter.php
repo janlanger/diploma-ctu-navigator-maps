@@ -83,6 +83,7 @@ class ApiPresenter extends BasePresenter {
                     $floorIds[] = $floor->id;
                 }
             }
+            $this->handleLastModification($lastUpdate);
 
             /** @var $item Building */
             foreach ($result as $item) {
@@ -91,6 +92,44 @@ class ApiPresenter extends BasePresenter {
 
             $this->sendResponse(new JsonResponse($payload));
         } else {
+            throw new BadRequestException("Building #$id does not exists.", 404);
+        }
+    }
+
+    public function actionBuilding_v1($id) {
+        if ($id != NULL && ((int)$id) <= 0) {
+            $this->badRequest("Invalid Building ID");
+        }
+        if($id != NULL) {
+            $result = [$this->getRepository('building')->find($id)];
+        }
+        else {
+            $result = $this->getRepository('building')->findAll();
+        }
+        $payload = [];
+
+        if (count($result)) {
+            $lastUpdate = new \DateTime("2000-01-01");
+
+            $floorIds = [];
+            foreach ($result as $item) {
+                if ($item->getLastUpdate() > $lastUpdate) {
+                    $lastUpdate = $item->getLastUpdate();
+                }
+            }
+            $this->handleLastModification($lastUpdate);
+
+            /** @var $item Building */
+            foreach ($result as $item) {
+                $payload[] = $this->getBuildingPayload($item, TRUE);
+            }
+            if(count($payload) == 1) {
+                $payload = array_shift($payload);
+            }
+
+            $this->sendResponse(new JsonResponse($payload));
+        }
+        else {
             throw new BadRequestException("Building #$id does not exists.", 404);
         }
     }
@@ -107,17 +146,9 @@ class ApiPresenter extends BasePresenter {
         if($floor) {
             $lastUpdate = $floor->getLastUpdate();
 
-            $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor->id));
-
-            if($plan != NULL) {
-                if($plan->getPublishedDate() > $lastUpdate) {
-                    $lastUpdate = $plan->getPublishedDate();
-                }
-            }
-
             $this->handleLastModification($lastUpdate);
 
-            $payload = $this->getFloorPayload($floor, [$floor->id => $plan->id]);
+            $payload = $this->getFloorPayload($floor);
             $this->sendResponse(new JsonResponse($payload));
         } else {
             throw new BadRequestException("Unknown Floor ID", 404);
@@ -204,19 +235,6 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
-    public function actionPlan($id) {
-        if ($id == NULL || ((int)$id) <= 0) {
-            $this->badRequest("Invalid plan ID");
-        }
-
-        $plan = $this->getRepository('plan')->find($id);
-        if($plan == NULL || !$plan->getPublished()) {
-            throw new BadRequestException("Plan with id $id does not exists.", 404);
-        }
-        $this->handleLastModification($plan->getPublishedDate());
-        $this->sendResponse(new JsonResponse($this->getPlanPayload($plan)));
-    }
-
     /**
      * @deprecated
      */
@@ -271,29 +289,34 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
-    private function getBuildingPayload(Building $item, $plans = []) {
-        $floors = [];
-        foreach ($item->getFloors() as $floor) {
-            $floors[] = $this->getFloorPayload($floor, $plans);
-        }
-
-        usort($floors, function ($a, $b) {
-            if ($a['floor'] < $b['floor']) return -1;
-            if ($a['floor'] > $b['floor']) return 1;
-            return 0;
-        });
-
-
-        return [
+    private function getBuildingPayload(Building $item, $version1 = FALSE) {
+        $r = [
             'id' => $item->getId(),
             'name' => $item->getName(),
             'type' => 'building',
             'coordinates' => $this->convertCoordinates($item->getGpsCoordinates()),
             'floorNumber' => $item->getFloorCount(),
-            'minFloor' => $floors[0]['floor'],
-            'plan' => $item->getId(),
-            'floors' => $floors,
+            //'minFloor' => $floors[0]['floor'],
         ];
+
+        if($version1) {
+            $r['plan'] = $item->getId();
+        }
+
+        if(!$version1) {
+            $floors = [];
+            foreach ($item->getFloors() as $floor) {
+                $floors[] = $this->getFloorPayload($floor);
+            }
+
+            usort($floors, function ($a, $b) {
+                if ($a['floor'] < $b['floor']) return -1;
+                if ($a['floor'] > $b['floor']) return 1;
+                return 0;
+            });
+            $r['floors'] = $floors;
+        }
+        return $r;
     }
 
     private function getFloorPayload(Floor $floor, $plans = [], $nodesData = NULL) {
