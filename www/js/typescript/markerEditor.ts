@@ -297,12 +297,16 @@ module Mapping {
 
             $("input[name=save]", html).click(() => {
                 this.eventHandler.onMarkerWindowSave(event, marker, this.options.roomPrefix, html);
+                event.stopPropagation();
                 window.close();
+                return false;
             });
 
             $("input[name=delete]", html).click((event) => {
                 this.removeNode(marker);
+                event.stopPropagation();
                 window.close();
+                return false;
             });
             html.removeAttr('id');
             html.attr('style', "");

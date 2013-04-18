@@ -22,6 +22,7 @@ module Mapping {
             var x = $('#modal-content').html(payload.snippets['snippet--modal']);
             this.requestedType = type;
             $("#modal-info").html(this.createInfoText(type));
+            $("#modal-info-2").hide();
 
             $("#floors-submit", x).click((event) => {
                 event.preventDefault();
@@ -71,7 +72,7 @@ module Mapping {
             });
             this.fitModalBody(modal);
             $(window).resize(()=>this.fitModalBody(modal));
-            $(".modal-footer .btn-primary", modal).click(() => {
+            $(".modal-footer .btn-primary", modal).click((event) => {
                 modal.modal('hide');
                 var floor = $("form select[name=floor] option:selected", modal);
                 var building = $("form select[name=building] option:selected", modal);
@@ -87,6 +88,8 @@ module Mapping {
                     }
 
                 });
+                event.preventDefault();
+                return false;
             });
             $(".modal-footer .btn-danger", modal).click(() => {
                 if(window.confirm("Opravdu odstranit?")) {
@@ -96,6 +99,8 @@ module Mapping {
                     });
                 }
 
+                event.preventDefault();
+                return false;
             })
         }
 
@@ -208,7 +213,7 @@ module Mapping {
             }
             this.highlightPosition(marker.getPosition());
             this.saved = marker;
-            $("#modal-info-2").text("Zvolen bod #"+marker.appOptions.propertyId+(marker.getTitle()?", název '"+marker.getTitle()+"'":""));
+            $("#modal-info-2").show().text("Zvolen bod #"+marker.appOptions.propertyId+(marker.getTitle()?", název '"+marker.getTitle()+"'":""));
         }
 
         private highlightPosition(position:google.maps.LatLng) {
