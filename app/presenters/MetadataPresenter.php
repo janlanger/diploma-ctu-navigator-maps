@@ -125,9 +125,8 @@ class MetadataPresenter extends SecuredPresenter {
 
         /** @var $path Path */
         foreach ($paths as $path) {
-            if (!$path->getProperties()->isFloorExchange()) {
-                $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
-            }
+            $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
+
         }
 
     }
@@ -248,12 +247,11 @@ class MetadataPresenter extends SecuredPresenter {
         $pathArray = [];
 
         foreach ($paths as $path) {
-            if (!$path->getProperties()->isFloorExchange()) {
                 $pathArray[] = [
                     'startNode' => $findNodeId($path->properties->startNode),
                     'endNode' => $findNodeId($path->properties->endNode),
                 ];
-            }
+
         }
 
         return json_encode(['nodes' => $nodes, 'paths' => $pathArray]);
@@ -316,7 +314,8 @@ class MetadataPresenter extends SecuredPresenter {
                 $this->getRepository('meta_node_change'),
                 $this->getRepository('meta_path_change'),
                 $this->getRepository('meta_node'),
-                $this->getRepository('meta_path')
+                $this->getRepository('meta_path'),
+                $this->getRepository('meta_floor_connection')
             );
             if ($p->handle($form)) {
                 $this->flashMessage("Data byla úspěšně uložena. Nezapomeňte novou revizi publikovat.", self::FLASH_SUCCESS);
@@ -565,9 +564,7 @@ class MetadataPresenter extends SecuredPresenter {
 
             /** @var $path Path */
             foreach ($paths as $path) {
-                if(!$path->getProperties()->isFloorExchange()) {
                     $map->addPath($path->properties->getStartNode()->position, $path->properties->getEndNode()->position);
-                }
             }
         }
 

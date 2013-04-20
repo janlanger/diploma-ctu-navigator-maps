@@ -83,12 +83,10 @@ class ProposalEditor extends Control {
             $paths = $this->activeRevision->paths;
 
             foreach ($paths as $path) {
-                if (!$path->getProperties()->isFloorExchange()) {
                     $this->addPath($path->properties->startNode->gpsCoordinates, $path->properties->endNode->gpsCoordinates);
-                }
             }
             if(!empty($nodeIds)) {
-                $floorExchange = $this->getPresenter()->context->em->getRepository('Maps\\Model\\Metadata\\Path')->fetchAssoc(new FloorExchangePaths($nodeIds, $this->activeRevision), 'id');
+                $floorExchange = $this->getPresenter()->context->em->getRepository('Maps\\Model\\Metadata\\FloorConnection')->fetchAssoc(new FloorExchangePaths($nodeIds, $this->activeRevision), 'id');
                 $this->setFloorExchangePaths($floorExchange);
             }
         }

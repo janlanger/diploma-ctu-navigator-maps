@@ -74,18 +74,18 @@ class PolyLinesEditor extends BaseMapControl {
 
                 foreach ($this->points as $id => $point) {
                     $node = NULL;
-                    if ($path->properties->startNode->id == $point['appOptions']['propertyId']) {
-                        $starting[$path->properties->startNode->id][] = [
-                            'destinationNode' => $path->properties->endNode->id,
-                            'pathId' => $path->properties->id,
+                    if ($path->nodeOne->id == $point['appOptions']['propertyId']) {
+                        $starting[$path->nodeOne->id][] = [
+                            'destinationNode' => $path->nodeTwo->id,
+                            'pathId' => $path->id,
                             'destinationFloor' => ['id' => $point['appOptions']['toFloor']->id, 'name' => $point['appOptions']['toFloor']->readableName],
                             'destinationBuilding' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name]
                         ];
                     }
-                    if ($path->properties->endNode->id == $point['appOptions']['propertyId']) {
-                        $ending[$path->properties->endNode->id][] = [
-                            'destinationNode' => $path->properties->startNode->id,
-                            'pathId' => $path->properties->id,
+                    if ($path->nodeTwo->id == $point['appOptions']['propertyId']) {
+                        $ending[$path->nodeTwo->id][] = [
+                            'destinationNode' => $path->nodeOne->id,
+                            'pathId' => $path->id,
                             'destinationFloor' => ['id' => $point['appOptions']['toFloor']->id, 'name' => $point['appOptions']['toFloor']->readableName],
                             'destinationBuilding' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name]
                         ];

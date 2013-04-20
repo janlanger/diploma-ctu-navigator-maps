@@ -21,22 +21,22 @@ class FloorConnection extends BaseEntity {
 
     /**
      * @var Revision
-     * @ManyToOne(targetEntity="Revision")
+     * @ManyToOne(targetEntity="Revision", cascade={"persist"})
      */
     private $revision_one;
     /**
-     * @var Node
-     * @ManyToOne(targetEntity="Node")
+     * @var NodeProperties
+     * @ManyToOne(targetEntity="NodeProperties")
      */
     private $node_one;
     /**
      * @var Revision
-     * @ManyToOne(targetEntity="Revision")
+     * @ManyToOne(targetEntity="Revision", cascade={"persist"})
      */
     private $revision_two;
     /**
-     * @var Node
-     * @ManyToOne(targetEntity="Node")
+     * @var NodeProperties
+     * @ManyToOne(targetEntity="NodeProperties")
      */
     private $node_two;
     /**

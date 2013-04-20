@@ -34,33 +34,6 @@ class PathProperties extends BaseEntity {
     private $endNode;
 
 
-    /**
-     * @var bool
-     * @column(type="boolean")
-     */
-    private $isFloorExchange = FALSE;
-
-    /**
-     * @var Floor
-     * @ManyToOne(targetEntity="Maps\Model\Floor\Floor", fetch="EAGER" )
-     * @JoinColumn(name="destinationFloor", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $destinationFloor = NULL;
-
-    /**
-     * @param \Maps\Model\Metadata\Floor $destinationFloor
-     */
-    public function setDestinationFloor($destinationFloor) {
-        $this->destinationFloor = $destinationFloor;
-    }
-
-    /**
-     * @return \Maps\Model\Metadata\Floor
-     */
-    public function getDestinationFloor() {
-        return $this->destinationFloor;
-    }
-
 
 
     /**
@@ -93,21 +66,6 @@ class PathProperties extends BaseEntity {
     public function getStartNode()
     {
         return $this->startNode;
-    }
-
-
-    /**
-     * @param boolean $isFloorExchange
-     */
-    public function setIsFloorExchange($isFloorExchange) {
-        $this->isFloorExchange = $isFloorExchange;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isFloorExchange() {
-        return $this->isFloorExchange;
     }
 
     public function toArray() {
