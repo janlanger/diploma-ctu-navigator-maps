@@ -22,15 +22,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
     private $pathOptions;
     private $paths = [];
-    private $floorExchangePaths;
 
-    public function setFloorExchangePaths($floorExchangePaths) {
-        $this->floorExchangePaths = $floorExchangePaths;
-    }
-
-    public function getFloorExchangePaths() {
-        return $this->floorExchangePaths;
-    }
 
 
     private $types;
@@ -145,32 +137,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         if($this->apiKey == NULL) {
             throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
         }
-        if(!empty($this->floorExchangePaths)) {
 
-
-            foreach($this->floorExchangePaths as $path) {
-                foreach($this->points as $id => $point) {
-                    $node = NULL;
-                    if($path->properties->startNode->id == $point['appOptions']['propertyId']) {
-                        $node = $path->properties->endNode;
-                    }
-                    if($path->properties->endNode->id == $point['appOptions']['propertyId']) {
-                        $node = $path->properties->startNode;
-                    }
-                    if($node !== NULL && isset($point['appOptions']['toFloor'])) {
-                        $this->points[$id]['appOptions']['other'] = [
-                            'propertyId' => $node->id,
-                            'reverse' => ($node == $path->properties->startNode),
-                            'pathProperty' => $path->properties->id,
-                            'floor' => ['id' => $point['appOptions']['toFloor']->id, 'name'=> $point['appOptions']['toFloor']->readableName],
-                            'building' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name],
-                        ];
-                        unset($this->points[$id]['appOptions']['toFloor']);
-                        break;
-                    }
-                }
-            }
-        }
         $template->apiKey = $this->apiKey;
 
         $template->mapWidth = "200px";

@@ -19,6 +19,8 @@ module Mapping {
         public markersOriginals = [];
         public pathOriginals = [];
 
+        private openedWindow:google.maps.InfoWindow;
+
         /*   get State():string {
          return this.editorState;
          }*/
@@ -238,8 +240,11 @@ module Mapping {
 
         public openMarkerInfoWindow(marker:google.maps.Marker) {
             var window = new google.maps.InfoWindow();
-            var content = this.createMarkerForm($("#innerForm form"), marker, window);
-
+            var content = this.createMarkerForm($("#innerForm"), marker, window);
+            if(this.openedWindow) {
+                this.openedWindow.close();
+            }
+            this.openedWindow = window;
             window.setContent(content);
             google.maps.event.addListener(window, 'domready', function () {
                 $("select[name=type]", content).trigger('change');
@@ -261,20 +266,20 @@ module Mapping {
             typeSelect.change(function(event) {
                 _this.eventHandler.onTypeChange(this.value, html);
             });
-
+            var otherNodeTemp = {};
             var otherNode = $("#form-other a", html).click((event)  => {
-                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, marker, typeSelect.val(),
+                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, this.options.modalMapSource, this.options.floorExchange.starting[marker.appOptions.propertyId], marker, typeSelect.val(),
                     (selected) => {
-                        var other = this.eventHandler.onOtherNodeSelected(marker, html, selected);
-                        if(!$.isEmptyObject(other)) {
-                            if(other.deleted) {
-                                marker.appOptions.x.propertyId = undefined;
-                                $("#form-other div", html).html("");
+                        otherNodeTemp = this.eventHandler.onOtherNodeSelected(marker, html, selected);
+                        if(!$.isEmptyObject(otherNodeTemp)) {
+                            if(otherNodeTemp.deleted) {
+                                $("#form-other div", html).html("").hide();
                                 return;
                             }
-                            var info = other;
-                            marker.appOptions.x = other;
-                            $("#form-other div", html).text("Cíl: bod #"+ info.propertyId + ", patro "+info.floor.name + (typeSelect.val() == "passage"?" budova "+info.building.name:""));
+                            var info = otherNodeTemp;
+                            $("#form-other div", html).html(
+                                "Spojení do #" + info.destinationNode + ", patro " + info.destinationFloor.name + (typeSelect.val() == "passage" ? " budova " + info.destinationBuilding.name : "")
+                            ).show();
                         }
                     }
             )});
@@ -297,6 +302,21 @@ module Mapping {
 
             $("input[name=save]", html).click(() => {
                 this.eventHandler.onMarkerWindowSave(event, marker, this.options.roomPrefix, html);
+
+                if (marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
+                    if (otherNodeTemp) {
+                        if (otherNodeTemp.deleted) {
+                            this.options.floorExchange.starting[marker.appOptions.propertyId] = null;
+                        } else {
+                            if(this.options.floorExchange.starting[marker.appOptions.propertyId].length != 0) {
+                                otherNodeTemp.pathId = this.options.floorExchange.starting[marker.appOptions.propertyId][0].pathId;
+                            }
+                            this.options.floorExchange.starting[marker.appOptions.propertyId] = [];
+                            this.options.floorExchange.starting[marker.appOptions.propertyId][0] = otherNodeTemp;
+                        }
+                    }
+                }
+
                 event.stopPropagation();
                 window.close();
                 return false;
@@ -318,14 +338,28 @@ module Mapping {
                 $("input[name='toFloor']", html).val(marker.appOptions.toFloor);
                 $("select[name='toBuilding']", html).val(marker.appOptions.toBuilding);
                 $("select[name=type]", html).val(marker.appOptions.type);
-                marker.appOptions.x = marker.appOptions.other;
-                if(marker.appOptions.x) {
-                    var info = marker.appOptions.x;
-                    if(info.reverse) {
-                        otherNode.hide();
+                if(this.options.floorExchange.starting[marker.appOptions.propertyId]) {
+                    //inter-floor path starts here - can be only one
+                    var info = this.options.floorExchange.starting[marker.appOptions.propertyId][0];
+                    $("#form-other div", html).html(
+                        "Spojení do #" + info.destinationNode + ", patro " + info.destinationFloor.name + (typeSelect.val() == "passage" ? " budova " + info.destinationBuilding.name : "")
+                    ).show();
+                }
+                else {
+                    $("#form-other div", html).hide();
+                }
+                if (this.options.floorExchange.ending[marker.appOptions.propertyId]) {
+                    //inter-floor path end here - can be more then one
+                    var info = this.options.floorExchange.ending[marker.appOptions.propertyId];
+                    var text = $("#other-reverse ul", html);
+                    text.html("");
+                    text.show();
+                    for(var i=0; i<info.length; i++) {
+                        text.append($("<li></li>").text("Bod #" + info[i].destinationNode + ", patro " + info[i].destinationFloor.name + (typeSelect.val() == "passage" ? ", budova " + info[i].destinationBuilding.name : "") + "."));
                     }
-                    $("#form-other div", html).html("Cíl: bod #" + info.propertyId + ", patro " + info.floor.name + (typeSelect.val() == "passage" ? " budova " + info.building.name : "") +
-                        (info.reverse ? " <br><b>Definováno v opačném směru, nelze upravit!</b>" : ""));
+                }
+                else {
+                    $("#other-reverse", html).hide();
                 }
             }
             return html[0];

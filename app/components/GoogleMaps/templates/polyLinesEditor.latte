@@ -34,10 +34,15 @@
         </div>
         <div n:if="$user->isInRole('admin')" id="form-other" style="margin-bottom: 5px;"><div></div><a href="#">Vybrat/upravit cílový bod</a></div>
 
-    {input otherNode}
+
     {input save, 'class'=>'btn btn-primary'}
     {input delete, 'class'=>'btn btn-danger btn-small pull-right'}
     {/form}
+    <div id="other-reverse">
+        <b>Spojení definované opačným směrem:</b>
+        <ul></ul>
+        <em>Pro změnu těchto spojení editujte druhé patro.</em>
+    </div>
 </div>
 
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$apiKey}&sensor=false"></script>
@@ -78,6 +83,8 @@
     var paths = [];
     var pathOptions = {$pathOptions};
     {if !empty($paths)}
+
+    var floorExchange = {$floorExchange}
 
     {foreach $paths as $path}
     paths.push({
@@ -133,7 +140,10 @@
         ],
         resizableBox: { element: document.getElementById("map_box"), options: { minHeight: 270, minWidth: 300}},
         positionSelect: document.getElementById('position-select'),
-        markerSelectorAction: {plink Metadata:modalMap}
+        markerSelectorAction: {plink Metadata:modalMap},
+        modalMapSource: {plink Metadata:modalMapPoints},
+        floorExchange: floorExchange
+
     };
     {if !isset($overiden)}
     var editor = new Mapping.MarkerEditor(document.getElementById('map_canvas'), editorOptions);
@@ -147,13 +157,13 @@
         <h3 id="modal-header">Výběr cílových bodů</h3>
     </div>
     <div class="modal-body">
-        <p>Vyberte budovy a podlaží a poté kliknutím vyberte odpovídající bod. <b>Spojnice schodišť a výtahů definujte vždy směrem nahoru!</b></p>
-
-        <div id="modal-content"></div>
-
-        <div id="modal-info" style="margin-top: 5px;"></div>
-        <div id="modal-info-2" style="margin-top: 5px;"></div>
-
+        <div id="modal-loader" style="text-align: center; padding: 50px 0px;"><img src="{$baseUrl}/img/ajax-loader.gif"></div>
+        <div id="modal-actual">
+            <p>Vyberte budovy a podlaží a poté kliknutím vyberte odpovídající bod. <b>Spojnice schodišť a výtahů definujte vždy směrem nahoru!</b></p>
+            <div id="modal-content"></div>
+            <div id="modal-info" style="margin-top: 5px;"></div>
+            <div id="modal-info-2" style="margin-top: 5px;"></div>
+        </div>
     </div>
     <div class="modal-footer">
         <a href="#" class="btn btn-primary pull-left">Uložit</a>

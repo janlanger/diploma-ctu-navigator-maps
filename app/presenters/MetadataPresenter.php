@@ -464,20 +464,27 @@ class MetadataPresenter extends SecuredPresenter {
         }
     }
 
+    public function actionModalMapPoints() {
+        $payload = $this['modalMap']->getPayload();
+        $this->payload->data = $payload;
+        $this->sendPayload();
+    }
+
     public function createComponentModalForm($name) {
         $form = new Form($this, $name);
+        $form->setAction("modalMapPoints");
 
         $form->addSelect("building", 'Budova', $this->getRepository('building')->fetchPairs(new DictionaryQuery()))
-            ->setDefaultValue($this->getFloor()->getBuilding()->id);
+                ->setDefaultValue($this->getFloor()->getBuilding()->id);
         $form->addDependedSelect('floor', 'Podlaží', $form['building'], callback($this, 'getFloorDictionary'), FALSE)
-            ->setDefaultValue($this->getFloor()->id);
+                ->setDefaultValue($this->getFloor()->id);
         $form->addSubmit('ok', 'Načíst podlaží')
-            ->setHtmlId('floors-submit')
-            ->onClick[] = function(SubmitButton $button) {
+                ->setHtmlId('floors-submit');
+/*                ->onClick[] = function (SubmitButton $button) {
             $payload = $this['modalMap']->getPayload();
             $this->payload->data = $payload;
             $this->sendPayload();
-        };
+        };*/
         return $form;
     }
 

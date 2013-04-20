@@ -30,13 +30,20 @@ class ModalMap extends BaseMapControl {
         foreach($this->getCustomLayers() as $title => $l) {
             $layers[$title] = $baseUri. "/".$l;
         }
+        $paths = [];
+        foreach($this->getPaths() as $path) {
+            $paths[] = [
+                'start' => $path[0],
+                'end' => $path[1],
+            ];
+        }
 
         return [
             "zoom"=> $this->getZoomLevel(),
             "center" => ['lat' => $this->getCenter()['lat'], 'lng' => $this->getCenter()['long']],
             "customLayers" => $layers,
             "points" => $this->getPoints(),
-            "paths" => $this->getPaths(),
+            "paths" => $paths,
             "pathOptions" => $this->getPathOptions(),
         ];
     }

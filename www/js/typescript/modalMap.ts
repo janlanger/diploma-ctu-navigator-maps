@@ -18,50 +18,41 @@ module Mapping {
 
         }
 
-        public open(payload, type, callback, propertyId) {
-            var x = $('#modal-content').html(payload.snippets['snippet--modal']);
-            this.requestedType = type;
-            $("#modal-info").html(this.createInfoText(type));
-            $("#modal-info-2").hide();
-
-            $("#floors-submit", x).click((event) => {
-                event.preventDefault();
-                $("#floors-submit", x).ajaxSubmit((payload) => {
-                    var data = payload.data;
-                    if (!data || ($.isEmptyObject(data.points))) {
-                        this.noMapData(modal);
-                        return;
-                    }
-
-                    $(".alert", modal).addClass('hide');
-                    $("#map_canvas-modal", modal).removeClass('hide');
-                    this.setNewData(payload.data, this.map);
-                })
-            })
+        public load(destination, dataDestination, data, type, callback, propertyId) {
             var modal = $("#modal").modal({
                 keyboard: true,
                 backdrop: true,
                 show: true
             });
-            modal.on('shown', () => {
-                if(!ModalMapInit) {
-                    this.noMapData(modal);
+            $('#modal-actual').hide();
+            $("#modal-loader").show();
+            $.get(destination, data, (payload, textStatus, XMLHttpRequest) => {
+                    if (payload.redirect) {
+                        window.location.href = payload.redirect;
+                        return;
+                    }
+                    if(payload.snippets['snippet--modal']) {
+                        $('#modal-content').html(payload.snippets['snippet--modal']);
 
+                        $.get(dataDestination, data, (payload, textStatus, XMLHttpRequest) => {
+                           this.initEvents(callback);
+                           this.show(payload.data, type, propertyId);
+                        });
+                        return;
+                    }
+                    alert("Server neposlal žádná data...");
+                    modal.modal('hide');
                 }
-                var data = ModalMapInit();
+            );
+        }
 
-                this.map = new Mapping.BasicMap(data.element, data.options);
-                this.map.initialize();
-
-                if (!data || ($.isEmptyObject(data.options.points))) {
-                    this.noMapData(modal);
-                    return;
-                }
-
-                $(".alert", modal).addClass('hide');
-                $("#map_canvas-modal", modal).removeClass('hide');
-                this.registerMarkerClickHandler(this.map.markers);
-                this.highlightPropertyId(propertyId);
+        private initEvents(callback) {
+            var modal = $("#modal");
+            modal.find("#floors-submit").on('click',(event) => {
+                event.preventDefault();
+                $("#floors-submit", modal).ajaxSubmit((payload) => {
+                    this.reloadMap(payload.data);
+                });
             });
             modal.css({
                 width: '100%',
@@ -70,7 +61,7 @@ module Mapping {
                     return -($(this).width() / 2);
                 }
             });
-            this.fitModalBody(modal);
+
             $(window).resize(()=>this.fitModalBody(modal));
             $(".modal-footer .btn-primary", modal).click((event) => {
                 modal.modal('hide');
@@ -78,7 +69,7 @@ module Mapping {
                 var building = $("form select[name=building] option:selected", modal);
                 callback({
                     marker: this.saved,
-                    floorInfo:{
+                    floorInfo: {
                         id: floor.val(),
                         name: floor.text()
                     },
@@ -92,7 +83,7 @@ module Mapping {
                 return false;
             });
             $(".modal-footer .btn-danger", modal).click(() => {
-                if(window.confirm("Opravdu odstranit?")) {
+                if (window.confirm("Opravdu odstranit?")) {
                     modal.modal('hide');
                     callback({
                         deleted: true
@@ -101,7 +92,57 @@ module Mapping {
 
                 event.preventDefault();
                 return false;
-            })
+            });
+
+            modal.on('hide', () => {
+                modal.find("#floors-submit").unbind('click');
+                modal.find("#floors-submit").unbind('click');
+                $(".modal-footer .btn-primary", modal).unbind('click');
+                $(".modal-footer .btn-danger", modal).unbind('click');
+                modal.unbind('hide');
+            });
+        }
+
+        private reloadMap(payload, propertyId=null) {
+            var modal = $("#modal");
+            var data = payload;
+            if (!data || ($.isEmptyObject(data.points))) {
+                this.noMapData(modal);
+                return;
+            }
+
+            modal.find(".alert").addClass('hide');
+            modal.find("#map_canvas-modal").removeClass('hide');
+
+            if(this.map == null) {
+                this.map = new Mapping.BasicMap(document.getElementById("map_canvas-modal"), {zoom:data.zoom, center:data.center, pathOptions: data.pathOptions});
+                this.map.initialize();
+                this.setNewData(data, this.map);
+            } else {
+                this.setNewData(payload, this.map);
+            }
+            this.fitModalBody(modal);
+
+            if(propertyId != null) {
+                this.highlightPropertyId(propertyId);
+            }
+        }
+
+        public show(payload, type, propertyId) {
+
+            this.requestedType = type;
+            $("#modal-info").html(this.createInfoText(type));
+            $("#modal-info-2").hide();
+
+
+            var modal = $("#modal");
+
+            $("#modal-loader").slideUp();
+            $('#modal-actual').slideDown();
+            this.reloadMap(payload, propertyId);
+
+
+
         }
 
         private createInfoText(type) {
@@ -187,8 +228,8 @@ module Mapping {
                 var item = paths[i];
                 if (!item) continue;
                 var pathInfo = {
-                    start: { lat: item[0].lat, lng: item[0].long},
-                    end: { lat: item[1].lat, lng: item[1].long}
+                    start: { lat: item.start.lat, lng: item.start.long},
+                    end: { lat: item.end.lat, lng: item.end.long}
                 };
 
                 newPaths.push(pathInfo);

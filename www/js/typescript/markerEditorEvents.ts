@@ -329,7 +329,7 @@ module Mapping {
             }
         }
 
-        public onMarkerWindowSave(event, marker:google.maps.Marker, roomPrefix:string, html) {
+        public onMarkerWindowSave(event, marker:google.maps.Marker, roomPrefix:string, html, otherNodeTemp) {
             if (!marker.appOptions) {
                 marker.appOptions = {};
             }
@@ -344,42 +344,23 @@ module Mapping {
             marker.appOptions.toFloor = $("input[name='toFloor']", html).val();
             marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();
             marker.appOptions.type = $("select[name=type]", html).val();
-            if(marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
-                if(marker.appOptions.x) {
-                    if(!marker.appOptions.other) {
-                        marker.appOptions.other = {};
-                    }
-                    $.extend(marker.appOptions.other, marker.appOptions.other, marker.appOptions.x);
-                    marker.appOptions.x = null;
-                }
-            }
+
 
             marker.setIcon(this.editor.getMarkerIcon(marker.appOptions.type));
         }
 
-        public onOtherNodeSelection(event, destination:string, marker:google.maps.Marker, type, callback) {
+        public onOtherNodeSelection(event, destination:string, destinationData:string, existing, marker:google.maps.Marker, type, callback) {
             event.preventDefault();
 
             var data = {coords: marker.getPosition().lat() + "," + marker.getPosition().lng()};
             var destProperty;
-            if(marker.appOptions.x) {
-                var info = marker.appOptions.x;
-                data.floor = info.floor.id;
-                data.building = info.building.id;
-                destProperty = info.propertyId;
+            if(existing.length == 1) {
+                data.floor = existing[0].destinationFloor.id;
+                data.building = existing[0].destinationBuilding.id;
+                destProperty = existing[0].destinationNode;
             }
-
-            $.get(destination, data,  (payload, textStatus, XMLHttpRequest) => {
-                if (payload.redirect) {
-                    window.location.href = payload.redirect;
-                    return;
-                }
-                var modal = new Mapping.ModalMap(this.editor);
-                modal.open(payload, type, callback, destProperty);
-
-
-
-            });
+            var modal = new Mapping.ModalMap(this.editor);
+            modal.load(destination, destinationData, data, type, callback, destProperty);
         }
 
         public onOtherNodeSelected(original:google.maps.Marker, html, returned) {
@@ -388,9 +369,9 @@ module Mapping {
             }
             if(!returned.marker) return;
             return {
-                propertyId: returned.marker.appOptions.propertyId,
-                floor: returned.floorInfo,
-                building: returned.buildingInfo
+                destinationNode: returned.marker.appOptions.propertyId,
+                destinationFloor: returned.floorInfo,
+                destinationBuilding: returned.buildingInfo
             }
         }
 
