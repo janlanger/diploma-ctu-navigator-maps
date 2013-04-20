@@ -18,7 +18,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
     private $apiKey;
     private $center;
     private $zoomLevel=10;
-    private $points = [];
+    protected  $points = [];
 
     private $pathOptions;
     private $paths = [];

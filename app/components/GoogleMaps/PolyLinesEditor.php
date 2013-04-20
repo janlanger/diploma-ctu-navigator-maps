@@ -64,16 +64,6 @@ class PolyLinesEditor extends BaseMapControl {
 
     public function render() {
 
-        $template = $this->createTemplate();
-
-        $template->setFile(__DIR__.'/templates/polyLinesEditor.latte');
-
-        $this->setMapSize($template, func_get_args());
-        $template->textField = $this->formField;
-        $template->submit = $this->submit;
-        $template->roomPrefix = $this->roomPrefix;
-        $template->overiden = $this->overiden;
-
         $starting = [];
         $ending = [];
         if (!empty($this->floorExchangePaths)) {
@@ -100,10 +90,23 @@ class PolyLinesEditor extends BaseMapControl {
                             'destinationBuilding' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name]
                         ];
                     }
+                    unset($this->points[$id]['appOptions']['toFloor']);
                 }
             }
         }
+
+        $template = $this->createTemplate();
         $template->floorExchange = ['starting' => $starting, 'ending' => $ending];
+
+        $template->setFile(__DIR__.'/templates/polyLinesEditor.latte');
+
+        $this->setMapSize($template, func_get_args());
+        $template->textField = $this->formField;
+        $template->submit = $this->submit;
+        $template->roomPrefix = $this->roomPrefix;
+        $template->overiden = $this->overiden;
+
+
 
 
         $template->render();

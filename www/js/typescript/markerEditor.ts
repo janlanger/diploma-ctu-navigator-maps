@@ -18,8 +18,10 @@ module Mapping {
 
         public markersOriginals = [];
         public pathOriginals = [];
+        public floorExchange;
+        public floorExchangeOriginals = [];
 
-        private openedWindow:google.maps.InfoWindow;
+        public openedWindow:google.maps.InfoWindow;
 
         /*   get State():string {
          return this.editorState;
@@ -53,7 +55,7 @@ module Mapping {
         public initialize() {
 
             super.initialize();
-
+            this.floorExchange = this.options.floorExchange;
             //parse definition field and ad its information to options
             this.map.setOptions({draggableCursor: 'crosshair'});
 
@@ -169,6 +171,7 @@ module Mapping {
                     end: (e ? e.appOptions.propertyId : null)
                 };
             }
+
         }
 
         private parseDefinition(definition) {
@@ -268,7 +271,7 @@ module Mapping {
             });
             var otherNodeTemp = {};
             var otherNode = $("#form-other a", html).click((event)  => {
-                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, this.options.modalMapSource, this.options.floorExchange.starting[marker.appOptions.propertyId], marker, typeSelect.val(),
+                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, this.options.modalMapSource, this.floorExchange.starting[marker.appOptions.propertyId], marker, typeSelect.val(),
                     (selected) => {
                         otherNodeTemp = this.eventHandler.onOtherNodeSelected(marker, html, selected);
                         if(!$.isEmptyObject(otherNodeTemp)) {
@@ -306,13 +309,13 @@ module Mapping {
                 if (marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
                     if (otherNodeTemp) {
                         if (otherNodeTemp.deleted) {
-                            this.options.floorExchange.starting[marker.appOptions.propertyId] = null;
+                            this.floorExchange.starting[marker.appOptions.propertyId] = null;
                         } else {
-                            if(this.options.floorExchange.starting[marker.appOptions.propertyId].length != 0) {
-                                otherNodeTemp.pathId = this.options.floorExchange.starting[marker.appOptions.propertyId][0].pathId;
+                            if(this.floorExchange.starting[marker.appOptions.propertyId] && this.floorExchange.starting[marker.appOptions.propertyId].length != 0) {
+                                otherNodeTemp.pathId = this.floorExchange.starting[marker.appOptions.propertyId][0].pathId;
                             }
-                            this.options.floorExchange.starting[marker.appOptions.propertyId] = [];
-                            this.options.floorExchange.starting[marker.appOptions.propertyId][0] = otherNodeTemp;
+                            this.floorExchange.starting[marker.appOptions.propertyId] = [];
+                            this.floorExchange.starting[marker.appOptions.propertyId][0] = otherNodeTemp;
                         }
                     }
                 }
@@ -334,13 +337,13 @@ module Mapping {
             if (marker.appOptions != null) {
                 $("input[name='name']", html).val(marker.appOptions.name);
                 $("input[name='room']", html).val((marker.appOptions.room ? marker.appOptions.room.replace(this.options.roomPrefix, "") : ""));
-                $("input[name='fromFloor']", html).val(marker.appOptions.fromFloor);
+             /*   $("input[name='fromFloor']", html).val(marker.appOptions.fromFloor);
                 $("input[name='toFloor']", html).val(marker.appOptions.toFloor);
-                $("select[name='toBuilding']", html).val(marker.appOptions.toBuilding);
+                $("select[name='toBuilding']", html).val(marker.appOptions.toBuilding);*/
                 $("select[name=type]", html).val(marker.appOptions.type);
-                if(this.options.floorExchange.starting[marker.appOptions.propertyId]) {
+                if(this.floorExchange.starting[marker.appOptions.propertyId]) {
                     //inter-floor path starts here - can be only one
-                    var info = this.options.floorExchange.starting[marker.appOptions.propertyId][0];
+                    var info = this.floorExchange.starting[marker.appOptions.propertyId][0];
                     $("#form-other div", html).html(
                         "Spojení do #" + info.destinationNode + ", patro " + info.destinationFloor.name + (typeSelect.val() == "passage" ? " budova " + info.destinationBuilding.name : "")
                     ).show();
@@ -348,9 +351,9 @@ module Mapping {
                 else {
                     $("#form-other div", html).hide();
                 }
-                if (this.options.floorExchange.ending[marker.appOptions.propertyId]) {
+                if (this.floorExchange.ending[marker.appOptions.propertyId]) {
                     //inter-floor path end here - can be more then one
-                    var info = this.options.floorExchange.ending[marker.appOptions.propertyId];
+                    var info = this.floorExchange.ending[marker.appOptions.propertyId];
                     var text = $("#other-reverse ul", html);
                     text.html("");
                     text.show();

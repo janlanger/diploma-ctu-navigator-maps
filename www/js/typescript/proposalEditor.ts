@@ -82,6 +82,16 @@ module Mapping {
                     end: (e ? e.appOptions.propertyId : null)
                 };
             }
+
+            this.floorExchangeOriginals = {starting: [], ending: []};
+            for (var key in this.floorExchange.starting) {
+                var item = this.floorExchange.starting[key];
+                this.floorExchangeOriginals.starting[key] = $.extend({}, item);
+            }
+            for (var key in this.floorExchange.ending) {
+                var item = this.floorExchange.ending[key];
+                this.floorExchangeOriginals.ending[key] = $.extend({}, item);
+            }
         }
 
         private registerEvents() {
@@ -127,6 +137,8 @@ module Mapping {
                 });
 
                 $("#proposal-send").click((event) => {
+                 //   event.preventDefault();
+                 //   $("#custom_changes").show();
                     var addedNodes = [];
                     var changedNodes = [];
                     var deletedNodes = [];
@@ -194,6 +206,31 @@ module Mapping {
                         };
                     }
 
+                    var addedExchange = [];
+                    var changedExchange = [];
+                    var deletedExchange = [];
+
+                    var checked = [];
+
+                    for (var key in this.floorExchange.starting) {
+                        var original = this.floorExchangeOriginals.starting[key];
+                        var newOne = this.floorExchange.starting[key];
+
+                        if (newOne && !newOne[0].pathId && original == null) {
+                            addedExchange.push(newOne);
+                        }
+                        if (newOne && newOne[0].pathId && (original.destinationNode != original.destinationNode)) {
+                            changedExchange.push(newOne);
+                        }
+                        if(newOne) {
+                            checked[key] = true;
+                        }
+                    }
+                    for (var key in this.floorExchangeOriginals.starting) {
+                        if (checked[key]) continue;
+                        deletedExchange.push(this.floorExchangeOriginals.starting[key]);
+                    }
+
                     $("#custom_changes").val(JSON.stringify({
                         nodes: {
                             added: addedNodes,
@@ -203,6 +240,11 @@ module Mapping {
                         paths: {
                             added: addedPaths,
                             deleted: deletedPaths
+                        },
+                        exchange: {
+                            added: addedExchange,
+                            changed: changedExchange,
+                            deleted: deletedExchange
                         }
                     }));
                 });
@@ -212,15 +254,19 @@ module Mapping {
 
         private optionsEquals(obj1, obj2) {
             for (var i in obj1) {
+                if(i == "toFloor") continue;
                 if (obj1.hasOwnProperty(i)) {
                     if (!obj2.hasOwnProperty(i)) return false;
+                    if((obj1[i]== null && obj2[i] == "") || (obj1[i] == "" && obj2[i] == null)) continue;
                     if (i != "gps" && obj1[i] != obj2[i]) return false;
                     if (i == "gps" && obj1[i] != null && obj1[i].equals != undefined && !obj1[i].equals(obj2[i])) return false;
                 }
             }
             for (var i in obj2) {
+                if (i == "toFloor") continue;
                 if (obj2.hasOwnProperty(i)) {
                     if (!obj1.hasOwnProperty(i)) return false;
+                    if ((obj1[i] == null && obj2[i] == "") || (obj1[i] == "" && obj2[i] == null)) continue;
                     if (i != "gps" && obj1[i] != obj2[i]) return false;
                     if (i == "gps" && obj2[i] != null && obj2[i].equals != undefined && !obj2[i].equals(obj1[i])) return false;
                 }
@@ -281,9 +327,6 @@ module Mapping {
                 room: "Místnost",
                 type: "Typ bodu",
                 name: "Popisek",
-                fromFloor: "Z patra",
-                toFloor: "Do patra",
-                toBuilding: "Do budovy"
             };
             return x[index];
         }
@@ -404,9 +447,6 @@ module Mapping {
                             if (item.original.type != item.properties.type) {
                                 node.setIcon(this.getMarkerIcon(this.properties.type));
                             }
-                            node.appOptions.toBuilding = item.properties.toBuilding;
-                            node.appOptions.toFloor = item.properties.toFloor;
-                            node.appOptions.fromFloor = item.properties.fromFloor;
                             node.appOptions.name = item.properties.name;
                             node.appOptions.room = item.properties.room;
 
@@ -460,9 +500,6 @@ module Mapping {
                         node.setPosition(newPosition);
 
                         node.setIcon(this.getMarkerIcon(item.type));
-                        node.appOptions.toBuilding = item.toBuilding;
-                        node.appOptions.toFloor = item.toFloor;
-                        node.appOptions.fromFloor = item.fromFloor;
                         node.appOptions.name = item.name;
                         node.appOptions.room = item.room;
 

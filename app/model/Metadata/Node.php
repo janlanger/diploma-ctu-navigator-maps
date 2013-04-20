@@ -82,9 +82,9 @@ class Node extends BaseEntity implements \JsonSerializable {
             'name' => $this->properties->getName(),
             'type' => $this->properties->getType(),
             'room' => $this->properties->getRoom(),
-            'fromFloor' => $this->properties->getFromFloor(),
+           // 'fromFloor' => $this->properties->getFromFloor(),
             'toFloor' => $this->properties->getToFloor(),
-            'toBuilding' => ($this->properties->getToBuilding() == NULL ? NULL : $this->properties->getToBuilding()->id),
+           // 'toBuilding' => ($this->properties->getToBuilding() == NULL ? NULL : $this->properties->getToBuilding()->id),
         ];
     }
 }

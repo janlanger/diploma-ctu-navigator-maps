@@ -177,7 +177,6 @@ module Mapping {
         }
 
         public newSubmitHandler(event, textElement) {
-            //event.preventDefault();
             var addedNodes = [];
             var changedNodes = [];
             var deletedNodes = [];
@@ -245,6 +244,7 @@ module Mapping {
                     end: $.extend(end.appOptions, {id: this.editor.markers.indexOf(end), position: end.getPosition().lat() + "," + end.getPosition().lng()})
                 };
             }
+
             $("#" + textElement).val(JSON.stringify({
                 nodes: {
                     added: addedNodes,
@@ -340,9 +340,9 @@ module Mapping {
             } else {
                 marker.appOptions.room = "";
             }
-            marker.appOptions.fromFloor = $("input[name='fromFloor']", html).val();
+          /*  marker.appOptions.fromFloor = $("input[name='fromFloor']", html).val();
             marker.appOptions.toFloor = $("input[name='toFloor']", html).val();
-            marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();
+            marker.appOptions.toBuilding = $("select[name='toBuilding']", html).val();*/
             marker.appOptions.type = $("select[name=type]", html).val();
 
 
@@ -354,7 +354,7 @@ module Mapping {
 
             var data = {coords: marker.getPosition().lat() + "," + marker.getPosition().lng()};
             var destProperty;
-            if(existing.length == 1) {
+            if(existing && existing.length == 1) {
                 data.floor = existing[0].destinationFloor.id;
                 data.building = existing[0].destinationBuilding.id;
                 destProperty = existing[0].destinationNode;
