@@ -71,6 +71,9 @@ module Mapping {
 
             $.each(this.markers, (index, item) => {
                 this.eventHandler.registerMarkerEvents(item);
+                if(this.floorExchange.starting[item.appOptions.propertyId]) {
+                    item.appOptions.floorExchange = this.floorExchange.starting[item.appOptions.propertyId][0];
+                }
             });
 
             $.each(this.paths, (index, item) => {
@@ -271,7 +274,8 @@ module Mapping {
             });
             var otherNodeTemp = {};
             var otherNode = $("#form-other a", html).click((event)  => {
-                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, this.options.modalMapSource, this.floorExchange.starting[marker.appOptions.propertyId], marker, typeSelect.val(),
+
+                this.eventHandler.onOtherNodeSelection(event, this.options.markerSelectorAction, this.options.modalMapSource, marker.appOptions.floorExchange, marker, typeSelect.val(),
                     (selected) => {
                         otherNodeTemp = this.eventHandler.onOtherNodeSelected(marker, html, selected);
                         if(!$.isEmptyObject(otherNodeTemp)) {
@@ -307,15 +311,15 @@ module Mapping {
                 this.eventHandler.onMarkerWindowSave(event, marker, this.options.roomPrefix, html);
 
                 if (marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
-                    if (otherNodeTemp) {
+                    if (otherNodeTemp && otherNodeTemp.destinationNode != undefined) {
                         if (otherNodeTemp.deleted) {
-                            this.floorExchange.starting[marker.appOptions.propertyId] = null;
+                            marker.appOptions.floorExchange = undefined;
                         } else {
-                            if(this.floorExchange.starting[marker.appOptions.propertyId] && this.floorExchange.starting[marker.appOptions.propertyId].length != 0) {
-                                otherNodeTemp.pathId = this.floorExchange.starting[marker.appOptions.propertyId][0].pathId;
+                            if(marker.appOptions.floorExchange) {
+                                otherNodeTemp.pathId = marker.appOptions.floorExchange.pathId;
                             }
-                            this.floorExchange.starting[marker.appOptions.propertyId] = [];
-                            this.floorExchange.starting[marker.appOptions.propertyId][0] = otherNodeTemp;
+
+                            marker.appOptions.floorExchange = otherNodeTemp;
                         }
                     }
                 }
@@ -337,13 +341,12 @@ module Mapping {
             if (marker.appOptions != null) {
                 $("input[name='name']", html).val(marker.appOptions.name);
                 $("input[name='room']", html).val((marker.appOptions.room ? marker.appOptions.room.replace(this.options.roomPrefix, "") : ""));
-             /*   $("input[name='fromFloor']", html).val(marker.appOptions.fromFloor);
-                $("input[name='toFloor']", html).val(marker.appOptions.toFloor);
-                $("select[name='toBuilding']", html).val(marker.appOptions.toBuilding);*/
                 $("select[name=type]", html).val(marker.appOptions.type);
-                if(this.floorExchange.starting[marker.appOptions.propertyId]) {
+
+                if(marker.appOptions.floorExchange) {
                     //inter-floor path starts here - can be only one
-                    var info = this.floorExchange.starting[marker.appOptions.propertyId][0];
+
+                    var info = marker.appOptions.floorExchange;
                     $("#form-other div", html).html(
                         "Spojení do #" + info.destinationNode + ", patro " + info.destinationFloor.name + (typeSelect.val() == "passage" ? " budova " + info.destinationBuilding.name : "")
                     ).show();

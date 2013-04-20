@@ -354,10 +354,10 @@ module Mapping {
 
             var data = {coords: marker.getPosition().lat() + "," + marker.getPosition().lng()};
             var destProperty;
-            if(existing && existing.length == 1) {
-                data.floor = existing[0].destinationFloor.id;
-                data.building = existing[0].destinationBuilding.id;
-                destProperty = existing[0].destinationNode;
+            if(existing) {
+                data.floor = existing.destinationFloor.id;
+                data.building = existing.destinationBuilding.id;
+                destProperty = existing.destinationNode;
             }
             var modal = new Mapping.ModalMap(this.editor);
             modal.load(destination, destinationData, data, type, callback, destProperty);

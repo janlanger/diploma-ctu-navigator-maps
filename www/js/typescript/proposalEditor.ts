@@ -137,12 +137,17 @@ module Mapping {
                 });
 
                 $("#proposal-send").click((event) => {
-                 //   event.preventDefault();
-                 //   $("#custom_changes").show();
+                    //event.preventDefault();
+                    //$("#custom_changes").show();
                     var addedNodes = [];
                     var changedNodes = [];
                     var deletedNodes = [];
                     var checked = [];
+
+                    var addedExchange = [];
+                    var changedExchange = [];
+                    var deletedExchange = [];
+
                     for (var key in this.markers) {
                         var original = this.markersOriginals[key];
                         var item = this.markers[key];
@@ -152,6 +157,9 @@ module Mapping {
                             addedNodes[key] = item.appOptions;
                             addedNodes[key].position = item.getPosition().lat() + "," + item.getPosition().lng();
                             addedNodes[key].gps = undefined;
+                            if(item.appOptions.floorExchange) {
+                                addedExchange[key] = item.appOptions.floorExchange;
+                            }
                         }
 
                         if (original && item.getMap() != null && !this.optionsEquals(original, item.appOptions)) {
@@ -159,6 +167,16 @@ module Mapping {
                             changedNodes[item.appOptions.propertyId].position = item.getPosition().lat() + "," +item.getPosition().lng();
                             changedNodes[item.appOptions.propertyId].gps = undefined;
                         }
+                        if(item.getMap() != null && item.appOptions.floorExchange) {
+                            var f = item.appOptions.floorExchange;
+                            if(!this.floorExchangeOriginals.starting[item.appOptions.propertyId]) {
+                                addedExchange[item.appOptions.propertyId] = item.appOptions.floorExchange;
+                            }
+                            else if (f.destinationNode != this.floorExchangeOriginals.starting[item.appOptions.propertyId][0].destinationNode) {
+                                changedExchange[item.appOptions.propertyId] = item.appOptions.floorExchange;
+                            }
+                        }
+
                         checked[key] = true;
                     }
 
@@ -166,6 +184,7 @@ module Mapping {
                         // deleted directly
                         if (checked[key]) continue;
                         deletedNodes.push(this.markersOriginals[key].propertyId);
+                        deletedExchange.push(this.floorExchangeOriginals.starting[this.markersOriginals[key].propertyId][0].pathId);
                     }
 
                     var addedPaths = [];
@@ -206,31 +225,6 @@ module Mapping {
                         };
                     }
 
-                    var addedExchange = [];
-                    var changedExchange = [];
-                    var deletedExchange = [];
-
-                    var checked = [];
-
-                    for (var key in this.floorExchange.starting) {
-                        var original = this.floorExchangeOriginals.starting[key];
-                        var newOne = this.floorExchange.starting[key];
-
-                        if (newOne && !newOne[0].pathId && original == null) {
-                            addedExchange.push(newOne);
-                        }
-                        if (newOne && newOne[0].pathId && (original.destinationNode != original.destinationNode)) {
-                            changedExchange.push(newOne);
-                        }
-                        if(newOne) {
-                            checked[key] = true;
-                        }
-                    }
-                    for (var key in this.floorExchangeOriginals.starting) {
-                        if (checked[key]) continue;
-                        deletedExchange.push(this.floorExchangeOriginals.starting[key]);
-                    }
-
                     $("#custom_changes").val(JSON.stringify({
                         nodes: {
                             added: addedNodes,
@@ -255,6 +249,7 @@ module Mapping {
         private optionsEquals(obj1, obj2) {
             for (var i in obj1) {
                 if(i == "toFloor") continue;
+                if(i == 'floorExchange') continue;
                 if (obj1.hasOwnProperty(i)) {
                     if (!obj2.hasOwnProperty(i)) return false;
                     if((obj1[i]== null && obj2[i] == "") || (obj1[i] == "" && obj2[i] == null)) continue;
@@ -264,6 +259,7 @@ module Mapping {
             }
             for (var i in obj2) {
                 if (i == "toFloor") continue;
+                if (i == 'floorExchange') continue;
                 if (obj2.hasOwnProperty(i)) {
                     if (!obj1.hasOwnProperty(i)) return false;
                     if ((obj1[i] == null && obj2[i] == "") || (obj1[i] == "" && obj2[i] == null)) continue;
