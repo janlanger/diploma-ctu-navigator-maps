@@ -52,6 +52,7 @@ abstract class BasePresenter extends Presenter {
             "meta_path_change" => "Maps\\Model\\Metadata\\PathChange",
             "meta_node" => "Maps\\Model\\Metadata\\Node",
             "meta_path" => "Maps\\Model\\Metadata\\Path",
+            "meta_floor_connection" => "Maps\\Model\\Metadata\\FloorConnection"
         ];
         if(isset($aliasMap[strtolower($entity)])) {
             return $this->getContext()->em->getRepository($aliasMap[strtolower($entity)]);
