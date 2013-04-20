@@ -10,8 +10,11 @@
 namespace Maps\Model\Metadata\Queries;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Expr\Join;
 use Maps\Model\Dao;
 use Maps\Model\Metadata\Changeset;
+use Maps\Model\Metadata\FloorConnection;
 use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Revision;
 use Maps\Model\User\User;
@@ -42,12 +45,19 @@ class RevisionProcessor extends Object {
     /** @var Changeset */
     private $directChangeset = NULL;
 
+
+    private $floorConnectionRepository;
+
     private $changedKeys = [];
+
+    private $connections = [];
+
+    private $nodeChangedIds = [];
 
     function __construct(Revision $activeRevision, User $user, Dao $revision,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
-    Dao $node, Dao $path)
+    Dao $node, Dao $path, Dao $floorConnection)
     {
         $this->actualRevision = $activeRevision;
         $this->nodePropertiesRepository = $nodeProperties;
@@ -58,6 +68,7 @@ class RevisionProcessor extends Object {
         $this->nodeRepository = $node;
         $this->pathRepository = $path;
         $this->revisionRepository = $revision;
+        $this->floorConnectionRepository = $floorConnection;
         $this->user = $user;
     }
 
@@ -66,7 +77,6 @@ class RevisionProcessor extends Object {
 
         $values = $form->getValues();
         $changes = json_decode($values['custom_changes'], TRUE);
-
 
         $this->processNewChanges($changes);
 
@@ -108,6 +118,8 @@ class RevisionProcessor extends Object {
 
             $this->applyChanges($newRevision, $changesetsToApply);
 
+            $this->cloneAndUpdateFloorConnections($newRevision);
+
             $this->autoCloseChangesets($changesets, $this->changedKeys);
             $this->countPathsLength($newRevision);
 
@@ -124,6 +136,8 @@ class RevisionProcessor extends Object {
     private function processNewChanges($changes) {
 
         //remove null shitty things...
+
+        if(!is_array($changes)) return;
 
         foreach ($changes as $part => $p) {
             foreach ($p as $key => $section) {
@@ -142,23 +156,16 @@ class RevisionProcessor extends Object {
                 'againstRevision' => $this->actualRevision,
                 'comment' => "Automaticky vytvořený návrh při tvorbě revize.",
                 'submittedBy' => $this->user,
+                'processedBy' => $this->user,
+                'processedDate' => new \DateTime(),
             ]);
 
             //load needed nodes properties for relations
 
             $nodePropertiesIds = [];
 
-            foreach ($changes['nodes']['added'] as $node) {
-                if(isset($node['other']) && !empty($node['other'])) {
-                    $nodePropertiesIds[] = $node['other']['propertyId'];
-                }
-            }
-
             foreach ($changes['nodes']['changed'] as $node) {
                 $nodePropertiesIds[] = $node['propertyId'];
-                if (isset($node['other']) && !empty($node['other']) && isset($node['other']['propertyId'])) {
-                    $nodePropertiesIds[] = $node['other']['propertyId'];
-                }
             }
             $nodePropertiesIds = array_merge($nodePropertiesIds, $changes['nodes']['deleted']);
 
@@ -212,18 +219,6 @@ class RevisionProcessor extends Object {
                     'room' => (isset($node['room']) && trim($node['room']) != "" ? $node['room'] : NULL),
                 ]);
 
-                if(isset($node['other']) && !empty($node['other'])) {
-                    $paths[] = $this->pathChangeRepository->createNew(NULL, array(
-                        'changeset' => $changeset,
-                        'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
-                            'isFloorExchange' => TRUE,
-                            'destinationFloor' => $this->nodeRepository->findOneBy(['properties'=> $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
-                            'startNode' => $nodesAdd[$id],
-                            'endNode' => $dbNodeProperties[$node['other']['propertyId']]
-                        ))
-                    ));
-                }
-
                 $nodes[] = $this->nodeChangeRepository->createNew(NULL, [
                     'changeset' => $changeset,
                     'properties' => $nodesAdd[$id],
@@ -247,27 +242,6 @@ class RevisionProcessor extends Object {
                     'original' => $dbNodeProperties[$node['propertyId']],
                     'wasDeleted' => FALSE
                 ]);
-
-                if (isset($node['other']) && !empty($node['other'])) {
-                    if(isset($node['other']['propertyId'])) {
-                        $paths[] = $this->pathChangeRepository->createNew(NULL, array(
-                            'changeset' => $changeset,
-                            'properties' => $this->pathPropertiesRepository->createNew(NULL, array(
-                                'isFloorExchange' => TRUE,
-                                'destinationFloor' => $this->nodeRepository->findOneBy(['properties' => $dbNodeProperties[$node['other']['propertyId']]])->revision->floor,
-                                'startNode' => $item,
-                                'endNode' => $dbNodeProperties[$node['other']['propertyId']]
-                            ))
-                        ));
-                    }
-                    if(isset($node['other']['pathProperty'])) {
-                        $paths[] = $this->pathChangeRepository->createNew(NULL, array(
-                            'changeset' => $changeset,
-                            'original' => $this->pathPropertiesRepository->find($node['other']['pathProperty']),
-                            'wasDeleted' => TRUE,
-                        ));
-                    }
-                }
             }
 
 
@@ -317,6 +291,48 @@ class RevisionProcessor extends Object {
 
             $this->nodeChangeRepository->getEntityManager()->flush();
 
+        }
+
+        if(!empty($changes['exchange']) && (!empty($changes['exchange']['added']) || !empty($changes['exchange']['changed']) || !empty($changes['exchange']['deleted']))) {
+            $connectionsAdded = [];
+            $connectionsChanged = [];
+
+            $selectIds = [];
+            foreach([$changes['exchange']['added'], $changes['exchange']['changed'], $changes['exchange']['deleted']] as $s) {
+                foreach($s as $id=>$x) {
+                    if(isset($x['destinationNode'])) {
+                        $selectIds[] = $x['destinationNode'];
+                    }
+                    if(!isset($nodesAdd[$id])) {
+                        $selectIds[] = $id;
+                    }
+                }
+            }
+            //$selectIds = array_merge($selectIds, array_keys($changes['exchange']['changed']));
+
+            $nodes = Mixed::mapAssoc($this->nodePropertiesRepository->findBy(["id"=>$selectIds]), 'id');
+
+            foreach($changes['exchange']['added'] as $id => $added) {
+                if(isset($nodesAdd[$id])) {
+                    $connectionsAdded[] = [$nodesAdd[$id], $nodes[$added['destinationNode']]];
+                } else {
+                    $connectionsAdded[] = [$nodes[$id], $nodes[$added['destinationNode']]];
+                }
+
+            }
+
+            foreach ($changes['exchange']['changed'] as $id => $changed) {
+                if (isset($nodes[$id])) {
+                    $connectionsChanged[$changed['pathId']] = [$nodes[$id], $nodes[$changed['destinationNode']]];
+                }
+            }
+
+            $connectionsDelete = $changes['exchange']['deleted'];
+            $this->connections = [
+                'add' => $connectionsAdded,
+                'change' => $connectionsChanged,
+                'delete' => $connectionsDelete
+            ];
         }
     }
 
@@ -419,6 +435,7 @@ class RevisionProcessor extends Object {
                 }
             }
         }
+        $this->nodeChangedIds = $changesMap;
 
 
         //change paths reference to new properties ids
@@ -518,14 +535,11 @@ class RevisionProcessor extends Object {
     private function countPathsLength(Revision $revision) {
         foreach($revision->getPaths() as $path) {
             /** @var $path Path */
-            if($path->getProperties()->isFloorExchange()) {
-                $path->setLength(0);
-            } else {
                 $path->setLength(($this->computeDistance(
                     $path->getProperties()->getStartNode()->getGpsCoordinates(),
                     $path->getProperties()->getEndNode()->getGpsCoordinates()
                 )));
-            }
+
         }
     }
 
@@ -556,6 +570,73 @@ class RevisionProcessor extends Object {
         $d = $R * $c;
 
         return $d*1000;
+    }
+
+
+    private function cloneAndUpdateFloorConnections(Revision $revision) {
+        $floorConnections = $this->floorConnectionRepository->findBy(["revision_one"=> $this->actualRevision]);
+
+//clone
+        $newFloorConnections = [];
+        if(is_array($floorConnections)) {
+            /** @var $conn FloorConnection */
+            foreach($floorConnections as $conn) {
+                $newFloorConnections[$conn->id] = $this->floorConnectionRepository->createNew(NULL, [
+                    'revisionOne' => $revision,
+                    'nodeOne' => $conn->getNodeOne(),
+                    'revisionTwo' => $conn->getRevisionTwo(),
+                    'nodeTwo' => $conn->getNodeTwo(),
+                    'type' => $conn->getType(),
+                ]);
+            }
+        }
+
+
+
+        if(!empty($this->connections)) {
+            $otherNodes = [];
+            foreach($this->connections as $item) {
+                foreach($item as $conn) {
+                    $otherNodes[] = $conn[1]->id;
+                }
+            }
+            $otherRevision = $this->revisionRepository->createQueryBuilder("r")
+                    ->select("r AS rev, p.id as prop")
+                    ->innerJoin("Maps\\Model\\Metadata\\Node", "n", Join::WITH, "n.revision = r")
+                    ->innerJoin("n.properties", "p")
+                    ->where("r.published = true")
+                    ->andWhere("n.properties IN (?1)")
+                    ->setParameter(1, $otherNodes)->getQuery()->getResult();
+            $otherMap = [];
+            foreach($otherRevision as $item) {
+                $otherMap[$item['prop']] = $item['rev'];
+            }
+
+
+            foreach($this->connections['add'] as $added) {
+                if(isset($this->nodeChangedIds[$added[0]->id])) {
+                    $added[0] = $revision->nodes->get($this->nodeChangedIds[$added[0]->id])->properties;
+                }
+                $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
+                    'revisionOne' => $revision,
+                    'nodeOne' => $added[0],
+                    'revisionTwo' => $otherMap[$added[1]->id],
+                    'nodeTwo' => $added[1],
+                    'type' => $added[0]->getType(),
+                ]);
+            }
+        }
+
+        //change
+
+        //delete
+
+        //update when nodeTwo was changed
+
+        //delete when nodeTwo is deleted
+
+
+        $this->floorConnectionRepository->add($newFloorConnections);
     }
 
 }
