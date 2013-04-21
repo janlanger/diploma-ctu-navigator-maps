@@ -112,7 +112,7 @@ class RevisionProcessor extends Object {
             }
         }
 
-        if(!empty($changesetsToApply)) {
+        if(!empty($changesetsToApply) || (!empty($this->connections) && (!empty($this->connections['add']) || !empty($this->connections['change']) || !empty($this->connections['delete'])))) {
 
             $newRevision = $this->cloneRevision($this->actualRevision);
 
@@ -148,6 +148,7 @@ class RevisionProcessor extends Object {
                 }
             }
         }
+
 
         if($this->hasChanges($changes)) {
             /** @var $changeset Changeset */
@@ -294,6 +295,7 @@ class RevisionProcessor extends Object {
         }
 
         if(!empty($changes['exchange']) && (!empty($changes['exchange']['added']) || !empty($changes['exchange']['changed']) || !empty($changes['exchange']['deleted']))) {
+           // dump($changes['exchange']);
             $connectionsAdded = [];
             $connectionsChanged = [];
 
@@ -595,45 +597,80 @@ class RevisionProcessor extends Object {
 
         if(!empty($this->connections)) {
             $otherNodes = [];
-            foreach($this->connections as $item) {
+            foreach([$this->connections['add'],$this->connections['change']] as $item) {
                 foreach($item as $conn) {
-                    $otherNodes[] = $conn[1]->id;
+                    if(is_array($conn)) {
+                        $otherNodes[] = $conn[1]->id;
+                    }
                 }
             }
-            $otherRevision = $this->revisionRepository->createQueryBuilder("r")
-                    ->select("r AS rev, p.id as prop")
-                    ->innerJoin("Maps\\Model\\Metadata\\Node", "n", Join::WITH, "n.revision = r")
-                    ->innerJoin("n.properties", "p")
-                    ->where("r.published = true")
-                    ->andWhere("n.properties IN (?1)")
-                    ->setParameter(1, $otherNodes)->getQuery()->getResult();
-            $otherMap = [];
-            foreach($otherRevision as $item) {
-                $otherMap[$item['prop']] = $item['rev'];
-            }
-
-
-            foreach($this->connections['add'] as $added) {
-                if(isset($this->nodeChangedIds[$added[0]->id])) {
-                    $added[0] = $revision->nodes->get($this->nodeChangedIds[$added[0]->id])->properties;
+            if(!empty($otherNodes)) {
+                $otherRevision = $this->revisionRepository->createQueryBuilder("r")
+                        ->select("r AS rev, p.id as prop")
+                        ->innerJoin("Maps\\Model\\Metadata\\Node", "n", Join::WITH, "n.revision = r")
+                        ->innerJoin("n.properties", "p")
+                        ->where("r.published = true")
+                        ->andWhere("n.properties IN (?1)")
+                        ->setParameter(1, $otherNodes)->getQuery()->getResult();
+                $otherMap = [];
+                foreach($otherRevision as $item) {
+                    $otherMap[$item['prop']] = $item['rev'];
                 }
-                $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
-                    'revisionOne' => $revision,
-                    'nodeOne' => $added[0],
-                    'revisionTwo' => $otherMap[$added[1]->id],
-                    'nodeTwo' => $added[1],
-                    'type' => $added[0]->getType(),
-                ]);
+
+
+
+                foreach($this->connections['add'] as $added) {
+                    if(isset($this->nodeChangedIds[$added[0]->id])) {
+                        $added[0] = $revision->nodes->get($this->nodeChangedIds[$added[0]->id])->properties;
+                    }
+                    $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
+                        'revisionOne' => $revision,
+                        'nodeOne' => $added[0],
+                        'revisionTwo' => $otherMap[$added[1]->id],
+                        'nodeTwo' => $added[1],
+                        'type' => $added[0]->getType(),
+                    ]);
+                }
+
+                foreach($this->connections['change'] as $id => $change) {
+                    if (isset($this->nodeChangedIds[$change[0]->id])) {
+                        $change[0] = $revision->nodes->get($this->nodeChangedIds[$change[0]->id])->properties;
+                    }
+                    $newFloorConnections[$id] = $this->floorConnectionRepository->createNew(NULL, [
+                        'revisionOne' => $revision,
+                        'nodeOne' => $change[0],
+                        'revisionTwo' => $otherMap[$change[1]->id],
+                        'nodeTwo' => $change[1],
+                        'type' => $change[0]->getType(),
+                    ]);
+                }
+            }
+            foreach($this->connections['delete'] as $item) {
+                unset($newFloorConnections[$item]);
             }
         }
 
-        //change
+        //find all connections ending here in actual revision
 
-        //delete
+        $floorConnections = $this->floorConnectionRepository->findBy(["revision_two" => $this->actualRevision]);
+        //clone and change to new nodes
 
-        //update when nodeTwo was changed
-
-        //delete when nodeTwo is deleted
+        /** @var $floorConnection FloorConnection */
+        foreach($floorConnections as $floorConnection) {
+            $node = $floorConnection->getNodeTwo();
+            if(isset($this->nodeChangedIds[$node->id])) {
+                $node = $revision->nodes->get(($this->nodeChangedIds[$node->id]))->properties;
+            } else if(is_array($this->changedKeys['nodes']) && isset($this->changedKeys['nodes'][$node->id])){
+                continue;
+            }
+            $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
+                'revisionOne' => $floorConnection->getRevisionOne(),
+                'nodeOne' => $floorConnection->getNodeOne(),
+                'revisionTwo' => $revision,
+                'nodeTwo' => $node,
+                'type' => $floorConnection->getType(),
+            ]);
+        }
 
 
         $this->floorConnectionRepository->add($newFloorConnections);

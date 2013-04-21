@@ -2,6 +2,7 @@
 namespace Maps\Components\GoogleMaps;
 use Maps\Components\Forms\Form;
 use Maps\Model\Building\DictionaryQuery;
+use Maps\Model\Metadata\FloorConnection;
 use Maps\Presenter\BasePresenter;
 
 /**
@@ -69,25 +70,27 @@ class PolyLinesEditor extends BaseMapControl {
         if (!empty($this->floorExchangePaths)) {
 
 
+            /** @var $path FloorConnection */
             foreach ($this->floorExchangePaths as $path) {
 
 
                 foreach ($this->points as $id => $point) {
                     $node = NULL;
                     if ($path->nodeOne->id == $point['appOptions']['propertyId']) {
+                        dump($path);
                         $starting[$path->nodeOne->id][] = [
                             'destinationNode' => $path->nodeTwo->id,
                             'pathId' => $path->id,
-                            'destinationFloor' => ['id' => $point['appOptions']['toFloor']->id, 'name' => $point['appOptions']['toFloor']->readableName],
-                            'destinationBuilding' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name]
+                            'destinationFloor' => ['id' => $path->getRevisionTwo()->getFloor()->id, 'name' => $path->getRevisionTwo()->getFloor()->readableName],
+                            'destinationBuilding' => ['id' => $path->getRevisionTwo()->getFloor()->building->id, 'name' => $path->getRevisionTwo()->getFloor()->building->name]
                         ];
                     }
                     if ($path->nodeTwo->id == $point['appOptions']['propertyId']) {
                         $ending[$path->nodeTwo->id][] = [
                             'destinationNode' => $path->nodeOne->id,
                             'pathId' => $path->id,
-                            'destinationFloor' => ['id' => $point['appOptions']['toFloor']->id, 'name' => $point['appOptions']['toFloor']->readableName],
-                            'destinationBuilding' => ['id' => $point['appOptions']['toFloor']->building->id, 'name' => $point['appOptions']['toFloor']->building->name]
+                            'destinationFloor' => ['id' => $path->getRevisionOne()->getFloor()->id, 'name' => $path->getRevisionOne()->getFloor()->readableName],
+                            'destinationBuilding' => ['id' => $path->getRevisionOne()->getFloor()->building->id, 'name' => $path->getRevisionOne()->getFloor()->building->name]
                         ];
                     }
                     unset($this->points[$id]['appOptions']['toFloor']);

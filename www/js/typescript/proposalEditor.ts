@@ -176,6 +176,10 @@ module Mapping {
                                 changedExchange[item.appOptions.propertyId] = item.appOptions.floorExchange;
                             }
                         }
+                        if(item.getMap() != null && this.floorExchangeOriginals.starting[item.appOptions.propertyId] && !item.appOptions.floorExchange) {
+                            deletedExchange.push(this.floorExchangeOriginals.starting[this.markersOriginals[key].propertyId][0].pathId);
+                        }
+
 
                         checked[key] = true;
                     }
@@ -184,7 +188,9 @@ module Mapping {
                         // deleted directly
                         if (checked[key]) continue;
                         deletedNodes.push(this.markersOriginals[key].propertyId);
-                        deletedExchange.push(this.floorExchangeOriginals.starting[this.markersOriginals[key].propertyId][0].pathId);
+                        if(this.floorExchangeOriginals.starting[this.markersOriginals[key].propertyId]) {
+                            deletedExchange.push(this.floorExchangeOriginals.starting[this.markersOriginals[key].propertyId][0].pathId);
+                        }
                     }
 
                     var addedPaths = [];

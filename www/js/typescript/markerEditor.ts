@@ -311,7 +311,7 @@ module Mapping {
                 this.eventHandler.onMarkerWindowSave(event, marker, this.options.roomPrefix, html);
 
                 if (marker.appOptions.type == "elevator" || marker.appOptions.type == "stairs" || marker.appOptions.type == "passage") {
-                    if (otherNodeTemp && otherNodeTemp.destinationNode != undefined) {
+                    if (otherNodeTemp && (otherNodeTemp.destinationNode != undefined || otherNodeTemp.deleted != undefined)) {
                         if (otherNodeTemp.deleted) {
                             marker.appOptions.floorExchange = undefined;
                         } else {

@@ -55,28 +55,28 @@ class FloorConnection extends BaseEntity {
     }
 
     /**
-     * @param \Maps\Model\Metadata\Node $node_one
+     * @param \Maps\Model\Metadata\NodeProperties $node_one
      */
     public function setNodeOne($node_one) {
         $this->node_one = $node_one;
     }
 
     /**
-     * @return \Maps\Model\Metadata\Node
+     * @return \Maps\Model\Metadata\NodeProperties
      */
     public function getNodeOne() {
         return $this->node_one;
     }
 
     /**
-     * @param \Maps\Model\Metadata\Node $node_two
+     * @param \Maps\Model\Metadata\NodeProperties $node_two
      */
     public function setNodeTwo($node_two) {
         $this->node_two = $node_two;
     }
 
     /**
-     * @return \Maps\Model\Metadata\Node
+     * @return \Maps\Model\Metadata\NodeProperties
      */
     public function getNodeTwo() {
         return $this->node_two;
