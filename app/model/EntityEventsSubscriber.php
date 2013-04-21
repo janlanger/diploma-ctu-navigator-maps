@@ -16,8 +16,10 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\NoResultException;
 use Maps\Model\Floor\Plan;
+use Maps\Model\Metadata\FloorConnection;
 use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Path;
+use Maps\Model\Metadata\Queries\FloorExchangePaths;
 use Maps\Model\Metadata\Revision;
 
 class EntityEventsSubscriber implements  EventSubscriber {
@@ -50,36 +52,7 @@ class EntityEventsSubscriber implements  EventSubscriber {
 
     }
 
-    public function postPersist(LifecycleEventArgs $args) {
-        $entity = $args->getEntity();
-        if ($entity instanceof Path) {
-            //back compatibility - fromFloor, toFloor and toBuilding
-            if ($entity->getProperties()->getDestinationFloor() != NULL) {
-                /** @var $node NodeProperties */
-                foreach ([$entity->getProperties()->getStartNode(), $entity->getProperties()->getEndNode()] as $node) {
-                    $other = ($node === $entity->getProperties()->getStartNode()?$entity->getProperties()->getEndNode():$entity->getProperties()->getStartNode());
-                    $q = $args->getEntityManager()->createQuery("SELECT f FROM Maps\\Model\\Floor\\Floor f INNER JOIN Maps\\Model\\Metadata\\Revision r
-                    WITH r.floor = f INNER JOIN Maps\\Model\\Metadata\\Node n WITH n.revision = r WHERE n.properties = ?1");
-                    $q->setMaxResults(1);
-                    $q->setParameter(1, $other);
-                    try {
-                        $floor = $q->getSingleResult();
-                    } catch (NoResultException $e) {
-                        $floor = $entity->getProperties()->getDestinationFloor();
-                    }
-                    @$node->setToFloor($floor);
 
-                    if ($node->getType() == 'elevator') {
-                        @$node->setFromFloor(0);
-                    }
-                    if ($node->getType() == 'passage') {
-                        @$node->setToBuilding($floor->getBuilding());
-                    }
-                }
-                $args->getEntityManager()->flush();
-            }
-        }
-    }
 
     /**
      * Returns an array of events this subscriber wants to listen to.
@@ -87,6 +60,6 @@ class EntityEventsSubscriber implements  EventSubscriber {
      * @return array
      */
     function getSubscribedEvents() {
-        return [Events::prePersist, Events::postPersist];
+        return [Events::prePersist];
     }
 }
