@@ -40,7 +40,7 @@ class TilesService extends Object {
     }
 
     public function getTilesBasePath($plan) {
-        return $this->baseUrl.'/'.Strings::webalize($plan->floor->building->name).'/'.$plan->floor->floorNumber;
+        return $this->baseUrl.'/'.($plan->floor->building->id).'/'.$plan->floor->id;
     }
 
     public function generateTiles(Plan $plan) {
