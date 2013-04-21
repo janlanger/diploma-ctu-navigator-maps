@@ -15,8 +15,10 @@ use Maps\Model\Building\Queries\BuildingWithFloors;
 use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Floor\Plan;
+use Maps\Model\Metadata\FloorConnection;
 use Maps\Model\Metadata\Node;
 use Maps\Model\Metadata\Path;
+use Maps\Model\Metadata\Queries\ActiveFloorConnections;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\SingleNode;
 use Nette\Application\BadRequestException;
@@ -179,17 +181,33 @@ class ApiPresenter extends BasePresenter {
         $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($id));
 
         if ($metadata != NULL) {
-            $this->handleLastModification($metadata->getPublishedDate());
+
+            $lastModified = $metadata->getPublishedDate();
+
+            $floorConnections = $this->getRepository('meta_floor_connection')->fetch(new ActiveFloorConnections($metadata));
+
+            $paths = [];
+            /** @var $connection FloorConnection */
+            foreach ($floorConnections as $connection) {
+                if ($connection->getCreated() > $lastModified) {
+                    $lastModified = $connection->getCreated();
+                }
+                $paths[] = $this->getFloorConnectionPayload($connection);
+            }
+            $this->handleLastModification($lastModified);
+
+
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
                 $nodes[] = $this->getNodePayload($node, $id);
             }
-            $paths = [];
+
             /** @var $path Path */
             foreach ($metadata->getPaths() as $path) {
                 $paths[] = $this->getPathPayload($path, $id);
             }
+
             $payload = [
                 'nodes' => $nodes,
                 'paths' => $paths
@@ -373,8 +391,19 @@ class ApiPresenter extends BasePresenter {
             'start' => $p->getStartNode()->id,
             'end' => $p->getEndNode()->id,
             'length' => $path->getLength(),
-            'isFloorExchangePoint' => $p->isFloorExchange(),
-            'destinationFloor' => ($p->getDestinationFloor() != NULL ? $p->getDestinationFloor()->id : NULL),
+            'isFloorConnection' => FALSE,
+        ];
+    }
+
+    private function getFloorConnectionPayload(FloorConnection $path) {
+        return [
+            'id' => $path->id,
+            'start' => $path->getNodeOne()->id,
+            'end' => $path->getNodeTwo()->id,
+            'length' => $path->estimatedLength(),
+            'isFloorConnection' => TRUE,
+            'destinationFloor' => $path->getRevisionTwo()->getFloor()->getId(),
+            'type'=>$path->getType(),
         ];
     }
 
