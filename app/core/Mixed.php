@@ -72,7 +72,7 @@ class Mixed extends Nette\Object {
 
         if (!$texy instanceof \Texy) {
             $texy = new \Texy();
-            \Texy::$advertisingNotice = false; //sorry, but it adds the notice every time someone edit the article... and thats weird
+            \Texy::$advertisingNotice = FALSE; //sorry, but it adds the notice every time someone edit the article... and thats weird
             $texy->setOutputMode(\Texy::HTML5);
             $texy->allowed['blocks'] = FALSE;
             $texy->allowed['figure'] = FALSE;
@@ -116,6 +116,35 @@ class Mixed extends Nette\Object {
             $arr[$item->$key] = $item;
         }
         return $arr;
+    }
+
+    /**
+     * @param $one string GPS coords
+     * @param $two string GPS coords
+     * @return float
+     */
+    public static function  calculateDistanceBetweenGPS($one, $two) {
+        $one = explode(",", $one);
+        $two = explode(",", $two);
+
+        $lat1 = (float)$one[0];
+        $lng1 = (float)$one[1];
+
+        $lat2 = (float)$two[0];
+        $lng2 = (float)$two[1];
+
+        $R = 6371; // km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $lat1 = deg2rad($lat1);
+        $lat2 = deg2rad($lat2);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+                sin($dLng / 2) * sin($dLng / 2) * cos($lat1) * cos($lat2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $d = $R * $c;
+
+        return $d * 1000;
     }
 
 }

@@ -551,27 +551,7 @@ class RevisionProcessor extends Object {
      * @return float distance between points in meters
      */
     private function computeDistance($one, $two) {
-        $one = explode(",", $one);
-        $two = explode(",", $two);
-
-        $lat1 = (float) $one[0];
-        $lng1 = (float) $one[1];
-
-        $lat2 = (float) $two[0];
-        $lng2 = (float) $two[1];
-
-        $R = 6371; // km
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLng = deg2rad($lng2 - $lng1);
-        $lat1 = deg2rad($lat1);
-        $lat2 = deg2rad($lat2);
-
-        $a = sin($dLat / 2) * sin($dLat / 2) +
-                sin($dLng / 2) * sin($dLng / 2) * cos($lat1) * cos($lat2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        $d = $R * $c;
-
-        return $d*1000;
+        return Mixed::calculateDistanceBetweenGPS($one, $two);
     }
 
 
@@ -605,16 +585,20 @@ class RevisionProcessor extends Object {
                 }
             }
             if(!empty($otherNodes)) {
-                $otherRevision = $this->revisionRepository->createQueryBuilder("r")
-                        ->select("r AS rev, p.id as prop")
+                $nodeToRevision = $this->revisionRepository->createQueryBuilder("r")
+                        ->select("p.id as prop, r.id AS rev")
                         ->innerJoin("Maps\\Model\\Metadata\\Node", "n", Join::WITH, "n.revision = r")
                         ->innerJoin("n.properties", "p")
                         ->where("r.published = true")
                         ->andWhere("n.properties IN (?1)")
                         ->setParameter(1, $otherNodes)->getQuery()->getResult();
                 $otherMap = [];
-                foreach($otherRevision as $item) {
+                foreach($nodeToRevision as $item) {
                     $otherMap[$item['prop']] = $item['rev'];
+                }
+                $revs = Mixed::mapAssoc($this->revisionRepository->findBy(['id'=>$otherMap]), 'id');
+                foreach ($otherMap as $id=> $revId) {
+                    $otherMap[$id] = $revs[$revId];
                 }
 
 
