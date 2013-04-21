@@ -10,6 +10,7 @@
 namespace Maps\Model\Metadata;
 
 use Maps\Model\BaseEntity;
+use Maps\Tools\Mixed;
 
 /**
  * Class FloorConnection
@@ -18,6 +19,8 @@ use Maps\Model\BaseEntity;
  * @Table(name="metadata_floor_connections")
  */
 class FloorConnection extends BaseEntity {
+
+    const STAIRS_SLOPE_ESTIMATE = 35;
 
     /**
      * @var Revision
@@ -124,7 +127,32 @@ class FloorConnection extends BaseEntity {
         return $this->type;
     }
 
+    /**
+     * @return \DateTime
+     */
+    public function getCreated() {
+        return $this->created;
+    }
 
-
-
+    /**
+     * Return estimated connection length for stairs based on class constant. For passage returs
+     * distance between point coordinates. Return 0 for elevator and when floor height is not set.
+     * @return float
+     */
+    public function estimatedLength() {
+        if($this->type == 'elevator') {
+            return 0;
+        }
+        if($this->type == 'passage') {
+            return Mixed::calculateDistanceBetweenGPS($this->node_one->getGpsCoordinates(), $this->node_two->getGpsCoordinates());
+        }
+        if($this->type == 'stairs') {
+            $floorHeight = $this->revision_one->getFloor()->floorHeight;
+            if($floorHeight < 0.5) {
+                return 0;
+            }
+            return round($floorHeight / sin(deg2rad(self::STAIRS_SLOPE_ESTIMATE)),4);
+        }
+        return 0;
+    }
 }
