@@ -345,13 +345,15 @@ class MetadataPresenter extends SecuredPresenter {
 
 
         $grid->setDataSource($datasource);
+        $grid->itemsPerPage = 10;
 
         $states = [Changeset::STATE_NEW => 'Nový', Changeset::STATE_APPROVED => 'Přijatý', Changeset::STATE_REJECTED => 'Odmítnutý', Changeset::STATE_WITHDRAWN => 'Zrušený'];
 
         $grid->addDateColumn("date", 'Odesláno dne', "%d.%m.%Y %H:%M");
 
-        $grid->addColumn("state", "Stav návrhu")
-                ->addSelectboxFilter($states, TRUE, FALSE);
+        $c = $grid->addColumn("state", "Stav návrhu");
+        $c->addSelectboxFilter($states, TRUE, FALSE);
+        $c->addDefaultFiltering(Changeset::STATE_NEW);
         //$grid['state']->addDefaultFiltering(Changeset::STATE_NEW);
         $grid['state']->formatCallback[] = function ($value, $data) use ($states) {
 
@@ -424,7 +426,7 @@ class MetadataPresenter extends SecuredPresenter {
         $grid->addActionColumn('a', 'Akce');
         $grid->addAction('Zobrazit', 'view');
         $grid->addAction('Publikovat', 'publish!');
-
+        $grid->itemsPerPage = 10;
         $grid['published']->formatCallback[] = function ($value, $data) {
             if ($value == 1) {
                 return "<span class='label label-success'><i class='icon-ok icon-white'>&nbsp;</i></span>";

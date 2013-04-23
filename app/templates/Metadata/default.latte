@@ -3,11 +3,16 @@
 
 {block #content}
 
-<h3>Revize</h3>
-{control revisionGrid}
-<hr>
+<ul class="nav nav-pills">
+    <li class="active"><a n:href="Metadata:default">Přehled revizí a návrhů</a></li>
+    <li><a class="" n:href="approval">Zpracovat návrhy/upravit data</a></li>
+</ul>
 
 <h3>Návrhy změn</h3>
-    <a class="btn btn-info" n:href="approval">Zpracovat návrhy/upravit data</a>
 
 {control proposalGrid}
+<hr>
+<h3>Revize</h3>
+{control revisionGrid}
+
+
