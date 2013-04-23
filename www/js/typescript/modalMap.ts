@@ -48,11 +48,11 @@ module Mapping {
 
         private initEvents(callback) {
             var modal = $("#modal");
-            modal.find("#floors-submit").on('click',(event) => {
-                event.preventDefault();
-                $("#floors-submit", modal).ajaxSubmit((payload) => {
-                    this.reloadMap(payload.data);
-                });
+            modal.find("#floors-select").on('change',(event) => {
+                this.handleAjaxLoad(event, modal);
+            });
+            modal.find("#floors-submit").on('click', (event) => {
+                this.handleAjaxLoad(event, modal);
             });
             modal.css({
                 width: '100%',
@@ -103,6 +103,17 @@ module Mapping {
             });
         }
 
+        private handleAjaxLoad(event, modal) {
+            event.preventDefault();
+            $("#floors-submit", modal).attr('disabled', 'disabled');
+            $("#form-spinner", modal).removeClass('hide');
+            $("#floors-submit", modal).ajaxSubmit((payload) => {
+                $("#floors-submit", modal).removeAttr('disabled');
+                $("#form-spinner", modal).addClass('hide');
+                this.reloadMap(payload.data);
+            });
+        }
+
         private reloadMap(payload, propertyId=null) {
             var modal = $("#modal");
             var data = payload;
@@ -137,7 +148,7 @@ module Mapping {
 
             var modal = $("#modal");
 
-            $("#modal-loader").slideUp();
+            $("#modal-loader").hide();
             $('#modal-actual').slideDown();
             this.reloadMap(payload, propertyId);
 
