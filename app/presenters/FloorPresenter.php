@@ -51,12 +51,14 @@ class FloorPresenter extends SecuredPresenter {
         $entity->setBuilding($this->getBuilding());
 
         $this['form']->bindEntity($entity);
+        $this['form']->setRedirect("Building:detail?id=" . $this->getBuilding()->id);
     }
 
     public function actionEdit($id) {
         $entity = $this->getRepository('floor')->find($id);
 
         $this['form']->bindEntity($entity);
+        $this['form']->setRedirect("default?id=".$entity->id);
 
     }
 
@@ -111,10 +113,6 @@ class FloorPresenter extends SecuredPresenter {
 
 
         $form->addSubmit('ok', 'Uložit');
-        $form->onComplete[] = function($entity) use ($form) {
-            $form->setRedirect('Floor:default?id=' . $entity->id);
-        };
-
     }
 
     public function createComponentMap($name) {
