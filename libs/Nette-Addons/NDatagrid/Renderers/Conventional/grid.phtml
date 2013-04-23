@@ -1,7 +1,7 @@
 {snippet grid}
 
 {foreach $flashes as $flash}
-<div class="flash {$flash->type}">{$flash->message}</div>
+<div class="flash {$flash->type} alert alert-{$flash->type}">{$flash->message}</div>
 {/foreach}
 
 {widget $control begin}

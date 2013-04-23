@@ -527,6 +527,9 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 		foreach ($by as $key => $value) {
 			if ($value !== '') $filters[$key] = $value;
 		}
+        if(count($filters) > 0) {
+            $this->defaultFilters = "";
+        }
 		$this->filters = http_build_query($filters, '', '&');
 
 		$this->finalize();
@@ -660,7 +663,7 @@ class DataGrid extends Nette\Application\UI\Control implements \ArrayAccess
 		$this->paginator->page = $this->page;
 		$this->paginator->itemCount = count($this->dataSource);
 
-		if ($this->wasRendered && $this->paginator->itemCount < 1 && !empty($this->filters)) {
+		if ($this->wasRendered && $this->paginator->itemCount < 1 && !empty($this->filters) && $this->filters != $this->defaultFilters) {
 			// NOTE: don't use flash messages (because you can't - header already sent)
 			$this->getTemplate()->flashes[] = (object) array(
 				'message' => $this->translate('Nebyly nalezeny žádné záznamy.'),
