@@ -61,7 +61,6 @@ class BuildingPresenter extends SecuredPresenter {
 
         $grid->setDataSource($ds);
 
-        $grid->addColumn("id","ID#");
         $grid->addColumn("name","Budova")->addFilter();
         $grid->addColumn("address","Adresa")->addFilter();
         $grid->addColumn("proposals", "Nové návrhy")->formatCallback[] = function($value, $data) {
@@ -71,7 +70,7 @@ class BuildingPresenter extends SecuredPresenter {
             return $value;
         };
 
-        $grid['id']->addDefaultSorting('asc');
+        $grid['name']->addDefaultSorting('asc');
         $grid->keyName = "id";
         $grid->addActionColumn("a","Akce");
         $grid->addAction("Detail", "Building:detail");
