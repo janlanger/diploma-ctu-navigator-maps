@@ -12,13 +12,22 @@
         {/if}
     </a>
 </div>
+
+<div class="pull-right">
+    <label for="position-select" style="display: inline-block; margin-right: 5px;">Umístění ovládacího panelu: </label><select class="position-select input-small">
+        <option value="top">Nahoře</option>
+        <option value="right" selected="selected">Vpravo</option>
+        <option value="bottom">Dole</option>
+    </select>
+</div>
 <br clear="all">
 <div style="width: {!$mapWidth}; height: {$mapHeight}; padding: 0px 5px 10px; border-right: 1px solid rgb(160, 165, 132);
         border-left: 1px solid rgb(160, 165, 132); border-bottom: 4px solid rgb(160, 165, 132);" id="map_box">
     <div id="map_canvas" class="" style="width: 100%;height: 100%; margin: auto"></div>
 </div>
-<br clear="all">
-<div class="pull-right">Umístění ovládacího panelu: <select id="position-select">
+<div class="pull-right" style="margin-top: 10px;">
+    <label for="position-select" style="display: inline-block; margin-right: 5px;">Umístění ovládacího
+        panelu: </label><select class="position-select input-small">
         <option value="top">Nahoře</option>
         <option value="right" selected="selected">Vpravo</option>
         <option value="bottom">Dole</option>
@@ -84,7 +93,6 @@
     var pathOptions = {$pathOptions};
     {if !empty($paths)}
 
-    var floorExchange = {$floorExchange}
 
     {foreach $paths as $path}
     paths.push({
@@ -139,10 +147,10 @@
             { element:document.getElementById('buttons'), position: google.maps.ControlPosition.RIGHT_CENTER}
         ],
         resizableBox: { element: document.getElementById("map_box"), options: { minHeight: 270, minWidth: 300}},
-        positionSelect: document.getElementById('position-select'),
+        positionSelect: 'position-select',
         markerSelectorAction: {plink Metadata:modalMap},
         modalMapSource: {plink Metadata:modalMapPoints},
-        floorExchange: floorExchange
+        floorExchange: {$floorExchange}
 
     };
     {if !isset($overiden)}

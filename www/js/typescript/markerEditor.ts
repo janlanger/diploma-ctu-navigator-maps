@@ -102,11 +102,12 @@ module Mapping {
                     var prevPosition = item.position;
                     google.maps.event.addListenerOnce(this.map, 'idle', function() {
                         $(item.element).removeClass('hide');
-                    })
+                    });
                     var index = this.map.controls[item.position].push(item.element) -1;
                     var _this = this;
-                    $(this.options.positionSelect).change(function(event) {
+                    $("." +this.options.positionSelect).change(function(event) {
                         _this.map.controls[prevPosition].removeAt(index);
+                        $("." + _this.options.positionSelect).val(this.value);
                         var newPosition;
                         switch($(this).val()) {
                             case 'top':
@@ -126,7 +127,7 @@ module Mapping {
                         index = _this.map.controls[newPosition].push(item.element) - 1;
                         prevPosition = newPosition;
                     });
-                    $(this.options.positionSelect).trigger('change');
+                    $("." + this.options.positionSelect + ":first").trigger('change');
                 }
             }
 
