@@ -314,6 +314,7 @@ class ApiPresenter extends BasePresenter {
             'type' => 'building',
             'coordinates' => $this->convertCoordinates($item->getGpsCoordinates()),
             'floorNumber' => $item->getFloorCount(),
+            'address' => $item->getAddress(),
             //'minFloor' => $floors[0]['floor'],
         ];
 
