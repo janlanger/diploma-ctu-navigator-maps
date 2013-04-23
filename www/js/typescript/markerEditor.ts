@@ -80,7 +80,7 @@ module Mapping {
                 this.eventHandler.registerPathEvents(item);
             });
 
-            $("#" + this.options.definitionElement).hide();
+            $("#" + this.options.definitionElement).parents(".control-group").hide();
 
             this.AdditionState = Mapping.Events.ADD_INCATIVE;
             //  this.State = Mapping.Events.STATE_ADD;
@@ -90,6 +90,19 @@ module Mapping {
                 this.eventHandler.newSubmitHandler(event, this.options.definitionElement)
                 //return false;
             });
+
+            if(this.options.sizeSelector) {
+                $("."+this.options.sizeSelector).change(function(event) {
+                    var element = _this.mapElement;
+                    if(_this.options.resizableBox) {
+                        element = _this.options.resizableBox.element;
+                    }
+                    var center = _this.map.getCenter();
+                    $(element).css({"height": this.value});
+                    google.maps.event.trigger(_this.map, "resize");
+                    _this.map.setCenter(center);
+                });
+            }
 
             if (this.options.customControls) {
 

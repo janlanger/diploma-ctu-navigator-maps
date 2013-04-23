@@ -116,3 +116,10 @@ form label.required:after {
 form label.checkbox:after {
     content: '';
 }
+input.extra-small, select.extra-small {
+    padding: 2px 3px;
+    font-size: 12px;
+    vertical-align: baseline;
+    height: 25px;
+    margin-bottom: 5px;
+}
