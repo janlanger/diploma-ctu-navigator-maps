@@ -2,30 +2,30 @@
 {block breadcrumbs}{$building->name}{/block}
 {block content}
 
-<div class="row">
+<div class="row" style="margin-left: 0px;">
 
-    <div class="span6">
+    <div class="span4">
         <div class="well">
             <p class="lead">{$building->address}</p>
             <ul>
                 <li><strong>Celkem podlaží:</strong> {$building->floorCount}</li>
                 <li><strong>Prefix místností:</strong> {$building->roomPrefix}</li>
             </ul>
-            <div n:if="$user->isAllowed('Building','edit')" class="pull-right">
-                <a n:href="edit?id={$building->id}" class="btn btn-primary">Upravit</a>
-                <a n:href="delete!?id={$building->id}" class="btn btn-danger" data-confirm="Opravdu chcete tuto budovu úplně odstranit?">Odstranit</a>
+            <div n:if="$user->isAllowed('Building','edit')" >
+                <a n:href="edit?id={$building->id}" class="btn btn-small btn-primary">Upravit budovu</a>
+                <a n:href="delete!?id={$building->id}" class="btn  btn-small btn-danger" data-confirm="Opravdu chcete tuto budovu úplně odstranit?">Odstranit</a>
             </div>
-            <br style="clear: both">
         </div>
-    </div>
-    <div class="span6">
         <div class="well">
             {control googleMap, "size"=>["100%", "250px"]}
         </div>
     </div>
-</div>
-<hr>
-<h2>Podlaží</h2>
-<a n:if="$user->isAllowed('Floor','add')" class="btn btn-primary" n:href="Floor:add?building={$building->id}">Založit nové</a>
+    <div class="span8">
+        <h2>Podlaží</h2>
+        <a n:if="$user->isAllowed('Floor','add')" class="btn btn-primary" n:href="Floor:add?building={$building->id}">Založit
+            nové</a>
 
-{control plansGrid}
+        {control plansGrid}
+    </div>
+</div>
+
