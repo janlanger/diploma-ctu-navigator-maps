@@ -11,18 +11,19 @@
             <li>Aktivní revize plánu: <b>{if $plan}{$plan->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
             <li>Aktivní revize metadat: <b>{if $metadata}{$metadata->revision} z {$metadata->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
             <li n:if="$user->isAllowed('Floor','edit')" n:ifset="$unprocessedProposals"><br>
-                Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>
+                Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>{if $unprocessedProposals>0} - <a n:href="Metadata:approve">Zpracovat</a>{/if}
             </li>
         </ul>
 
     </div>
     <div class="span6">
-        <ul style="list-style-type: none">
-            <li n:if="$user->isAllowed('Floor','edit')" style="margin-bottom: 10px;"><a n:href="edit?id=$floor->id" class="btn btn-info">Upravit základní data</a>
-                <a n:href="delete!?id=$floor->id" data-confirm="Opravdu chcete smazat data tohoto podlaží, včetně zadaných plánů a metadata?" class="btn btn-small btn-danger">Smazat</a> </li>
-            <li n:if="$user->isAllowed('Plan','default')" style="margin-bottom: 10px;"><a n:href="Plan:default?floor=$floor->id" class="btn btn-warning">Spravovat plán</a></li>
-            <li n:if="$user->isAllowed('Metadata','default')" style="margin-bottom: 10px;"><a n:href="Metadata:default?floor=$floor->id" class="btn btn-danger">Spravovat revize metadat</a></li>
-            <li n:if="!$user->isAllowed('Metadata','default')"><a n:href="Metadata:proposal?floor=$floor->id" class="btn btn-primary">Vytvořit návrh</a></li>
+            <div n:if="$user->isAllowed('Floor','edit')" style="margin-bottom: 20px;"><a n:href="edit?id=$floor->id" class="btn btn-small btn-primary">Upravit základní informace</a>
+                <a n:href="delete!?id=$floor->id" data-confirm="Opravdu chcete smazat data tohoto podlaží, včetně zadaných plánů a metadata?" class="btn btn-small btn-danger">Odstranit podlaží</a></div>
+            <div>
+                <a n:if="$user->isAllowed('Plan','default')" n:href="Plan:default?floor=$floor->id" class="btn btn-info">Správa mapových podkladů</a>
+                <a n:if="$user->isAllowed('Metadata','default')" n:href="Metadata:default?floor=$floor->id" class="btn btn-info">Správa metadat</a></div>
+                <a n:if="!$user->isAllowed('Metadata','default')" n:href="Metadata:proposal?floor=$floor->id" class="btn btn-primary">Vytvořit návrh</a>
+            </div>
         </ul>
     </div>
 </div>
@@ -34,4 +35,5 @@
     Toto podlaží nemá publikovány žádná metadata.
 </div>
 <h4>Aktuálně publikovaný plán a metadata:</h4>
-{control map, size=>['100%','700px']}
+{control map, size=>['100%','500px']}
+<br>
