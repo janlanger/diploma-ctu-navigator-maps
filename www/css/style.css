@@ -100,3 +100,15 @@ div.list-row:hover{
 #map_canvas-modal img {
     max-width: none
 }
+
+form label:after {
+    color: #323333;
+    content: ':';
+    display: inline;
+}
+
+form label.required:after {
+    color: #323333;
+    content: ':*';
+    display: inline;
+}
