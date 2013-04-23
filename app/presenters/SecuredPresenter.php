@@ -18,8 +18,8 @@ abstract class SecuredPresenter extends BasePresenter {
                 $this->flashMessage('Vaše sezení vypršelo. Přihlašte se prosím znovu, původní požadavek bude poté obnoven.', self::FLASH_ERROR);
             }
 
-            $backlink = $this->getApplication()->storeRequest();
-            $this->redirect('Sign:in', array('backlink' => $backlink));
+            $backlink = $this->storeRequest();
+            $this->redirect('Sign:in', array('key' => $backlink));
         } else {
 /*            if(!$user->isAllowed('Admin:Dashboard','default')) {
                 $this->flashMessage('Nemáte potřebná oprávnění.', self::FLASH_ERROR);
