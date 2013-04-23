@@ -112,3 +112,7 @@ form label.required:after {
     content: ':*';
     display: inline;
 }
+
+form label.checkbox:after {
+    content: '';
+}
