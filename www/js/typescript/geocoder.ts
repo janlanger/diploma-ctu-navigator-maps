@@ -11,6 +11,9 @@ module Mapping {
         constructor(private mapping:BasicMap, private button, private source, private destination) {
             $(window).load(() => {
                 $("#"+this.button).click((event) => {this.buttonClicked(event)});
+                google.maps.event.addListener(this.mapping.map, 'click', (event) => {
+                    this.setMarkerPosition(event.latLng)
+                });
                 if(this.getMarker()) {
                     this.setCallback(this.getMarker());
                 }
@@ -18,7 +21,12 @@ module Mapping {
         }
 
         public buttonClicked(event) {
-            var address = $("#"+this.source).val();
+            var address = $("#"+this.source).val().trim();
+            if(address == "") {
+                alert("Zadejte prosím adresu budovy.");
+                $("#" + this.source).focus();
+                return;
+            }
             var geocoder = new google.maps.Geocoder();
             geocoder.geocode(
                 {address: address, region: 'cz'},
@@ -56,6 +64,9 @@ module Mapping {
                 this.mapping.map.setCenter(result[0].geometry.location);
                 this.mapping.map.setZoom(16);
                 this.setMarkerPosition(result[0].geometry.location)
+            }
+            else if(status == "ZERO_RESULTS") {
+                alert("Tuto adresu se bohužel nepodařilo najít. Umístěte značku na správnou pozici ručně.");
             }
             else {
                 console.log('ERROR: '+status);

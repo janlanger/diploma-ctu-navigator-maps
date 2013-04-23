@@ -1,24 +1,38 @@
 {block #pageTitle}Editace budovy{/block}
 
 {block #content}
-<div class="row">
-    <div class="span6">
 {form form}
-    {pair name}
-    <div id="frmform-address-pair" class="control-group required">
-        {label address /}
-        <div class="controls">
-            {input address} <a href="#" id="gps-search" class="btn btn-small btn-info" title="Vyhledat GPS souřadnice podle adresy"><i class="icon-globe icon-white"></i></a>
+<div class="row" style="margin-left: 0px;">
+
+    <div class="span6">
+        {pair name}
+        <div id="frmform-address-pair" class="control-group required">
+            {label address /}
+            <div class="controls">
+                {input address} <a href="#" id="gps-search" class="btn btn-small btn-info"
+                                   title="Vyhledat GPS souřadnice podle adresy"><i
+                            class="icon-globe icon-white"></i></a>
+            </div>
+        </div>
+        {pair gpsCoordinates}
+        {pair floorCount}
+        {pair roomPrefix}
+        <div>Všechny pole formuláře jsou povinné</div>
+    </div>
+
+    <div class="span6">
+        <div style="width: 100%; max-width: 500px; margin: auto; margin-right: 0px;">
+            {control googleMapGeocoder, "size"=>["100%","250px"]}
+
+            <p>Použijte tlačítko <i class="icon-globe"></i> k nalezení zadané adresy na mapě. Kliknutím do mapy a
+                táhnutím za značku ji nastavte na střed zadávané budovy.</p>
         </div>
     </div>
-    {pair gpsCoordinates}
-    {pair floorCount}
-    {pair roomPrefix}
-    {form buttons}
-
-{/form}
-    </div>
-    <div class="span6">
-        {control googleMapGeocoder, "size"=>["300px","300px"]}
-    </div>
 </div>
+<div class="row" style="margin-left: 0px;">
+    <div class="span12">
+        {form buttons}
+    </div>
+
+</div>
+{/form}

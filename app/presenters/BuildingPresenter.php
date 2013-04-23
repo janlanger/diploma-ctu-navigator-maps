@@ -28,6 +28,9 @@ class BuildingPresenter extends SecuredPresenter {
 
     public function actionAdd() {
         $this['form']->bindEntity($this->getRepository("building")->createNew());
+        $this['googleMapGeocoder']->setCenter("50.087547,14.433289");
+        $this['googleMapGeocoder']->setZoomLevel(12);
+
     }
 
     public function actionEdit($id) {
