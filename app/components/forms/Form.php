@@ -16,19 +16,19 @@ use Nextras\Forms\Controls\OptionList;
 //setup of default rule messages
 
 \Nette\Forms\Rules::$defaultMessages = array(
-		NForm::PROTECTION => 'Bezpečnostní kód nesouhlasí, možný CSRF útok. Zkuste odeslat formulář znovu.',
+		NForm::PROTECTION => 'Došlo k chybě při odesílání formuláře. Zkuste to prosím znovu.',
 		NForm::EQUAL => 'Prosím vložte %s.',
-		NForm::FILLED => 'Pole %label je povinné.',
-		NForm::MIN_LENGTH => 'Please enter a value of at least %d characters.',
-		NForm::MAX_LENGTH => 'Please enter a value no longer than %d characters.',
-		NForm::LENGTH => 'Please enter a value between %d and %d characters long.',
-		NForm::EMAIL => 'Please enter a valid email address.',
-		NForm::URL => 'Please enter a valid URL.',
-		NForm::INTEGER => 'Please enter a numeric value.',
-		NForm::FLOAT => 'Please enter a numeric value.',
-		NForm::RANGE => 'Please enter a value between %d and %d.',
-		NForm::MAX_FILE_SIZE => 'The size of the uploaded file can be up to %d bytes.',
-		NForm::IMAGE => 'The uploaded file must be image in format JPEG, GIF or PNG.',
+		NForm::FILLED => 'Vyplňte prosím pole %label.',
+		NForm::MIN_LENGTH => 'Do pole %label vyplňte prosím alespoň %d znaků.',
+		NForm::MAX_LENGTH => 'Prosím vyplňte nejvýše %d znaků do pole $label.',
+		NForm::LENGTH => 'Do pole %label vyplňte minimálně %d a maximálně %d znaků.',
+		NForm::EMAIL => 'Zkontrolujte prosím e-mailovou adresu v poli %label.',
+		NForm::URL => 'Do pole %label zadejte prosím URL adresu ve správném formátu.',
+		NForm::INTEGER => 'Do pole %label prosím zadejte celočíselnou hodnotu.',
+		NForm::FLOAT => 'Do pole %label prosím zadejte číselnou hodnotu.',
+		NForm::RANGE => 'Do pole %label prosím vyplňte číslo mezi %d a %d.',
+		NForm::MAX_FILE_SIZE => 'Maximální velikost nahraného souboru může být %d bytů.',
+		NForm::IMAGE => 'Nahraný soubor musí být obrázek ve formátu JPEG, GIF nebo PNG.',
 	);
 
 class Form extends AppForm {
