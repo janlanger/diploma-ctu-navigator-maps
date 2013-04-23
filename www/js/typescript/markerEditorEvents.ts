@@ -58,6 +58,12 @@ module Mapping {
                 event.preventDefault();
                 _this.editor.ActiveMarkerType = this.id.substring(7);
             });
+
+            $(document).keyup((e) => {
+                if (e.keyCode == 27) {
+                    this.mapRightClicked();
+                }
+            });
         }
 
         // --- map events
