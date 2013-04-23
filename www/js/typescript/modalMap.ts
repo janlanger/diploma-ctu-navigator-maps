@@ -146,7 +146,7 @@ module Mapping {
         }
 
         private createInfoText(type) {
-            return "Musíte vybrat bod typu " + this.editor.readableNodeType(type)
+            return "Musíte vybrat bod typu " + this.editor.readableNodeType(type) +" - <img src='"+this.editor.getMarkerIcon(type).url+"'>."
         }
 
         private fitModalBody(modal) {
