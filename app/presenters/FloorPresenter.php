@@ -100,9 +100,15 @@ class FloorPresenter extends SecuredPresenter {
         $form->addText('floorNumber', 'Číslo podlaží')
                 ->setRequired()
                 ->addRule(Form::NUMERIC)
-                ->setOption('description', 'Kolikáté je toto patro nad úrovní ulice.');
-        $form->addText('name', 'Popisek podlaží');
-        //$form->addHidden('building');
+                ->setOption('description', 'Kolikáté je toto patro nad úrovní ulice. Přízemí = 0');
+        $form->addText('name', 'Popisek podlaží')
+            ->setRequired()
+            ->setOption('description', 'Označení patra obvyklé v dané budově.');
+        $form->addText('floorHeight', 'Výška patra')
+            ->setRequired()
+            ->addRule(Form::FLOAT)
+            ->setOption("description", 'Přibližná výška stropu v podlaží. Hodnota slouží k odhadu délky schodiště.');
+
 
         $form->addSubmit('ok', 'Uložit');
         $form->onComplete[] = function($entity) use ($form) {
