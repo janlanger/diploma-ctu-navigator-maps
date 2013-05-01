@@ -23,9 +23,11 @@ use Maps\Model\Floor\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\Node;
+use Maps\Model\Metadata\NonBlockingHttp;
 use Maps\Model\Metadata\ProposalProcessor;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\FloorExchangePaths;
+use Maps\Model\Metadata\Queries\OtherAffectedFloors;
 use Maps\Model\Metadata\Queries\ProposalsGridQuery;
 use Maps\Model\Metadata\Queries\RevisionDictionary;
 use Maps\Model\Metadata\Queries\RevisionGridQuery;
@@ -33,6 +35,8 @@ use Maps\Model\Metadata\Queries\RevisionProcessor;
 use Maps\Model\Metadata\Revision;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Forms\Controls\SubmitButton;
+use Nette\Http\Url;
+use Nette\Http\UrlScript;
 use Nette\Utils\Html;
 
 class MetadataPresenter extends SecuredPresenter {
@@ -150,9 +154,29 @@ class MetadataPresenter extends SecuredPresenter {
                 $newOne->setPublishedDate(new \DateTime());
 
                 $repository->save();
+
+                //inform core
+
+                $data = $this->getRepository('meta_floor_connection')->fetch(new OtherAffectedFloors([$oldOne, $newOne]));
+                $floors = [$newOne->getFloor()->id];
+                foreach($data as $x) {
+                    $floors[] = $x['id'];
+                }
+                $floors = array_unique($floors);
+
+                $url = new Url($this->getContext()->parameters['coreUpdatePing']['url']);
+                $url->appendQuery(['floors' => $floors]);
+
+                $request = new NonBlockingHttp($url->getAbsoluteUrl());
+                $request->setNoHttpsCheck(TRUE);
+                $request->addHeader("Authorization", $this->getContext()->parameters['coreUpdatePing']['apikey']);
+
+                $request->execute();
             });
+
             $this->flashMessage("Revize byla publikována.", self::FLASH_SUCCESS);
         } catch (\Exception $e) {
+            throw $e;
             $this->flashMessage("Nepodařilo se publikocat revizi.", self::FLASH_ERROR);
         }
 

@@ -22,6 +22,9 @@ common:
             collation: utf8_czech_ci
         google:
             apiKey: AIzaSyBTcOLRLRr9kEYkl98O1oFxicSsVqmdaIk
+        coreUpdatePing:
+            url: "https://navigator.fit.cvut.cz/api/1/map/update/"
+            apikey: "Bearer 0123456789"
         api:
             keys:
                 - 123 #CTU Navigator core
