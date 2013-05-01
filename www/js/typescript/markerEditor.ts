@@ -272,7 +272,7 @@ module Mapping {
             window.open(this.map, marker);
         }
 
-        private createMarkerForm(element, marker:google.maps.Marker, window:google.maps.InfoWindow) {
+        private createMarkerForm(element, marker:google.maps.Marker, infoWindow:google.maps.InfoWindow) {
             var html = element.clone(true, true);
             var _this = this;
 
@@ -309,7 +309,7 @@ module Mapping {
             room.attr('autocomplete', 'off');
             room.typeahead({
                 source: (query, process) => {
-                    return $.get("http://navigator.jamrtal.cz/api/1/kos/rooms",
+                    return $.get("https://navigator.fit.cvut.cz/api/1/kos/rooms",
                         {query: "code==*" + this.options.roomPrefix + query + "*"},
                         (data)=> {
                             return process(data.rooms);
@@ -339,14 +339,14 @@ module Mapping {
                 }
 
                 event.stopPropagation();
-                window.close();
+                infoWindow.close();
                 return false;
             });
 
             $("input[name=delete]", html).click((event) => {
                 this.removeNode(marker);
                 event.stopPropagation();
-                window.close();
+                infoWindow.close();
                 return false;
             });
             html.removeAttr('id');
