@@ -295,7 +295,8 @@ module Mapping {
             room.attr('autocomplete', 'off');
             room.typeahead({
                 source: (query, process) => {
-                    return $.get("http://navigator.jamrtal.cz/api/1/kos/rooms",
+                    var schema = window.location.protocol;
+                    return $.get("//navigator.fit.cvut.cz/api/1/kos/rooms",
                         {query: "code==*" + this.options.roomPrefix + query + "*"},
                         (data)=> {
                             return process(data.rooms);
