@@ -101,7 +101,7 @@ class PlanPresenter extends SecuredPresenter {
         }
         $plan->setInPublishQueue(TRUE);
 
-        $toUnpublish = $this->getRepository('plan')->findBy(['inPublishQueue' => TRUE]);
+        $toUnpublish = $this->getRepository('plan')->findBy(['inPublishQueue' => TRUE, 'floor' => $plan->getFloor()]);
         foreach($toUnpublish as $p) {
             if($p->id != $plan->id) {
                 $p->inPublishQueue = FALSE;
@@ -112,29 +112,6 @@ class PlanPresenter extends SecuredPresenter {
 
         $this->flashMessage('Publikace plánu byla zařazena ke zpracování do dlaždic. Vygenerování dlaždic trvá cca 5 minut.', self::FLASH_SUCCESS);
         $this->redirect('this');
-    }
-
-    public function handleRender() {
-        set_time_limit(180);
-        //load all plans in queue
-        $plans = $this->getRepository('plan')->findBy(['inPublishQueue'=>TRUE, 'published'=>FALSE]);
-        $repository = $this->getRepository('plan');
-
-        //each
-        foreach($plans as $plan) {
-            //unset actualy active plan
-            $q = new DeactivatePlansOfFloorQuery($plan->floor);
-            $q->getQuery($repository)->execute();
-            //set queued plan as active
-            $plan->setPublished(TRUE);
-            $plan->setPublishedDate(new \DateTime());
-            $plan->setInPublishQueue(FALSE);
-            //generate plan
-            $this->getContext()->tiles->generateTiles($plan);
-        }
-        $repository->getEntityManager()->flush();
-
-        $this->redirect('default');
     }
 
     public function createComponentGrid($name) {
