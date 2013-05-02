@@ -72,9 +72,14 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
                 // he was authenticated
                 //try finding user in db
                 $row = $this->service->getUserByLogin($username);
-                if ($row == NULL)
+                if ($row == NULL) {
                     //not in database - create him
                     $row = $this->registerUser($username, $userInfo);
+                } else {
+                    //he was in db - update info
+                    $this->setUserInfo($userInfo, $row);
+                    $this->service->save($row);
+                }
             }
             else {
                 throw new \Nette\InvalidStateException("Unknown LDAP error.");
@@ -92,11 +97,23 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
     private function registerUser($username, $info) {
         $user = $this->service->createBlank();
         $user->username = $username;
-        $user->name = $info['cn'][0];
-        $user->mail = $info['mail'][0];
+        $this->setUserInfo($info, $user);
         $user->role = 'registered';
 
         $this->service->save($user);
         return $user;
+    }
+
+    private function setUserInfo($info, User $user) {
+        $user->mail = (isset($info['preferredemail']) && !empty($info['preferredemail'])) ? $info['preferredemail'][0] : $info['mail'][0];
+
+        $given = $info['givenname'];
+        unset($given['count']);
+        $name = implode(" ", $given);
+        $sn = $info['sn'];
+        unset($sn['count']);
+        $name .= " ".implode(" ", $sn);
+
+        $user->setName($name);
     }
 }
