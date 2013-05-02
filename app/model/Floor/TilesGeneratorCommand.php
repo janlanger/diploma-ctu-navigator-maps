@@ -12,6 +12,7 @@ namespace Maps\Model\Floor;
 
 use Doctrine\ORM\EntityManager;
 use Maps\Model\Dao;
+use Nette\Diagnostics\Debugger;
 use Nette\NotImplementedException;
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -111,7 +112,9 @@ class TilesGeneratorCommand extends Command {
                 $output->writeln("New plan for " . $floorName . " was published" . PHP_EOL);
             } catch (\Exception $e) {
                 $this->repository->getEntityManager()->rollback();
-                $output->writeln(PHP_EOL . 'There was an unexpected exception during publishing. Check the logs dir for mor information.' . PHP_EOL . ' Aborting.');
+                Debugger::log($e);
+                $output->writeln(PHP_EOL . 'There was an unexpected exception during publishing - '.$e->getMessage().PHP_EOL.
+                    'Check the logs dir for more information.' . PHP_EOL . 'Aborting.');
             }
 
         }

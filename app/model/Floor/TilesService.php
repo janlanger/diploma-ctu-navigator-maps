@@ -32,11 +32,14 @@ class TilesService extends Object {
     private $maxZoom=21;
     private $minZoom=16;
 
+    private $tmpDir;
+
     public function __construct($baseUrl, $wwwDir, $minZoom, $maxZoom) {
         $this->baseUrl = $baseUrl;
         $this->wwwDir = $wwwDir;
         $this->minZoom = $minZoom;
         $this->maxZoom = $maxZoom;
+        $this->tmpDir = WWW_DIR.'/../temp/gdal';
     }
 
     public function getTilesBasePath($plan) {
@@ -50,26 +53,35 @@ class TilesService extends Object {
             throw new InvalidStateException('All reference points are not set.');
         }
         $this->plan = $plan;
+        if(!is_dir($this->tmpDir)) {
+            mkdir($this->tmpDir, 0777, TRUE);
+        }
 
 
 
         $this->sourceFile = $this->prepareFile(WWW_DIR.'/data/plans/raw/'.$plan->getPlan(), $plan->getSourceFilePage());
         $this->wrapper = new GDALWrapper();
+
+
         $file = $this->translateImage();
-        $dir = $this->prepareDirectory();
-        $this->generate($file, $dir);
+        $tilesTemp = $this->tmpDir.'/'.str_replace($this->baseUrl."/", '', $this->getTilesBasePath($plan));
 
-
+        $this->generate($file, $tilesTemp);
+        $this->moveToFinalLocation($tilesTemp);
         $this->computeBoundingCoordinates($this->plan);
 
         $this->plan->setMaxZoom($this->maxZoom);
         $this->plan->setMinZoom($this->minZoom);
 
         //cleanup
-        foreach(Finder::findFiles(basename($file).'*')->in(WWW_DIR.'/../temp') as $f) {
-            unlink($f->getRealPath());
+        foreach(Finder::find('*')->from($this->tmpDir)->childFirst() as $f) {
+            if ($f->isDir()) {
+                @rmdir($f->getRealPath());
+            }
+            else {
+                @unlink($f->getRealPath());
+            }
         }
-        unlink($this->sourceFile);
     }
 
     private function translateImage() {
@@ -83,9 +95,10 @@ class TilesService extends Object {
         return $translated;
     }
 
-    private function prepareDirectory() {
+    private function moveToFinalLocation($tmpDir) {
         $tilesDir = $this->getTilesBasePath($this->plan);
-        $fullPath = $this->wwwDir.'/'.$tilesDir;
+        $fullPath = WWW_DIR.'/'.$tilesDir;
+        $tmpDir = realpath($tmpDir);
 
         if(is_dir($fullPath)) {
             //delete contents
@@ -100,16 +113,31 @@ class TilesService extends Object {
         } else {
             mkdir($fullPath,0777,TRUE);
         }
+        foreach (Finder::find('*')->from($tmpDir) as $file) {
+            $newPath = str_replace($tmpDir, $fullPath, $file->getRealPath());
+            if($file->isDir() && !is_dir($newPath)) {
+                mkdir($newPath, 0777, TRUE);
+            } else {
+                copy($file->getRealPath(), $newPath);
+            }
+        }
+
         return $fullPath;
     }
 
     private function generate($file, $destination) {
+        if(!is_dir($destination)) {
+            mkdir($destination, 0777, TRUE);
+        }
         $this->wrapper->generate($file, $destination, $this->minZoom, $this->maxZoom);
     }
 
     private function prepareFile($sourcePath, $page=NULL) {
+        if(!file_exists($sourcePath)) {
+            throw new InvalidStateException("Source file does not exists.");
+        }
         $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $sourcePath);
-        $tempFile = $this->wwwDir.'/../temp/gdal_temp.png';
+        $tempFile = $this->tmpDir.'/gdal_temp.png';
         if(is_file($tempFile)) {
             @unlink($tempFile);
         }

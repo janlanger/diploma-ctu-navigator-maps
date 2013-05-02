@@ -57,7 +57,7 @@ class ImageMagick extends Image
      * @param  string  detected image format
      * @param  string
      */
-    public function __construct($file, $page=null, & $format = NULL)
+    public function __construct($file, $page=NULL, & $format = NULL)
     {
         if(!function_exists('exec')) {
             throw new \InvalidArgumentException("exec() function doesn't exists, probably disabled.");
@@ -182,7 +182,7 @@ class ImageMagick extends Image
      * @param  int  optional image type
      * @return bool TRUE on success or FALSE on failure.
      */
-    public function save($file = NULL, $quality = NULL, $type = NULL, $options = null)
+    public function save($file = NULL, $quality = NULL, $type = NULL, $options = NULL)
     {
         if ($this->file === NULL) {
             return parent::save($file, $quality, $type);
@@ -225,10 +225,10 @@ class ImageMagick extends Image
      * @param  string|bool  process output?
      * @return string
      */
-    private function execute($command, $output = NULL, $options= null)
+    private function execute($command, $output = NULL, $options= NULL)
     {
         $arguments = "";
-        if($options != null) {
+        if($options != NULL) {
             foreach($options as $argument => $value) {
                 $arguments.=' -'.$argument;
                 if(!is_bool($value)) {
@@ -238,7 +238,7 @@ class ImageMagick extends Image
         }
 
 
-        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file.($this->page!=null?"[".$this->page."]":"")), $command);
+        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file.($this->page!=NULL?"[".$this->page."]":"")), $command);
         if ($output) {
             $newFile = is_string($output)
                 ? $output
@@ -250,12 +250,11 @@ class ImageMagick extends Image
 
         $lines = array();
         exec(self::$path . $command, $lines, $status); // $status: 0 - ok, 1 - error, 127 - command not found?
-
+        if ($status != 0) {
+            throw new \Exception("Unknown error while calling ImageMagick. Command " . $command);
+        }
         if ($output) {
-            if ($status != 0) {
-                dump($lines);
-                throw new \Exception("Unknown error while calling ImageMagick. Command ".$command);
-            }
+
             if ($this->isTemporary) {
                 unlink($this->file);
             }

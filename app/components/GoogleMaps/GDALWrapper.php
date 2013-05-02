@@ -32,7 +32,7 @@ class GDALWrapper extends Object {
 
     public function translate($source, $destination, $topLeft, $topRight, $bottomRight) {
         $image = new ImageMagick($source);
-        $command= 'gdal_translate -of GTiff';
+        $command= 'gdal_translate -of GTiff -expand rgba';
         $topLeft = explode(",", $topLeft);
         $topRight = explode(",", $topRight);
         $bottomRight = explode(",", $bottomRight);
