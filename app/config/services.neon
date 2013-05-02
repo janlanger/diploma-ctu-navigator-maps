@@ -19,3 +19,6 @@ services:
         tags: [doctrineEvent]
 
     tiles: Maps\Model\Floor\TilesService('data/tiles',%wwwDir%, 18,22)
+    tileGenerator:
+        class: Maps\Model\Floor\TilesGeneratorCommand(@doctrine.entityManager::getRepository(Maps\Model\Floor\Plan), @tiles)
+        tags: [consoleCommand]
