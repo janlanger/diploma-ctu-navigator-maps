@@ -27,7 +27,7 @@ common:
             apikey: "Bearer 0123456789"
         api:
             keys:
-                - 123 #CTU Navigator core
+                123 : Navigator Core
 
 
     php:

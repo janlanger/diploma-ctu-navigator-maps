@@ -21,6 +21,7 @@ use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\ActiveFloorConnections;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\SingleNode;
+use Maps\Tools\JsonErrorResponse;
 use Nette\Application\BadRequestException;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\Responses\TextResponse;
@@ -41,9 +42,9 @@ class ApiPresenter extends BasePresenter {
         if (isset($this->context->parameters['api'])) {
             $allowedKeys = $this->context->parameters['api']['keys'];
         }
-        if ($this->apikey == NULL || !in_array($this->apikey, $allowedKeys)) {
+        if ($this->apikey == NULL || !isset($allowedKeys[$this->apikey])) {
             $this->getHttpResponse()->setCode(401);
-            $response = new TextResponse("API key was not included or it is invalid.");
+            $response = new JsonErrorResponse("API key was not included or it is invalid.");
             $this->sendResponse($response);
             $this->terminate();
         }
@@ -58,7 +59,12 @@ class ApiPresenter extends BasePresenter {
 
     private function badRequest($msg) {
         $this->getHttpResponse()->setCode(400);
-        $this->sendResponse(new TextResponse($msg));
+        $this->sendResponse(new JsonErrorResponse($msg));
+    }
+
+    private function notFound($msg) {
+        $this->getHttpResponse()->setCode(404);
+        $this->sendResponse(new JsonErrorResponse($msg));
     }
 
 
@@ -94,7 +100,7 @@ class ApiPresenter extends BasePresenter {
 
             $this->sendResponse(new JsonResponse($payload));
         } else {
-            throw new BadRequestException("Building #$id does not exists.", 404);
+            $this->notFound("Building #$id does not exists.");
         }
     }
 
@@ -132,7 +138,7 @@ class ApiPresenter extends BasePresenter {
             $this->sendResponse(new JsonResponse($payload));
         }
         else {
-            throw new BadRequestException("Building #$id does not exists.", 404);
+            $this->notFound("Building #$id does not exists.");
         }
     }
 
@@ -153,7 +159,7 @@ class ApiPresenter extends BasePresenter {
             $payload = $this->getFloorPayload($floor);
             $this->sendResponse(new JsonResponse($payload));
         } else {
-            throw new BadRequestException("Unknown Floor ID", 404);
+            $this->notFound("Unknown Floor ID");
         }
     }
 
@@ -169,7 +175,7 @@ class ApiPresenter extends BasePresenter {
             $this->sendResponse(new JsonResponse($this->getPlanPayload($plan)));
         }
         else {
-            throw new BadRequestException("Plan for floor $id does not exists.", 404);
+            $this->notFound("Plan for floor $id does not exists.");
         }
     }
 
@@ -215,7 +221,7 @@ class ApiPresenter extends BasePresenter {
             $this->sendResponse(new JsonResponse($payload));
         }
         else {
-            throw new BadRequestException("Floor $id does not have any metadata.", 404);
+            $this->notFound("Floor $id does not have any metadata.");
         }
     }
 
@@ -229,7 +235,7 @@ class ApiPresenter extends BasePresenter {
             $this->sendResponse(new JsonResponse($this->getNodePayload($node)));
         }
         else {
-            throw new BadRequestException("Node with id $id does not exists.", 404);
+            $this->notFound("Node with id $id does not exists.");
         }
     }
 
@@ -249,7 +255,7 @@ class ApiPresenter extends BasePresenter {
             $this->sendResponse(new JsonResponse($nodes));
         }
         else {
-            throw new BadRequestException("Floor with id $id does not exists or has no metadata.", 404);
+            $this->notFound("Floor with id $id does not exists or has no metadata.");
         }
     }
 
@@ -263,7 +269,7 @@ class ApiPresenter extends BasePresenter {
 
         $building = $this->getRepository('building')->fetchOne(new BuildingWithFloors($id));
         if($building == NULL) {
-            throw new BadRequestException("Building #$id does not exists.", 404);
+            $this->notFound("Building #$id does not exists.");
         }
         $floorIds = [];
         foreach ($building->getFloors() as $floor) {
