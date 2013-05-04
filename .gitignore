@@ -13,3 +13,4 @@ _thumbs
 /app/config/config.local.neon
 d.ts
 /www/js/typescript/*.js*
+docs
