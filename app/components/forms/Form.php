@@ -58,16 +58,6 @@ class Form extends AppForm {
         return $this[$name] = new \DateTimePicker($label, $cols, $maxLength);
     }
 
-    public function addCKeditor($name, $label = NULL, $cols = 40, $rows = 10) {
-
-        $area = $this[$name] = new CKTextArea($label, $this, $name, $cols, $rows);
-        $area->getControlPrototype()->class='ckeditor';
-        $area->addFilter(callback("\SeriesCMS\Tools\Mixed::sanitazeCKEditor"));
-        
-        $this->form->getElementPrototype()->onsubmit[] = 'CKEDITOR.instances["' . $area->getHtmlId() . '"].updateElement()';
-        return $area;
-    }
-
     public function addTagInput($name, $label, $items, $useKeys = TRUE) {
         return $this[$name] = new \SuggestPicker\SuggestPicker($label, $items, $useKeys);
     }
@@ -82,7 +72,7 @@ class Form extends AppForm {
 	}
         
         public function add3SCheckbox($name, $label = NULL) {
-            return $this[$name] = new \SeriesCMS\Components\Forms\CBox3S($label);
+            return $this[$name] = new CBox3S($label);
         }
 
     public function addSubmit($name, $caption = NULL) {

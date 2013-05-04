@@ -5,6 +5,7 @@ namespace Maps\Components\Forms;
 use Maps\Model\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
+use Maps\Model\Persistence\BaseFormProcessor;
 
 /**
  * Description of EntityForm
@@ -84,7 +85,7 @@ class EntityForm extends Form {
 
     /**
      *
-     * @return \SeriesCMS\Model\BaseService
+     * @return BaseFormProcessor
      */
     public function getEntityService() {
         return $this->entityService;

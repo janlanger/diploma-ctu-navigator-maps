@@ -5,7 +5,7 @@
  * @copyright (c) 2010, 2011 Lopo <lopo@lohini.net>
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3
  */
-namespace SeriesCMS\Components\Forms;
+namespace Maps\Components\Forms;
 
 use Nette\Utils\Html;
 
