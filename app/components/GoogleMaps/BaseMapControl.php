@@ -4,66 +4,90 @@ use Maps\InvalidStateException;
 use Maps\Model\Metadata\Queries\FloorByNodePropertiesId;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 10.2.13
- * Time: 22:30
- * To change this template use File | Settings | File Templates.
+ * Base class for all Google Maps components
+ * @author Jan Langer, <langeja1@fit.cvut.cz>
  */
 abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
+    /**
+     * @var string base icons path
+     */
     private $nodeIconBase;
 
+    /** @var array custom layer paths */
     private $customLayers = [];
+    /** @var bool show node legend in map? */
     private $showLegend = FALSE;
+
+    /** @var  string google API key */
     private $apiKey;
+    /** @var  string GPS position of center of map */
     private $center;
+    /** @var int map initial zoom level */
     private $zoomLevel=10;
+    /** @var array point definition */
     protected  $points = [];
 
+    /** @var  array path style detinition */
     private $pathOptions;
+    /** @var array paths definition */
     private $paths = [];
-
-
-
+    /** @var arrat node types definition */
     private $types;
 
+    /**
+     * @param string $apiKey
+     */
     public function setApiKey($apiKey) {
         $this->apiKey = $apiKey;
     }
 
-
-
+    /**
+     * Set custom layers array - rewrites already defined ones
+     * @param array $customLayers
+     */
     public function setCustomLayers($customLayers) {
         $this->customLayers = $customLayers;
     }
 
-
-
+    /**
+     * @return array
+     */
     public function getCustomLayers() {
         return $this->customLayers;
     }
 
-
-
+    /**
+     * @param array $paths
+     */
     public function setPaths($paths) {
         $this->paths = $paths;
     }
 
-
-
+    /**
+     * @return array
+     */
     public function getPaths() {
         return $this->paths;
     }
 
+    /**
+     * @param array $points
+     */
     public function setPoints($points) {
         $this->points = $points;
     }
 
+    /**
+     * @return array
+     */
     public function getPoints() {
         return $this->points;
     }
 
+    /**
+     * @return bool
+     */
     public function getShowLegend() {
         return $this->showLegend;
     }

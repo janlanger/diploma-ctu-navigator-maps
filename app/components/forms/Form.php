@@ -5,13 +5,8 @@ use Nette\Application\UI\Form AS AppForm;
 use Maps\Presenter\BasePresenter;
 use Kdyby\BootstrapFormRenderer\BootstrapRenderer;
 use Nette\Forms\Form as NForm;
+use Nette\Forms\IControl;
 use Nextras\Forms\Controls\OptionList;
-
-/**
- * Description of BaseForm
- *
- * @author Jan -Quinix- Langer
- */
 
 //setup of default rule messages
 
@@ -30,51 +25,84 @@ use Nextras\Forms\Controls\OptionList;
 		NForm::MAX_FILE_SIZE => 'Maximální velikost nahraného souboru může být %d bytů.',
 		NForm::IMAGE => 'Nahraný soubor musí být obrázek ve formátu JPEG, GIF nebo PNG.',
 	);
+/**
+ * Base form for every form in app. Adds extended field type to forms
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 
 class Form extends AppForm {
 
+    /**
+     * @inheritdoc
+     */
     public function __construct(\Nette\ComponentModel\IContainer $parent = NULL, $name = NULL) {
         parent::__construct($parent, $name);
         $this->addProtection();
         $this->setRenderer(new BootstrapRenderer());
-    /*    $render=$this->getRenderer();
-        $render->wrappers['label']['suffix']=":";
-        $render->wrappers['label']['requiredsuffix']="*";
-        $render->wrappers['controls']['container'] = 'table width=100%';
-        $render->wrappers['label']['container'] = 'th width=200';*/
-
-
     }
 
+    /**
+     * @param string $message adds form error as flash message
+     */
     public function addError($message) {
         if(trim($message) != "")
             $this->getPresenter()->flashMessage($message, BasePresenter::FLASH_ERROR);
         $this->valid = FALSE;
     }
 
+    /**
+     * Creates date time picker field
+     *
+     * @param string $name field internal name
+     * @param string $label field label
+     * @param string $cols
+     * @param string $maxLength
+     * @return \DateTimePicker
+     */
     public function addDateTimePicker($name, $label, $cols = NULL, $maxLength = NULL) {
-        
-
         return $this[$name] = new \DateTimePicker($label, $cols, $maxLength);
     }
 
+    /**
+     * Adds suggested (autocomplete) input
+     *
+     * @param $name
+     * @param $label
+     * @param $items
+     * @param bool $useKeys
+     * @return \SuggestPicker\SuggestPicker
+     */
     public function addTagInput($name, $label, $items, $useKeys = TRUE) {
         return $this[$name] = new \SuggestPicker\SuggestPicker($label, $items, $useKeys);
     }
 
-	public function addFileUpload($name, $label = NULL)
+    /**
+     * Added extended file upload field
+     *
+     * @param $name
+     * @param null $label
+     * @return FileUpload
+     */
+    public function addFileUpload($name, $label = NULL)
 	{
 		return $this[$name] = new FileUpload($label, $this, $name);
 	}
-	
-	public function addCaptcha($name, $label = NULL) {
-		return $this[$name] = new \PhraseCaptcha();
-	}
-        
-        public function add3SCheckbox($name, $label = NULL) {
-            return $this[$name] = new CBox3S($label);
-        }
 
+    /**
+     * Adds 3-state checkbox field
+     *
+     * @param string $name
+     * @param string $label
+     * @return CBox3S
+     */
+    public function add3SCheckbox($name, $label = NULL) {
+        return $this[$name] = new CBox3S($label);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addSubmit($name, $caption = NULL) {
         $component = parent::addSubmit($name, $caption);
         $component->getControlPrototype()->addClass("btn-primary");
@@ -82,15 +110,24 @@ class Form extends AppForm {
 
     }
 
+    /**
+     * Adds options list field container
+     *
+     * @param string $name
+     * @param string $label
+     * @param array $items
+     * @return OptionList
+     */
     public function addOptionList($name, $label = NULL, array $items = NULL) {
         return $this[$name] = new OptionList($label, $items);
     }
 
     /**
-     * @param $name
-     * @param $caption
-     * @param $parent
-     * @param $callback
+     * @param string $name
+     * @param string $caption
+     * @param IControl $parent root element
+     * @param $callback root element changed event
+     * @param bool $autoselect execute autoselect of first item in root element?
      * @return JsonDependentSelectBox
      */
     public function addDependedSelect($name, $caption, $parent, $callback, $autoselect = TRUE) {
