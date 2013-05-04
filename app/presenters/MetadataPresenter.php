@@ -176,8 +176,7 @@ class MetadataPresenter extends SecuredPresenter {
 
             $this->flashMessage("Revize byla publikována.", self::FLASH_SUCCESS);
         } catch (\Exception $e) {
-            throw $e;
-            $this->flashMessage("Nepodařilo se publikocat revizi.", self::FLASH_ERROR);
+            $this->flashMessage("Nepodařilo se publikovat revizi.", self::FLASH_ERROR);
         }
 
         $this->redirect("default");
