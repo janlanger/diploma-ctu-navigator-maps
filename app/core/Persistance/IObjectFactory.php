@@ -11,9 +11,10 @@ namespace Maps\Model\Persistence;
 interface IObjectFactory
 {
 
-	/**
-	 * @return object
-	 */
+    /**
+     * @param array $arguments
+     * @return object
+     */
 	function createNew($arguments = array());
 
 }

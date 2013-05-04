@@ -1,17 +1,16 @@
 <?php
 namespace Maps\Presenter;
-use App\Model\Proxies\__CG__\Maps\Model\Building\Building;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\BasicMap;
+use Maps\Model\Building\Building;
 use Maps\Model\Floor\ActivePlanQuery;
-use Maps\Model\Floor\Node;
-use Maps\Model\Floor\Path;
+use Maps\Model\Metadata\Node;
+use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\CountUnprocessedProposals;
 use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\Diagnostics\Debugger;
-use Nette\NotImplementedException;
 
 /**
  * Created by JetBrains PhpStorm.

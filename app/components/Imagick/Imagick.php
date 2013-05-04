@@ -11,6 +11,9 @@
 
 namespace Maps\Components;
 
+use Maps\InvalidArgumentException;
+use Maps\InvalidStateException;
+use Maps\ShellCommandException;
 use Nette;
 use Nette\Image;
 
@@ -60,23 +63,23 @@ class ImageMagick extends Image
     public function __construct($file, $page=NULL, & $format = NULL)
     {
         if(!function_exists('exec')) {
-            throw new \InvalidArgumentException("exec() function doesn't exists, probably disabled.");
+            throw new InvalidArgumentException("exec() function doesn't exists, probably disabled.");
         }
 
         exec("convert -version", $out, $returnCode);
 
         if(!Nette\Utils\Strings::startsWith($out[0],'Version: ImageMagick')) {
-            throw new \InvalidArgumentException("ImageMagick is not installed, or I cannot execute it.");
+            throw new InvalidArgumentException("ImageMagick is not installed, or I cannot execute it.");
         }
 
         if($returnCode != 0) {
-            throw new \InvalidArgumentException("exec(convert -version) returned code ".$returnCode.", so it propably doesn't work...");
+            throw new InvalidArgumentException("exec(convert -version) returned code ".$returnCode.", so it propably doesn't work...");
         }
 
 
 
         if (!is_file($file)) {
-            throw new \InvalidArgumentException("File '$file' not found.");
+            throw new InvalidArgumentException("File '$file' not found.");
         }
         $this->page = $page;
         $format = $this->setFile(realpath($file));
@@ -211,7 +214,7 @@ class ImageMagick extends Image
         $this->file = $file;
         $res = $this->execute('identify -format "%w,%h,%m" ' . escapeshellarg($this->file));
         if (!$res) {
-            throw new \Exception("Unknown image type in file '$file' or ImageMagick not available.");
+            throw new InvalidStateException("Unknown image type in file '$file' or ImageMagick not available.");
         }
         list($this->width, $this->height, $format) = explode(',', $res, 3);
         return $format;
@@ -251,7 +254,7 @@ class ImageMagick extends Image
         $lines = array();
         exec(self::$path . $command, $lines, $status); // $status: 0 - ok, 1 - error, 127 - command not found?
         if ($status != 0) {
-            throw new \Exception("Unknown error while calling ImageMagick. Command " . $command);
+            throw new ShellCommandException("Unknown error while calling ImageMagick. Command " . $command);
         }
         if ($output) {
 

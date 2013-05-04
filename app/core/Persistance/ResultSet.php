@@ -6,6 +6,8 @@ namespace Maps\Model\Persistence;
 use Doctrine\ORM;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator as ResultPaginator;
+use Maps\InvalidArgumentException;
+use Maps\InvalidStateException;
 use Nette;
 use Nette\Utils\Strings;
 use Nette\Utils\Paginator as UIPaginator;
@@ -38,7 +40,7 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 	/**
 	 * @param \Doctrine\ORM\QueryBuilder|\Doctrine\ORM\Query $query
 	 *
-	 * @throws \InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function __construct($query)
 	{
@@ -49,7 +51,7 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 			$this->query = $query;
 
 		} else {
-			throw new \InvalidArgumentException("Given argument is not instanceof Query or QueryBuilder.");
+			throw new InvalidArgumentException("Given argument is not instanceof Query or QueryBuilder.");
 		}
 	}
 
@@ -58,13 +60,13 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 	/**
 	 * @param string|array $columns
 	 *
-	 * @throws \InvalidStateException
+	 * @throws InvalidStateException
 	 * @return ResultSet
 	 */
 	public function applySorting($columns)
 	{
 		if ($this->paginatedQuery !== NULL) {
-			throw new \InvalidStateException("Cannot modify result set, that was fetched from storage.");
+			throw new InvalidStateException("Cannot modify result set, that was fetched from storage.");
 		}
 
 		$sorting = array();
@@ -92,13 +94,13 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 	 * @param int $offset
 	 * @param int $limit
 	 *
-	 * @throws \Nette\InvalidStateException
+	 * @throws InvalidStateException
 	 * @return ResultSet
 	 */
 	public function applyPaging($offset, $limit)
 	{
 		if ($this->paginatedQuery !== NULL) {
-			throw new \Nette\InvalidStateException("Cannot modify result set, that was fetched from storage.");
+			throw new InvalidStateException("Cannot modify result set, that was fetched from storage.");
 		}
 
 		$this->query->setFirstResult($offset);

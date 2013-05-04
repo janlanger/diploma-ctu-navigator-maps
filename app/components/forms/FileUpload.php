@@ -6,15 +6,14 @@ use Nette\Environment;
 use Nette\Utils\Html;
 
 /**
- * Description of FileField
+ * Adds ability to download and delete previously uploaded file
  *
  * @author Jan -Quinix- Langer
  */
 class FileUpload extends \Nette\Forms\Controls\UploadControl {
 
 	private $defaultValue = '';
-        
-        private $deleteOption = true;
+    private $deleteOption = true;
 
 	public function __construct($label, $form, $name) {
 		parent::__construct($label);

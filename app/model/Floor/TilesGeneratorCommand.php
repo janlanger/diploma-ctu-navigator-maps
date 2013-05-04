@@ -13,7 +13,6 @@ namespace Maps\Model\Floor;
 use Doctrine\ORM\EntityManager;
 use Maps\Model\Dao;
 use Nette\Diagnostics\Debugger;
-use Nette\NotImplementedException;
 use Nette\Object;
 use Nette\Utils\Strings;
 use Symfony\Component\Console\Command\Command;

@@ -12,8 +12,7 @@ namespace Maps\Model\Floor;
 
 use Maps\Components\GoogleMaps\GDALWrapper;
 use Maps\Components\ImageMagick;
-use Nette\InvalidStateException;
-use Nette\NotImplementedException;
+use Maps\InvalidStateException;
 use Nette\Object;
 use Nette\Utils\Finder;
 use Nette\Utils\Strings;

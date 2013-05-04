@@ -10,12 +10,9 @@
 namespace Maps\Core;
 
 use Nette\Application\IRouter;
-use Nette\InvalidArgumentException;
-use Nette\Http\Request as HttpRequest;
 use Nette\Application\Request;
 use Nette\Http\IRequest;
 use Nette\Http\Url;
-use Nette\InvalidStateException;
 use Nette\Utils\Strings;
 use Nette;
 

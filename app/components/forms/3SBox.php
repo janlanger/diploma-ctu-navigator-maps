@@ -7,6 +7,7 @@
  */
 namespace Maps\Components\Forms;
 
+use Maps\InvalidArgumentException;
 use Nette\Utils\Html;
 
 /**
@@ -35,15 +36,16 @@ extends \Nette\Forms\Controls\BaseControl
 		return $this->value;
 	}
 
-	/**
-	 * Sets control's value
-	 * @param string $value
-	 * @throws \InvalidArgumentException
-	 */
+    /**
+     * Sets control's value
+     * @param string $value
+     * @throws \Maps\InvalidArgumentException
+     * @return \Nette\Forms\Controls\BaseControl|void
+     */
 	public function setValue($value)
 	{
 		if (!in_array($value, array(-1, 0, 1))) {
-			throw new \InvalidArgumentException("Invalid argument passed, one of [-1, 0, 1] expected, '$value' given.");
+			throw new InvalidArgumentException("Invalid argument passed, one of [-1, 0, 1] expected, '$value' given.");
 			}
 		parent::setValue($value);
 	}

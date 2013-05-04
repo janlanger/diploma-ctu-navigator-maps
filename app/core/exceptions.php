@@ -84,3 +84,18 @@ class QueryException extends \Exception
 	}
 
 }
+
+class InvalidArgumentException extends \InvalidArgumentException {
+
+}
+
+class InvalidStateException extends \RuntimeException {
+
+}
+
+class ShellCommandException extends \RuntimeException {
+
+}
+class StaticClassException extends \LogicException {
+    
+}

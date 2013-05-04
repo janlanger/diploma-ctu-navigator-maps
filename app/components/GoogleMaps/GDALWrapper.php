@@ -11,6 +11,8 @@ namespace Maps\Components\GoogleMaps;
 
 
 use Maps\Components\ImageMagick;
+use Maps\InvalidArgumentException;
+use Maps\ShellCommandException;
 use Nette\Diagnostics\Debugger;
 use Nette\Image;
 use Nette\Object;
@@ -21,12 +23,12 @@ class GDALWrapper extends Object {
     public function __construct() {
 
         if(!function_exists('exec')) {
-            throw new \InvalidArgumentException("GDAL requires exec() function, but it seems it's not available.");
+            throw new InvalidArgumentException("GDAL requires exec() function, but it seems it's not available.");
         }
 
         exec('gdal_translate --version', $out, $status);
         if($status != 0) {
-            throw new \InvalidArgumentException("GDAL executable was not found. Is it really installed and reachable inside PATH?");
+            throw new InvalidArgumentException("GDAL executable was not found. Is it really installed and reachable inside PATH?");
         }
     }
 
@@ -55,9 +57,9 @@ class GDALWrapper extends Object {
         exec($command.' 2>&1', $out, $status);
         try {
             if($status != 0) {
-                throw new \RuntimeException("Shell command returned $status. Command $command");
+                throw new ShellCommandException("Shell command returned $status. Command $command");
             }
-        } catch (\RuntimeException $e) {
+        } catch (ShellCommandException $e) {
             Debugger::log($e);
             throw $e;
         }

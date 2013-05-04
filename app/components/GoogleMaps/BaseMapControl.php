@@ -1,5 +1,6 @@
 <?php
 namespace Maps\Components\GoogleMaps;
+use Maps\InvalidStateException;
 use Maps\Model\Metadata\Queries\FloorByNodePropertiesId;
 
 /**
@@ -135,7 +136,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
         $template->registerHelperLoader("Maps\\Templates\\TemplateHelpers::loader");
         if($this->apiKey == NULL) {
-            throw new \Nette\InvalidStateException("Google Maps API key must be set before component rendering.");
+            throw new InvalidStateException("Google Maps API key must be set before component rendering.");
         }
 
         $template->apiKey = $this->apiKey;

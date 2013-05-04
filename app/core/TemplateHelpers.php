@@ -3,6 +3,7 @@
 namespace Maps\Templates;
 use Imagine\Imagick\Imagine;
 use Maps\Components\ImageMagick;
+use Maps\InvalidStateException;
 use Nette\Image;
 use Nette\Utils\Strings;
 
@@ -19,7 +20,7 @@ class TemplateHelpers {
         }
     }
 
-    public static function dateInWords($time, $format = 'j.n.Y H:i', $onlyDate=false) {
+    public static function dateInWords($time, $format = 'j.n.Y H:i', $onlyDate=FALSE) {
         if (!$time) {
             return FALSE;
         } elseif (is_numeric($time)) {
@@ -245,7 +246,7 @@ class TemplateHelpers {
      * @param type $quality
      * @param type $crop true = crop image to match width x height (no deformation), false = resize with aspect ration (dimensions <= specified)
      */
-    public static function thumbnail($path, $width = 100, $height = 100, $quality = 85, $crop = false) {
+    public static function thumbnail($path, $width = 100, $height = 100, $quality = 85, $crop = FALSE) {
         if(!file_exists(WWW_DIR.'/'.$path) || !is_file(WWW_DIR.'/'.$path)) {
             return "/".$path;
         }
@@ -264,7 +265,7 @@ class TemplateHelpers {
                 return "/" . $thumb_wwwpath;
             }
         }
-        throw new \Nette\InvalidStateException("Unable to convert $path to thumbnail.");
+        throw new InvalidStateException("Unable to convert $path to thumbnail.");
     }
 
     private static function generateThumbnail($original, $thumbpath, $width, $height,$quality, $crop) {
@@ -279,18 +280,18 @@ class TemplateHelpers {
         $image->sharpen();
         $fullpath = WWW_DIR . '/' . $thumbpath;
         if (!(file_exists(dirname($fullpath)) && is_dir(dirname($fullpath)))) {
-            mkdir(dirname($fullpath), 0777, true);
+            mkdir(dirname($fullpath), 0777, TRUE);
         }
         if ($image->save($fullpath, $quality)) {
             chmod($fullpath, 0666);
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
-    public static function image($path, $format='png', $force=false, $width, $height) {
-        $page=null;
+    public static function image($path, $format='png', $force=FALSE, $width, $height) {
+        $page=NULL;
         if(Strings::endsWith($path, "]")) {
             $page = Strings::match($path,"#.*\\[(\\d)\\]$#")[1];
             $path = Strings::substring($path, 0, strlen($path)-strlen($page)-2);
@@ -302,7 +303,7 @@ class TemplateHelpers {
         if(is_file($newPath)) {
             return str_replace(WWW_DIR,'',$newPath);
         }
-        if(!($force == false && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
+        if(!($force == FALSE && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
             //try converting it using imagemagick
             $i = new ImageMagick($fullpath, $page-1);
 
@@ -318,11 +319,11 @@ class TemplateHelpers {
 
             }
 
-            $i->save($newPath,null, $type, [
+            $i->save($newPath,NULL, $type, [
 		'transparent' => 'white',
                 'density'=> 100,
-                'trim'=> true,
-                'geometry' => $width.'x'.($height == null?$width:$height.'!').'>',
+                'trim'=> TRUE,
+                'geometry' => $width.'x'.($height == NULL?$width:$height.'!').'>',
 
             ]);
 

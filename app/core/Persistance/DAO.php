@@ -7,6 +7,8 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\NonUniqueResultException;
+use Maps\InvalidArgumentException;
+use Maps\InvalidStateException;
 use Nette;
 use Nette\ObjectMixin;
 use Maps\Model\Persistence\QueryObjectBase;
@@ -69,7 +71,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 			return array_map(array($this, 'add'), $entity);
 
 		} elseif (!$entity instanceof $this->_entityName) {
-			throw new \InvalidArgumentException("Entity is not instanceof " . $this->_entityName . ", instanceof '" . get_class($entity) . "' given.");
+			throw new InvalidArgumentException("Entity is not instanceof " . $this->_entityName . ", instanceof '" . get_class($entity) . "' given.");
 		}
 
 		$this->getEntityManager()->persist($entity);
@@ -176,14 +178,13 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 	}
 
 
-
-	/**
-	 * @param object|array|\Doctrine\Common\Collections\Collection $entity
-	 * @param bool $withoutFlush
-	 *
-	 * @throws\InvalidArgumentException
-	 * @return null
-	 */
+    /**
+     * @param object|array|\Doctrine\Common\Collections\Collection $entity
+     * @param bool $withoutFlush
+     *
+     * @throws \Maps\InvalidArgumentException
+     * @return null
+     */
 	public function delete($entity, $withoutFlush = Persistence\IDao::FLUSH)
 	{
 		if ($entity instanceof Collection) {
@@ -202,7 +203,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 		}
 
 		if (!$entity instanceof $this->_entityName) {
-			throw new \InvalidArgumentException("Entity is not instanceof " . $this->_entityName . ', ' . get_class($entity) . ' given.');
+			throw new InvalidArgumentException("Entity is not instanceof " . $this->_entityName . ', ' . get_class($entity) . ' given.');
 		}
 
 		$this->getEntityManager()->remove($entity);
@@ -385,7 +386,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 				$meta = $this->_em->getClassMetadata(get_class(current($result)));
 
 			} catch (\Exception $e) {
-				throw new \InvalidStateException('Result of ' . get_class($queryObject) . ' is not list of entities.');
+				throw new InvalidStateException('Result of ' . get_class($queryObject) . ' is not list of entities.');
 			}
 
 			$assoc = array();
@@ -398,7 +399,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 			}
 			return $assoc;
 
-		} catch (\InvalidStateException $e) {
+		} catch (InvalidStateException $e) {
 			throw $e;
 
 		} catch (\Exception $e) {

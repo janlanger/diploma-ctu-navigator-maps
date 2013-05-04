@@ -4,6 +4,7 @@ namespace Maps\Model\Floor;
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
+use Nette\Diagnostics\Debugger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -47,10 +48,10 @@ class MetadataFormProcessor {
 
             $this->dbNodes = $this->nodeRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
             $this->dbPaths = $this->pathRepository->fetchAssoc(new \Maps\Model\BasicFetchByQuery(["floor" => $this->floor]), 'id');
-            if($this->dbNodes == null) {
+            if($this->dbNodes == NULL) {
                 $this->dbNodes = [];
             }
-            if($this->dbPaths == null) {
+            if($this->dbPaths == NULL) {
                 $this->dbPaths = [];
             }
 
@@ -78,7 +79,7 @@ class MetadataFormProcessor {
             
             
         } catch (\InvalidArgumentException $e) {
-            
+            Debugger::log($e);
         }
     }
 
@@ -86,16 +87,16 @@ class MetadataFormProcessor {
         $unprocessedNodes = array_flip(array_keys($this->dbNodes));
         foreach($nodes as $node) {
             if(!isset($node->id) || !isset($this->dbNodes[$node->id])) {
-                if($node == null) continue;
-                $this->nodesAdd[] = $this->nodeRepository->createNew(null, array(
+                if($node == NULL) continue;
+                $this->nodesAdd[] = $this->nodeRepository->createNew(NULL, array(
                     'floor' => $this->floor,
                     'gpsCoordinates' => $node->position,
                     'type' => $node->type,
-                    'name' => (isset($node->name) ? $node->name : null),
-                    'room' => (isset($node->room) ? $node->room : null),
-                    'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : null,
-                    'toFloor' => isset($node->toFloor) ? $node->toFloor : null,
-                    'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : null,
+                    'name' => (isset($node->name) ? $node->name : NULL),
+                    'room' => (isset($node->room) ? $node->room : NULL),
+                    'fromFloor' => isset($node->fromFloor) ? $node->fromFloor : NULL,
+                    'toFloor' => isset($node->toFloor) ? $node->toFloor : NULL,
+                    'toBuilding' => isset($node->toBuilding) ? $node->toBuilding : NULL,
                 ));
                 $node->addedId = count($this->nodesAdd) -1;
             } else {
@@ -104,7 +105,7 @@ class MetadataFormProcessor {
                 foreach($node as $key=>$value) {
                     if(in_array($key, ['id','state'])) continue;
                     $method = "set".ucfirst($key);
-                    if($value == "") $value = null;
+                    if($value == "") $value = NULL;
                     $entity->$method($value);
                 }
                 unset($unprocessedNodes[$node->id]);
@@ -119,24 +120,24 @@ class MetadataFormProcessor {
     private function processPaths($paths, $nodes) {
         $unprocessedPaths = array_flip(array_keys($this->dbPaths));
         foreach($paths as $path) {
-            $updated = false;
+            $updated = FALSE;
             if(isset($nodes[$path->startNode]->id) && isset($nodes[$path->endNode]->id)) {
                 //oba maji id - jsou z db - zkus najit zaklade id bodu
                 $entity = $this->findPathWithNodes($nodes[$path->startNode]->id, $nodes[$path->endNode]->id);
-                if($entity != null) {
+                if($entity != NULL) {
                     $entity->length = $path->length;
-                    $updated = true;
-                    if($entity->id != null)
+                    $updated = TRUE;
+                    if($entity->id != NULL)
                         unset($unprocessedPaths[$entity->id]);
                 }
             }
             if(!$updated) {
                 $begin = $this->getNodeWithPathId($path->startNode, $nodes);
                 $end = $this->getNodeWithPathId($path->endNode, $nodes);
-                if($begin == null || $end == null) {
+                if($begin == NULL || $end == NULL) {
                     continue; // not ended with markers on both sides
                 }
-                $this->pathsAdd[] = $this->pathRepository->createNew(null, [
+                $this->pathsAdd[] = $this->pathRepository->createNew(NULL, [
                     "startNode" => $begin,
                     "endNode" => $end,
                     "length" => $path->length,
@@ -164,7 +165,7 @@ class MetadataFormProcessor {
                 return $path;
             }
         }
-        return null;
+        return NULL;
     }
 
     private function getNodeWithPathId($nodeId, $nodes)

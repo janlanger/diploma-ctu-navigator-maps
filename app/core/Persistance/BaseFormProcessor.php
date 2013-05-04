@@ -9,6 +9,8 @@ namespace Maps\Model\Persistence;
  * and open the template in the editor.
  */
 
+use Maps\InvalidStateException;
+
 /**
  * Description of BaseFormProvider
  *
@@ -65,9 +67,9 @@ class BaseFormProcessor extends \Nette\Object {
                 return basename($path);
             }
         } elseif($file->getError() != UPLOAD_ERR_NO_FILE) {
-            throw new \Nette\InvalidStateException("Unexpected error.");
+            throw new InvalidStateException("Unexpected error.");
         }
-        return null;
+        return NULL;
     }
 
 
