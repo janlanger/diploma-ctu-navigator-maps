@@ -8,16 +8,17 @@ use Nette\Utils\Html;
 /**
  * Adds ability to download and delete previously uploaded file
  *
- * @author Jan -Quinix- Langer
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\Formss
  */
 class FileUpload extends \Nette\Forms\Controls\UploadControl {
 
 	private $defaultValue = '';
-    private $deleteOption = true;
+    private $deleteOption = TRUE;
 
 	public function __construct($label, $form, $name) {
 		parent::__construct($label);
-		$form->addCheckbox($name . 'deletor', 'Smazat soubor')->setOption('rendered',true);
+		$form->addCheckbox($name . 'deletor', 'Smazat soubor')->setOption('rendered',TRUE);
 	}
 
 	public function setDefaultValue($value) {
@@ -69,7 +70,7 @@ class FileUpload extends \Nette\Forms\Controls\UploadControl {
 		return isset($table)?$table:$data;
 	}
         
-        public function disableDeleteOption($set = true) {
+        public function disableDeleteOption($set = TRUE) {
             $this->deleteOption = !$set;
             if($set) {
                 $form = $this->getForm(); 

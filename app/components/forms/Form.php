@@ -29,6 +29,7 @@ use Nextras\Forms\Controls\OptionList;
  * Base form for every form in app. Adds extended field type to forms
  *
  * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\Forms
  */
 
 class Form extends AppForm {

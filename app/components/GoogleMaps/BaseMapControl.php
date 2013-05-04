@@ -1,11 +1,12 @@
 <?php
 namespace Maps\Components\GoogleMaps;
 use Maps\InvalidStateException;
-use Maps\Model\Metadata\Queries\FloorByNodePropertiesId;
+use Nette\Templating\ITemplate;
 
 /**
  * Base class for all Google Maps components
- * @author Jan Langer, <langeja1@fit.cvut.cz>
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\GoogleMaps
  */
 abstract class BaseMapControl extends \Nette\Application\UI\Control{
 
@@ -32,7 +33,7 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
     private $pathOptions;
     /** @var array paths definition */
     private $paths = [];
-    /** @var arrat node types definition */
+    /** @var array node types definition */
     private $types;
 
     /**
@@ -92,69 +93,99 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         return $this->showLegend;
     }
 
-
-
+    /**
+     * @return string Google API key
+     */
     public function getApiKey() {
         return $this->apiKey;
     }
 
+    /**
+     * @param string $center GPS of center of map
+     */
     public function setCenter($center) {
         $this->center = $this->formatCoordinates($center);
     }
 
+    /**
+     * @return string GPS of center of map
+     */
     public function getCenter() {
         return $this->center;
     }
 
+    /**
+     * @param int $zoomLevel initial zoom level
+     */
     public function setZoomLevel($zoomLevel) {
         $this->zoomLevel = $zoomLevel;
     }
 
+    /**
+     * @return int initial zoom level
+     */
     public function getZoomLevel() {
         return $this->zoomLevel;
     }
 
+    /**
+     * Adds point (marker to map)
+     * @param string $point GPS coordinated
+     * @param array $options points options (type, title...)
+     */
     public function addPoint($point, $options=[]) {
         $options['position'] = $this->formatCoordinates($point);
-       /* if(!isset($options['icon']) && $this->types != NULL) {
-            if(isset($options['type']) && isset($this->types[$options['type']])) {
-                $options['icon'] = $this->types[$options['type']];
-            }
-            else {
-                $options['icon'] = $this->pointsInfo['default'];
-            }
-        }*/
         $this->points[]= $options;
     }
 
-
+    /**
+     * @param array $options path style definition
+     */
     public function setPathOptions(array $options) {
         $this->pathOptions = $options;
     }
 
+    /**
+     * Adds path between $start and $end gpps coordinates
+     *
+     * @param string $start
+     * @param string $destination
+     */
     public function addPath($start, $destination) {
         $this->paths[] = [$this->formatCoordinates($start), $this->formatCoordinates($destination)];
     }
 
+    /**
+     * Converst string lat;lng format to array
+     * @param string $point
+     * @return array
+     */
     protected function formatCoordinates($point) {
         $parts = \Nette\Utils\Strings::split($point,"/;|,/");;
         //TODO some validation
         return ['lat'=>$parts[0],'long'=>$parts[1]];
     }
 
+    /**
+     * @param string $title layer title
+     * @param string $basePath base url for tiles
+     */
     public function addCustomTilesLayer($title, $basePath)
     {
         $this->customLayers[$title] = $basePath;
     }
 
-
-
+    /**
+     * Sets base path for node icons
+     * @param string $nodeIconBase
+     */
     public function setNodeIconBase($nodeIconBase) {
         $this->nodeIconBase = $nodeIconBase;
     }
 
-
-
+    /**
+     * {@inheritdoc}
+     */
     protected function createTemplate($class = NULL) {
         $template = parent::createTemplate($class);
 
@@ -187,22 +218,34 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         return $template;
     }
 
+    /**
+     * Show map legend?
+     * @param bool $i
+     */
     public function showLegend($i) {
         $this->showLegend = $i;
     }
 
+    /**
+     * @param array $types
+     */
     public function setNodeTypes(array $types) {
         $this->types = $types;
     }
 
-
-
+    /**
+     * @return array
+     */
     public function getNodeTypes() {
         return $this->types;
     }
 
-
-
+    /**
+     * Sets template variables for map width and height
+     *
+     * @param ITemplate $template
+     * @param array $args
+     */
     protected function setMapSize($template, $args) {
         if(!empty($args)) {
             $args = array_shift($args);
@@ -214,6 +257,9 @@ abstract class BaseMapControl extends \Nette\Application\UI\Control{
         }
     }
 
+    /**
+     * @return array
+     */
     public function getPathOptions() {
         return $this->pathOptions;
     }

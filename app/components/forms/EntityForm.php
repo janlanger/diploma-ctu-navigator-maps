@@ -10,7 +10,8 @@ use Maps\Model\Persistence\BaseFormProcessor;
 /**
  * Binds form to defined entity and updates it after form is sended.
  *
- * @author Jan -Quinix- Langer
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\Forms
  */
 class EntityForm extends Form {
 

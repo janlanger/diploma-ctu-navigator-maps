@@ -1,15 +1,13 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 12.4.13
- * Time: 20:38
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Components\GoogleMaps;
 
-
+/**
+ * Handles modal map - has ability to return payload and don't generate the map
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\GoogleMaps
+ */
 class ModalMap extends BaseMapControl {
 
     public function render() {
@@ -22,6 +20,9 @@ class ModalMap extends BaseMapControl {
         $template->render();
     }
 
+    /**
+     * @return array payload for map initialization
+     */
     public function getPayload() {
 
         $layers = [];

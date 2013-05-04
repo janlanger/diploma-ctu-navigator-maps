@@ -6,29 +6,44 @@ namespace Maps\Components\GoogleMaps;
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
+use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Queries\ActiveProposals;
 use Maps\Model\Metadata\Queries\FloorExchangePaths;
-use Maps\Model\Metadata\Queries\RevisionProcessor;
+use Maps\Model\Metadata\Revision;
 use Nette\Application\UI\Control;
 
+/**
+ * Proposal editor component main class
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\GoogleMaps
+ */
 class ProposalEditor extends Control {
+    /** @var callable on form success event */
     private $submitHandler;
+    /** @var  array */
     private $revisionDictionary;
 
     /** @var Dao */
     private $proposalRepository;
 
+    /** @var Revision actual revision */
     private $activeRevision;
 
+    /**
+     * @param array $revisionDictionary
+     */
     public function setRevisionDictionary($revisionDictionary) {
         $this->revisionDictionary = $revisionDictionary;
     }
 
+    /**
+     * @return array
+     */
     public function getRevisionDictionary() {
         return $this->revisionDictionary;
     }
-
 
 
     function __call($name, $arguments) {
@@ -49,14 +64,17 @@ class ProposalEditor extends Control {
         return $this['mapEditor'];
     }
 
-
-
+    /**
+     * @param Revision $activeRevision
+     */
     public function setActiveRevision($activeRevision) {
         $this->activeRevision = $activeRevision;
     }
 
 
-
+    /**
+     * @param Dao $proposalRepository
+     */
     public function setProposalRepository(Dao $proposalRepository) {
         $this->proposalRepository = $proposalRepository;
     }
@@ -115,12 +133,13 @@ class ProposalEditor extends Control {
 
     public function createComponentMapEditor($name) {
         $editor = new PolyLinesEditor();
-        $editor->overiden = TRUE;
+        $editor->overridden = TRUE;
         return $editor;
     }
 
-
-
+    /**
+     * @return Changeset[]
+     */
     private function getProposals() {
         static $items;
         if($items == NULL && $this->activeRevision != NULL) {
@@ -133,6 +152,10 @@ class ProposalEditor extends Control {
 
     }
 
+    /**
+     * @param NodeProperties $properties
+     * @return string readable node title
+     */
     private function getNodeTitle(NodeProperties $properties) {
         $title = "";
         $nodeTypes = $this->getMapComponent()->getNodeTypes();
@@ -159,6 +182,12 @@ class ProposalEditor extends Control {
         $form->onSuccess[] = $this->submitHandler;
     }
 
+    /**
+     * Finds collisions in proposals and returns collision map
+     *
+     * @param Changeset[] $proposals
+     * @return array
+     */
     private function collisionResolution($proposals) {
         $changesNodes = [];
         $changedPaths = [];
@@ -203,11 +232,17 @@ class ProposalEditor extends Control {
         return $collisions;
     }
 
+    /**
+     * @param callable $submitHandler
+     */
     public function setSubmitHandler($submitHandler)
     {
         $this->submitHandler = $submitHandler;
     }
 
+    /**
+     * @return callable
+     */
     public function getSubmitHandler()
     {
         return $this->submitHandler;

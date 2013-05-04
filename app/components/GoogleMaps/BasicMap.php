@@ -1,27 +1,35 @@
 <?php
 namespace Maps\Components\GoogleMaps;
 use Nette\Forms\Controls\BaseControl;
+use Nette\Forms\IControl;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 6.2.13
- * Time: 23:25
- * To change this template use File | Settings | File Templates.
+ * Basic Map optionally with geodecoder
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\GoogleMaps
  */
 class BasicMap extends BaseMapControl{
 
-    private $geodecoderEnabled = false;
+    /** @var bool is geodecoder enabled */
+    private $geodecoderEnabled = FALSE;
+    /** @var IControl form field for addres (=geodecoder source) */
     private $geodecoderAddress;
+
+    /** @var  IControl form field for GPS coords (=geodecoder destination) */
     private $geodecoderGPS;
 
 
+    /**
+     * Enable gendecoder support
+     * @param BaseControl $addressField address source
+     * @param BaseControl $gpsField coordinates destination
+     */
     public function enableGeodecoder(BaseControl $addressField, BaseControl $gpsField) {
         if(trim($gpsField->value) != "") {
             $this->setCenter($gpsField->value);
-            $this->addPoint($gpsField->value, ['draggable'=>true]);
+            $this->addPoint($gpsField->value, ['draggable'=>TRUE]);
         }
-        $this->geodecoderEnabled = true;
+        $this->geodecoderEnabled = TRUE;
         $this->geodecoderAddress = $addressField;
         $this->geodecoderGPS = $gpsField;
     }

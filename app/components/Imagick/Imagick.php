@@ -1,14 +1,5 @@
 <?php
 
-/**
- * This file is part of the Nette Framework (http://nette.org)
- *
- * Copyright (c) 2004, 2011 David Grudl (http://davidgrudl.com)
- *
- * For the full copyright and license information, please view
- * the file license.txt that was distributed with this source code.
- */
-
 namespace Maps\Components;
 
 use Maps\InvalidArgumentException;
@@ -29,7 +20,7 @@ use Nette\Image;
  * $image->send();
  * </code>
  *
- * @author     David Grudl
+ * @author  David Grudl
  * @author Jan Langer
  */
 class ImageMagick extends Image
@@ -51,14 +42,16 @@ class ImageMagick extends Image
 
     /** @var int */
     private $height;
-
+    /** @var int */
     private $page;
 
 
     /**
      * Wraps image file.
-     * @param  string  detected image format
-     * @param  string
+     * @param string $file
+     * @param int $page page for multi-page files
+     * @param string $format detected format
+     * @throws \Maps\InvalidArgumentException
      */
     public function __construct($file, $page=NULL, & $format = NULL)
     {
@@ -136,9 +129,9 @@ class ImageMagick extends Image
 
     /**
      * Resizes image.
-     * @param  mixed  width in pixels or percent
-     * @param  mixed  height in pixels or percent
-     * @param  int    flags
+     * @param  mixed  $width in pixels or percent
+     * @param  mixed  $height in pixels or percent
+     * @param  int    $flags
      * @return ImageMagick  provides a fluent interface
      */
     public function resize($width, $height, $flags = self::FIT)
@@ -221,11 +214,12 @@ class ImageMagick extends Image
     }
 
 
-
     /**
      * Executes command.
-     * @param  string  command
-     * @param  string|bool  process output?
+     * @param string $command
+     * @param bool $output
+     * @param array $options
+     * @throws \Maps\ShellCommandException
      * @return string
      */
     private function execute($command, $output = NULL, $options= NULL)
