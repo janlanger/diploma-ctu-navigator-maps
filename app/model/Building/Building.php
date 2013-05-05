@@ -24,11 +24,20 @@ class Building extends \Maps\Model\BaseEntity {
      * @Column(type="string", length=200)
      */
     private $address;
-    /** @var int @Column(type="integer") */
+    /**
+     * @var int
+     * @Column(type="integer")
+     */
     private $floor_count;
-    /** @var string  @Column(type="string", length=10, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string", length=10, nullable=true)
+     */
     private $room_prefix;
-    /** @var string @Column(type="string", length=200, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string", length=200, nullable=true)
+     */
     private $gps_coordinates;
     /**
      * @var \DateTime

@@ -76,20 +76,41 @@ class Plan extends BaseEntity {
     private $published_date;
 
 
-    /** @var string @Column(type="string",length=100, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string",length=100, nullable=true)
+     */
     private $reference_topLeft;
-    /** @var string @Column(type="string",length=100, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string",length=100, nullable=true)
+     */
     private $reference_topRight;
-    /** @var string @Column(type="string",length=100, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string",length=100, nullable=true)
+     */
     private $reference_bottomRight;
 
-    /** @var string @Column(type="string",length=100, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string",length=100, nullable=true)
+     */
     private $bounding_SW;
-    /** @var string @Column(type="string",length=100, nullable=true) */
+    /**
+     * @var string
+     * @Column(type="string",length=100, nullable=true)
+     */
     private $bounding_NE;
-    /** @var int @Column(type="integer", nullable=true) */
+    /**
+     * @var int
+     * @Column(type="integer", nullable=true)
+     */
     private $maxZoom;
-    /** @var int @Column(type="integer", nullable=true) */
+    /**
+     * @var int
+     * @Column(type="integer", nullable=true)
+     */
     private $minZoom;
 
     public function __construct() {
