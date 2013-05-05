@@ -1,39 +1,56 @@
 <?php
 
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Service;
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
+use Maps\Model\Floor\Floor;
+use Maps\Model\Metadata\Node;
+use Maps\Model\Metadata\Path;
 use Nette\Diagnostics\Debugger;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of MetadataFormProcessor
+ * Process metadata form submit
  *
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @package Maps\Model\Floor\Service
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class MetadataFormProcessor {
 
+    /** @var \Maps\Model\Dao  */
     private $nodeRepository;
+    /** @var \Maps\Model\Dao  */
     private $pathRepository;
+    /** @var Floor */
     private $floor;
+    /** @var Node[] */
     private $dbNodes;
+    /** @var Path[] */
     private $dbPaths;
+    /** @var array  */
     private $nodesAdd = [];
+    /** @var array  */
     private $nodesDelete = [];
+    /** @var array  */
     private $pathsAdd = [];
+    /** @var array  */
     private $pathsDelete = [];
 
+    /**
+     * @param Dao $nodeRepository
+     * @param Dao $pathRepository
+     * @param Floor $floor
+     */
     function __construct(Dao $nodeRepository, Dao $pathRepository, $floor) {
         $this->nodeRepository = $nodeRepository;
         $this->pathRepository = $pathRepository;
         $this->floor = $floor;
     }
 
+    /**
+     * Main handler
+     * @param Form $form
+     */
     public function handle(Form $form) {
         if (!$form->isValid()) {
             return;
@@ -83,6 +100,9 @@ class MetadataFormProcessor {
         }
     }
 
+    /**
+     * @param array $nodes
+     */
     private function processNodes($nodes) {
         $unprocessedNodes = array_flip(array_keys($this->dbNodes));
         foreach($nodes as $node) {
@@ -117,6 +137,10 @@ class MetadataFormProcessor {
         }
     }
 
+    /**
+     * @param array $paths
+     * @param array $nodes
+     */
     private function processPaths($paths, $nodes) {
         $unprocessedPaths = array_flip(array_keys($this->dbPaths));
         foreach($paths as $path) {
@@ -150,7 +174,11 @@ class MetadataFormProcessor {
         }
     }
 
-
+    /**
+     * @param int $f
+     * @param int $s
+     * @return Path|null
+     */
     private function findPathWithNodes($f, $s) {
         foreach($this->dbPaths as $id => $path) {
             if(($f == $path->startNode->id && $s == $path->endNode->id) ||
@@ -168,6 +196,11 @@ class MetadataFormProcessor {
         return NULL;
     }
 
+    /**
+     * @param int $nodeId
+     * @param array $nodes
+     * @return Node
+     */
     private function getNodeWithPathId($nodeId, $nodes)
     {
         return (isset($nodes[$nodeId]->addedId)? $this->nodesAdd[$nodes[$nodeId]->addedId]:$this->dbNodes[$nodes[$nodeId]->id]);

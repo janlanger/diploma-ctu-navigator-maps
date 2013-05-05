@@ -1,39 +1,39 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 8.3.13
- * Time: 16:42
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Queries;
 
 
+use Maps\Model\Floor\Floor;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Unpublish floor pland
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Model\Floor\Queries
+ */
 class DeactivatePlansOfFloorQuery extends QueryObjectBase {
     /** @var Floor */
     private $floor;
 
+    /**
+     * @param Floor $floor
+     */
     function __construct(Floor $floor) {
         $this->floor = $floor;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $q = $repository->createQueryBuilder("p");
         $q->update(__NAMESPACE__.'\\Plan','p')
-            ->set("p.published", $q->expr()->literal(false))
+            ->set("p.published", $q->expr()->literal(FALSE))
             ->where("p.floor = :floor")
             ->andWhere("p.published = :published")
             ->setParameter('floor', $this->floor)
-            ->setParameter("published", true);
+            ->setParameter("published", TRUE);
 
         return $q;
     }

@@ -4,7 +4,7 @@ use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\BasicMap;
 use Maps\Model\Building\Building;
-use Maps\Model\Floor\ActivePlanQuery;
+use Maps\Model\Floor\Queries\ActivePlanQuery;
 use Maps\Model\Metadata\Node;
 use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\ActiveRevision;

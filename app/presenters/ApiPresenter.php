@@ -12,7 +12,7 @@ namespace Maps\Presenter;
 
 use Maps\Model\Building\Building;
 use Maps\Model\Building\Queries\BuildingWithFloors;
-use Maps\Model\Floor\ActivePlanQuery;
+use Maps\Model\Floor\Queries\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Floor\Plan;
 use Maps\Model\Metadata\FloorConnection;

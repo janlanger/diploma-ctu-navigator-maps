@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 2.5.13
- * Time: 10:38
- * To change this template use File | Settings | File Templates.
- */
-
-namespace Maps\Model\Floor;
-
+namespace Maps\Model\Floor\Service;
 
 use Doctrine\ORM\EntityManager;
 use Maps\Model\Dao;
+use Maps\Model\Floor\Plan;
+use Maps\Model\Floor\Queries\DeactivatePlansOfFloorQuery;
+use Maps\Model\Floor\Service\TilesService;
 use Nette\Diagnostics\Debugger;
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -20,6 +14,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles CLI command to generate tiles
+ *
+ * @package Maps\Model\Floor\Service
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class TilesGeneratorCommand extends Command {
 
     /** @var \Maps\Model\Dao plan repository */
@@ -28,13 +28,17 @@ class TilesGeneratorCommand extends Command {
     private $tileService;
 
 
+    /**
+     * @param Dao $repository
+     * @param TilesService $tileService
+     */
     function __construct($repository, $tileService) {
         parent::__construct();
         $this->repository = $repository;
         $this->tileService = $tileService;
     }
 
-
+    /** {@inheritdoc} */
     protected function configure() {
         $this->setName("tiles:generate")
                 ->setDescription("Generates tiles for newly published plans revision.")->setDefinition(array(
@@ -46,6 +50,7 @@ class TilesGeneratorCommand extends Command {
 
     }
 
+    /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output) {
         if ($input->getOption('force') === TRUE) {
             $this->generateTiles($output);
@@ -68,6 +73,11 @@ class TilesGeneratorCommand extends Command {
     }
 
 
+    /**
+     * Actually generates the tiles
+     *
+     * @param OutputInterface $output
+     */
     public function generateTiles(OutputInterface $output) {
         set_time_limit(300);
         //load all plans in queue
@@ -119,6 +129,11 @@ class TilesGeneratorCommand extends Command {
         }
     }
 
+    /**
+     * Returns plans to be published
+     *
+     * @return Plan[]
+     */
     private function getPlansToPublish() {
         return $this->repository->findBy(['inPublishQueue' => TRUE, 'published' => FALSE]);
     }

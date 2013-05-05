@@ -1,22 +1,25 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 8.3.13
- * Time: 21:52
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Queries;
 
 
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Fetches active plan of a floor
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Model\Floor\Queries
+ */
 class ActivePlanQuery extends QueryObjectBase {
 
+    /** @var array floor ids */
     private $floors;
 
+    /**
+     * @param array|int $floors ids
+     */
     function __construct($floors) {
         if(is_scalar($floors)) {
             $this->floors = [$floors];
@@ -27,10 +30,7 @@ class ActivePlanQuery extends QueryObjectBase {
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         return $repository->createQueryBuilder("p")->select("p")
             ->where("p.floor IN (:floor)")

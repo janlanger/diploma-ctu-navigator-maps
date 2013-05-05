@@ -15,11 +15,11 @@ use DataGrid\DataSources\Doctrine\QueryBuilder;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\OverlayPlacement;
-use Maps\Model\Floor\DeactivatePlansOfFloorQuery;
+use Maps\Model\Floor\Queries\DeactivatePlansOfFloorQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Floor\Plan;
-use Maps\Model\Floor\PlanFormProcessor;
-use Maps\Model\Floor\PlanRevisionsQuery;
+use Maps\Model\Floor\Service\PlanFormProcessor;
+use Maps\Model\Floor\Queries\PlanRevisionsQuery;
 use Maps\Model\Persistence\BaseFormProcessor;
 
 class PlanPresenter extends SecuredPresenter {
