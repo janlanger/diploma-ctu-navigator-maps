@@ -1,29 +1,34 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 1.5.13
- * Time: 23:06
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Metadata;
+namespace Maps\Model\Metadata\Service;
 
 
 use Nette\Object;
 
+/**
+ * Executes non blocking HTTP request. Requires curl and exec()
+ *
+ * @package Maps\Model\Metadata\Service
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class NonBlockingHttp extends Object {
-
+    /** @var string */
     private $url;
-
+    /** @var bool  */
     private $noHttpsCheck = FALSE;
+    /** @var array  */
     private $headers = [];
 
-
+    /**
+     * @param $url URL to call
+     */
     function __construct($url) {
         $this->url = $url;
     }
 
+    /**
+     * Executes the request
+     */
     public function execute() {
         $command = "curl –silent -L";
         if($this->noHttpsCheck) {
@@ -43,14 +48,26 @@ class NonBlockingHttp extends Object {
         shell_exec($command." &");
     }
 
+    /**
+     * Adds HTTP header
+     * @param $header
+     * @param $content
+     */
     public function addHeader($header, $content) {
         $this->headers[$header] = $content;
     }
 
+    /**
+     * Don't check certificate
+     * @param $noHttpsCheck
+     */
     public function setNoHttpsCheck($noHttpsCheck) {
         $this->noHttpsCheck = $noHttpsCheck;
     }
 
+    /**
+     * @return bool
+     */
     public function getNoHttpsCheck() {
         return $this->noHttpsCheck;
     }

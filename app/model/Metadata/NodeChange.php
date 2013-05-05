@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 13.3.13
- * Time: 19:25
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata;
 
@@ -16,6 +9,7 @@ use Maps\Model\BaseEntity;
 /**
  * Class NodeChange
  * @package Maps\Model\Metadata
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  * @Entity
  * @Table(name="metadata_node_change")
  */
@@ -31,7 +25,7 @@ class NodeChange extends BaseEntity {
      * @var boolean
      * @Column(type="boolean")
      */
-    private $was_deleted = false;
+    private $was_deleted = FALSE;
 
     /**
      * @var NodeProperties

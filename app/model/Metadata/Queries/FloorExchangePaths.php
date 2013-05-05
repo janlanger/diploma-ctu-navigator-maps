@@ -1,35 +1,37 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 13.4.13
- * Time: 15:44
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
 
 use Maps\Model\Floor\Floor;
+use Maps\Model\Metadata\Revision;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Floor connections to and from this floor
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class FloorExchangePaths extends QueryObjectBase{
-
+    /** @var int[] */
     private $nodeIds = [];
+    /** @var  Revision */
     private $revision;
 
 
+    /**
+     * @param int[] $nodeIds
+     * @param Revision $revision
+     */
     function __construct($nodeIds, $revision) {
         $this->nodeIds = $nodeIds;
         $this->revision = $revision;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $namespace = "Maps\\Model\\Metadata\\";
 

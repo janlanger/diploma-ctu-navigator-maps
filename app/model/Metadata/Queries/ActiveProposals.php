@@ -1,35 +1,39 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 21.3.13
- * Time: 22:22
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
 
 use Maps\Model\Metadata\Changeset;
+use Maps\Model\Metadata\Revision;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
+use Maps\Model\User\User;
 
+/**
+ * Non processed proposals for floor
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class ActiveProposals extends QueryObjectBase {
 
+    /** @var User */
     private $user;
+    /** @var Revision */
     private $revision;
 
-    function __construct($user=NULL, $revision = null) {
+    /**
+     * @param User $user
+     * @param Revision $revision
+     */
+    function __construct($user=NULL, $revision = NULL) {
         $this->user = $user;
         $this->revision = $revision;
     }
 
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $q = $repository->createQueryBuilder("c")->select("c, u, n, p")
             ->innerJoin("c.submitted_by", 'u')

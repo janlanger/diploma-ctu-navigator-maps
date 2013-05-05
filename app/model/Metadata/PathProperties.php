@@ -15,6 +15,7 @@ use Maps\Model\BaseEntity;
 /**
  * Class PathProperties
  * @package Maps\Model\Metadata
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  * @Entity
  * @Table(name="metadata_path_properties")
  */
@@ -68,6 +69,10 @@ class PathProperties extends BaseEntity {
         return $this->startNode;
     }
 
+    /**
+     * Converts instance variables to array
+     * @return array
+     */
     public function toArray() {
         return [
             "startNode" => $this->startNode->id,

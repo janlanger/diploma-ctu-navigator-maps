@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 27.3.13
- * Time: 17:43
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Metadata\Queries;
+namespace Maps\Model\Metadata\Service;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,7 +8,11 @@ use Doctrine\ORM\Query\Expr\Join;
 use Maps\Model\Dao;
 use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\FloorConnection;
+use Maps\Model\Metadata\NodeProperties;
 use Maps\Model\Metadata\Path;
+use Maps\Model\Metadata\Queries\ActiveProposals;
+use Maps\Model\Metadata\Queries\NodePropertiesQuery;
+use Maps\Model\Metadata\Queries\PathPropertiesByNodes;
 use Maps\Model\Metadata\Revision;
 use Maps\Model\User\User;
 use Maps\Tools\Mixed;
@@ -24,8 +21,14 @@ use Nette\Forms\Form;
 use Nette\Object;
 use Nette\Utils\Strings;
 
+/**
+ * Processing of revision submit
+ *
+ * @package Maps\Model\Metadata\Service
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class RevisionProcessor extends Object {
-
+    /** @var \Maps\Model\Dao  */
     private $nodePropertiesRepository;
     /** @var \Maps\Model\Dao */
     private $pathPropertiesRepository;
@@ -33,27 +36,42 @@ class RevisionProcessor extends Object {
     private $changesetRepository;
     /** @var Dao */
     private $nodeChangeRepository;
-
+    /** @var \Maps\Model\Dao  */
     private $pathChangeRepository;
+    /** @var \Maps\Model\Dao  */
     private $nodeRepository;
+    /** @var \Maps\Model\Dao  */
     private $pathRepository;
+    /** @var \Maps\Model\Dao  */
     private $revisionRepository;
-
+    /** @var \Maps\Model\User\User  */
     private $user;
     /** @var Revision */
     private $actualRevision = NULL;
     /** @var Changeset */
     private $directChangeset = NULL;
-
-
+    /** @var \Maps\Model\Dao  */
     private $floorConnectionRepository;
-
+    /** @var int[] */
     private $changedKeys = [];
-
+    /** @var int[] */
     private $connections = [];
-
+    /** @var int[] */
     private $nodeChangedIds = [];
 
+    /**
+     * @param Revision $activeRevision
+     * @param User $user
+     * @param Dao $revision
+     * @param Dao $nodeProperties
+     * @param Dao $pathProperties
+     * @param Dao $changeset
+     * @param Dao $nodeChange
+     * @param Dao $pathChange
+     * @param Dao $node
+     * @param Dao $path
+     * @param Dao $floorConnection
+     */
     function __construct(Revision $activeRevision, User $user, Dao $revision,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange,
@@ -72,7 +90,11 @@ class RevisionProcessor extends Object {
         $this->user = $user;
     }
 
-
+    /**
+     * Main handler
+     * @param Form $form
+     * @return bool
+     */
     public function handle(Form $form) {
 
         $values = $form->getValues();
@@ -133,9 +155,13 @@ class RevisionProcessor extends Object {
         return TRUE;
     }
 
+    /**
+     * Finds out if there is changes and creates Changeset from them
+     * @param array $changes
+     */
     private function processNewChanges($changes) {
 
-        //remove null shitty things...
+        //remove null things...
 
         if(!is_array($changes)) return;
 
@@ -338,6 +364,11 @@ class RevisionProcessor extends Object {
         }
     }
 
+    /**
+     * Was something changed?
+     * @param array $changes
+     * @return bool
+     */
     private function hasChanges($changes) {
         $nodes = $changes['nodes'];
         $paths = $changes['paths'];
@@ -351,6 +382,12 @@ class RevisionProcessor extends Object {
 
     }
 
+    /**
+     * Clones provided version and its elements
+     *
+     * @param Revision $revision
+     * @return Revision
+     */
     private function cloneRevision(Revision $revision) {
         /** @var $newRevision Revision */
         $newRevision = $this->revisionRepository->createNew(NULL, array(
@@ -383,6 +420,12 @@ class RevisionProcessor extends Object {
         return $newRevision;
     }
 
+    /**
+     * Apply changes from accepted proposals to revision
+     *
+     * @param Revision $revision
+     * @param Changeset[] $changes
+     */
     private function applyChanges(Revision $revision, array $changes) {
 
 
@@ -461,6 +504,13 @@ class RevisionProcessor extends Object {
         }
     }
 
+    /**
+     * Merges changes in node properties
+     * @param NodeProperties $original
+     * @param NodeProperties $previous
+     * @param NodeProperties $replacement
+     * @return NodeProperties
+     */
     public function mergeNodeChanges($original, $previous, $replacement) {
         if($replacement->wasDeleted) {
             return $replacement;
@@ -493,6 +543,12 @@ class RevisionProcessor extends Object {
         ));
     }
 
+    /**
+     * find element key in collection based by properties ID
+     * @param array $collection
+     * @param NodeProperties $nodeP
+     * @return int
+     */
     private function findKeyByPropertiesId($collection, $nodeP) {
         foreach ($collection as $key => $value) {
             if($value->properties->id == $nodeP->id) {
@@ -501,6 +557,11 @@ class RevisionProcessor extends Object {
         }
     }
 
+    /**
+     * Auto closes changesets with collision changes
+     * @param Changeset[] $changesets
+     * @param array $keys
+     */
     private function autoCloseChangesets($changesets, $keys) {
         /** @var $changeset Changeset */
         foreach($changesets as $changeset) {
@@ -534,6 +595,11 @@ class RevisionProcessor extends Object {
         }
     }
 
+    /**
+     * Updates path length
+     *
+     * @param Revision $revision
+     */
     private function countPathsLength(Revision $revision) {
         foreach($revision->getPaths() as $path) {
             /** @var $path Path */
@@ -546,6 +612,7 @@ class RevisionProcessor extends Object {
     }
 
     /**
+     * @link Mixed::calculateDistanceBetweenGPS
      * @param $one string GPS
      * @param $two string GPS
      * @return float distance between points in meters
@@ -554,7 +621,11 @@ class RevisionProcessor extends Object {
         return Mixed::calculateDistanceBetweenGPS($one, $two);
     }
 
-
+    /**
+     * Updates floor connection for new revision
+     *
+     * @param Revision $revision
+     */
     private function cloneAndUpdateFloorConnections(Revision $revision) {
         $floorConnections = $this->floorConnectionRepository->findBy(["revision_one"=> $this->actualRevision]);
 
