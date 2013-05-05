@@ -4,13 +4,16 @@ use Nette\Security\Permission;
 use Nette\Caching\Cache;
 
 /**
- * Description of Authorizator
+ * Authorize access based on Presenter::action combination.
+ *  Data are loaded from DB
  *
- * @author Jan -Quinix- Langer
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class Authorizator extends Permission {
-    //put your code here
 
+    /**
+     * @param Service $service
+     */
     private function __construct(Service $service) {
 
         $roles=$service->getRoles();
@@ -39,7 +42,7 @@ class Authorizator extends Permission {
     /**
      *
      * @param Service $service
-     * @param Cache $cache
+     * @param \Nette\Caching\IStorage $storage
      * @return Authorizator
      */
     public static function getInstance(Service $service, \Nette\Caching\IStorage $storage) {

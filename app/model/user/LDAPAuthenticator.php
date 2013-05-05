@@ -1,21 +1,29 @@
 <?php
 namespace Maps\Model\User;
 use Nette\Security\AuthenticationException;
+use Nette\Security\IIdentity;
 use Nette\Security\Identity;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 1.2.13
- * Time: 11:38
- * To change this template use File | Settings | File Templates.
+ * Class LDAPAuthenticator
+ *
+ * @package Maps\Model\User
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthenticator {
+    /** @var  string LDAP url */
     private $url;
+    /** @var \Maps\Model\User\Service  */
     private $service;
+    /** @var int LDAP port */
     private $port;
+    /** @var string LDAP DN */
     private $dn;
 
+    /**
+     * @param array $ldapConfig
+     * @param Service $service
+     */
     function __construct($ldapConfig, Service $service) {
         $this->url = $ldapConfig['server'];
         $this->dn = $ldapConfig['dn'];
@@ -27,9 +35,11 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
     /**
      * Performs an authentication against LDAP.
      * and returns IIdentity on success or throws AuthenticationException
-     * @param  array
+     *
+     * @param array $credentials
+     * @throws \Nette\InvalidStateException
+     * @throws \Nette\Security\AuthenticationException
      * @return IIdentity
-     * @throws AuthenticationException
      */
     function authenticate(array $credentials) {
 
@@ -43,6 +53,7 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
         $password = $credentials[self::PASSWORD];
 
         if ($username == 'admin' || $username == 'user') {
+            //remove in production
             if($password !== "lalalalappp") {
                 throw new AuthenticationException();
             }
@@ -93,7 +104,13 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
         ]);
     }
 
-
+    /**
+     * Creates and stores new user entity
+     *
+     * @param $username
+     * @param $info
+     * @return mixed
+     */
     private function registerUser($username, $info) {
         $user = $this->service->createBlank();
         $user->username = $username;
@@ -104,6 +121,11 @@ class LDAPAuthenticator extends \Nette\Object implements \Nette\Security\IAuthen
         return $user;
     }
 
+    /**
+     *
+     * @param $info
+     * @param User $user
+     */
     private function setUserInfo($info, User $user) {
         $user->mail = (isset($info['preferredemail']) && !empty($info['preferredemail'])) ? $info['preferredemail'][0] : $info['mail'][0];
 

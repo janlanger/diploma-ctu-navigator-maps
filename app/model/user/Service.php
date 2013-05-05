@@ -4,15 +4,11 @@ namespace Maps\Model\User;
 
 use Maps\Model\BaseService;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of Service
+ * Class Service
  *
- * @author Honza
+ * @package Maps\Model\User
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class Service extends BaseService {
 

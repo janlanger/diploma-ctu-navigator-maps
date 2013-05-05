@@ -7,14 +7,18 @@ use Maps\Model\BaseEntity;
  * @Table(name="acl_privileges",
  *      uniqueConstraints={@UniqueConstraint(name="name_uq",columns={"name"})}
  * )
- * @author Jan -Quinix- Langer
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class Privilege extends BaseEntity {
-    /** @Column(type="string", length=50) */
+    /**
+     * @Column(type="string", length=50)
+     * @var string
+     */
     private $name;
     
     /**
      * @oneToMany(targetEntity="Acl", mappedBy="privilege", cascade={"persist"})
+     * @var Acl[]
      */
     private $acl;
     
@@ -22,6 +26,9 @@ class Privilege extends BaseEntity {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     */
     public function setName($name) {
         $this->name = $name;
     }

@@ -1,6 +1,8 @@
 <?php
 namespace Maps\Presenter;
 use Maps\Components\Forms\EntityForm;
+use Maps\Model\Persistence\BaseFormProcessor;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Jan
@@ -73,7 +75,7 @@ class UserPresenter extends SecuredPresenter {
 
     public function createComponentForm($name) {
         $form = new EntityForm($this, $name);
-        $form->setEntityService(new \Maps\Model\User\UserFormProcessor($this->repository));
+        $form->setEntityService(new BaseFormProcessor($this->repository));
 
         $form->addText("name","Jméno")
             ->setRequired();
