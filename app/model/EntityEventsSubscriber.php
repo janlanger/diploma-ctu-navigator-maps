@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 7.3.13
- * Time: 10:47
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model;
 
@@ -22,8 +15,18 @@ use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\FloorExchangePaths;
 use Maps\Model\Metadata\Revision;
 
+/**
+ * Event subscriber for doctrine
+ *
+ * @package Maps\Model
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class EntityEventsSubscriber implements  EventSubscriber {
 
+    /**
+     * Updates revision ids for new revisions
+     * @param LifecycleEventArgs $args
+     */
     public function prePersist(LifecycleEventArgs $args) {
         $entity = $args->getEntity();
         if($entity instanceof Plan) {

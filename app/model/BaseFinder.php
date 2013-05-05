@@ -4,7 +4,12 @@ namespace Maps\Model;
 
 use Nette\Utils\Paginator;
 
-
+/**
+ * Finder class for old model configuration
+ *
+ * @package Maps\Model
+ * @deprecated
+ */
 abstract class BaseFinder extends \Nette\Object {
 
     /** @var \Doctrine\ORM\QueryBuilder */
@@ -36,7 +41,7 @@ abstract class BaseFinder extends \Nette\Object {
         try {
             return $this->qb->getQuery()->getSingleResult();
         } catch (\Doctrine\ORM\NoResultException $e) {
-            return null;
+            return NULL;
         }
     }
 
@@ -61,6 +66,7 @@ abstract class BaseFinder extends \Nette\Object {
     }
 
     /**
+     * @param \Nette\Utils\Paginator $paginator
      * @return array
      */
     public function getPaginatedResult(Paginator $paginator) {
@@ -71,6 +77,7 @@ abstract class BaseFinder extends \Nette\Object {
     }
 
     /**
+     * @param $limit
      * @return array
      */
     public function getLimitedResult($limit) {
@@ -78,6 +85,8 @@ abstract class BaseFinder extends \Nette\Object {
     }
 
     /**
+     * @param $key
+     * @param $value
      * @return array
      */
     public function fetchPairs($key, $value) {
@@ -95,8 +104,8 @@ abstract class BaseFinder extends \Nette\Object {
     }
 
     /**
-     * @param int id
-     * @return EntityFinder
+     * @param int $id
+     * @return BaseFinder
      */
     public function whereId($id) {
         $this->qb->andWhere("$this->alias.id = :id");

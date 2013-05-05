@@ -4,9 +4,9 @@ namespace Maps\Model;
 
 
 /**
- * Description of BaseEntity
+ * Base Entity parent class
  * @MappedSuperClass
- * @author Honza
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  * @property-read int $id
  */
 abstract class BaseEntity extends \Nette\Object {
@@ -14,12 +14,16 @@ abstract class BaseEntity extends \Nette\Object {
     /**
      * @Id @Column(type="integer")
      * @generatedValue(strategy="IDENTITY")
+     * @var int
      */
     protected $id;
     
     public function __construct() {
     }
 
+    /**
+     * @return int
+     */
     public function getId() {
         return $this->id;
     }

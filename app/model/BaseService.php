@@ -1,14 +1,11 @@
 <?php
 namespace Maps\Model;
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of BaseService
+ * Base service parent class for old model system
  *
- * @author Honza
+ * @package Maps\Model
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @deprecated
  */
 abstract class BaseService extends \Nette\Object {
 
