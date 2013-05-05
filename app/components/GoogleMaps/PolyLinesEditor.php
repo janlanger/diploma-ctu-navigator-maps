@@ -2,7 +2,7 @@
 namespace Maps\Components\GoogleMaps;
 use Maps\Components\Forms\Form;
 use Maps\Model\Building\Building;
-use Maps\Model\Building\DictionaryQuery;
+use Maps\Model\Building\Queries\DictionaryQuery;
 use Maps\Model\Metadata\FloorConnection;
 use Maps\Presenter\BasePresenter;
 use Nette\Forms\IControl;

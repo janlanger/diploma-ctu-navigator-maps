@@ -4,7 +4,7 @@ use DataGrid\DataGrid;
 use DataGrid\DataSources\Doctrine\QueryBuilder;
 use DependentSelectBox\JsonDependentSelectBox;
 use Maps\Components\Forms\Form;
-use Maps\Model\Building\DictionaryQuery;
+use Maps\Model\Building\Queries\DictionaryQuery;
 use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\Queries\MyProposalsQuery;
 use Nette\Application\BadRequestException;
@@ -152,7 +152,7 @@ class DashboardPresenter extends SecuredPresenter
         $values = $form->getValues();
         $r = [];
         if($values['buildings'] > 0) {
-            $r = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\DictionaryQuery($values['buildings']), 'id', 'name');
+            $r = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['buildings']), 'id', 'name');
             if($r == NULL) {
                 $r = array();
             }

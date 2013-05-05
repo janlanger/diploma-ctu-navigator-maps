@@ -17,9 +17,9 @@ use Maps\Components\GoogleMaps\ModalMap;
 use Maps\Components\GoogleMaps\PolyLinesEditor;
 use Maps\Components\GoogleMaps\ProposalEditor;
 use Maps\Model\BaseDatagridQuery;
-use Maps\Model\Building\DictionaryQuery;
+use Maps\Model\Building\Queries\DictionaryQuery;
 use Maps\Model\Dao;
-use Maps\Model\Floor\ActivePlanQuery;
+use Maps\Model\Floor\Queries\ActivePlanQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\Node;
@@ -520,7 +520,7 @@ class MetadataPresenter extends SecuredPresenter {
             if(isset($cache[$values['building']])) {
                 return $cache[$values['building']];
             }
-            $r = $cache[$values['building']] = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\DictionaryQuery($values['building']), 'id', 'name');
+            $r = $cache[$values['building']] = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['building']), 'id', 'name');
             if ($r == NULL) {
                 $r = array();
             }

@@ -1,24 +1,20 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 17.3.13
- * Time: 16:53
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Building;
+namespace Maps\Model\Building\Queries;
 
 
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Loads pair id => name for all buildings
+ *
+ * @package Maps\Model\Building\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class DictionaryQuery extends QueryObjectBase {
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository)
     {
         return $repository->createQueryBuilder("b")->select("b.id, b.name");

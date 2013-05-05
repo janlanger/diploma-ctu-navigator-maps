@@ -3,6 +3,7 @@ namespace Maps\Presenter;
 use Maps\Model\Building\BuildingFormProcessor;
 use DataGrid\DataSources\Doctrine\QueryBuilder;
 use Maps\Model\Building\Queries\BuildingDatagridQuery;
+use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\Utils\Html;
 
 /**
@@ -106,7 +107,7 @@ class BuildingPresenter extends SecuredPresenter {
 
     public function createComponentForm($name) {
         $form = new \Maps\Components\Forms\EntityForm($this, $name);
-        $form->setEntityService(new BuildingFormProcessor($this->getRepository('building')));
+        $form->setEntityService(new BaseFormProcessor($this->getRepository('building')));
 
         $form->addText('name','Název')
             ->setRequired();
@@ -130,7 +131,7 @@ class BuildingPresenter extends SecuredPresenter {
     
     public function createComponentPlansGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
-        $q = new \Maps\Model\Floor\FloorsDatagridQuery($this->getParameter('id'));
+        $q = new \Maps\Model\Floor\Queries\FloorsDatagridQuery($this->getParameter('id'));
         $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('floor')));
         $datasource->setMapping([
             'id' => 'f.id',
