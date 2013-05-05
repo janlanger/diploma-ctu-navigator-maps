@@ -3,33 +3,48 @@
 namespace Maps\Model\Persistence;
 
 
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Maps\InvalidStateException;
+use Maps\Model\BaseEntity;
+use Maps\Model\Dao;
 
 /**
- * Description of BaseFormProvider
+ * Process values from EntityForm to provided entity
  *
- * @author Honza
+ * @see \Maps\Component\Forms\EntityForm
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class BaseFormProcessor extends \Nette\Object {
 
+    /** @var \Maps\Model\Dao  */
     private $dao;
 
+    /**
+     * @param \Maps\Model\Dao $dao
+     */
     public function __construct(\Maps\Model\Dao $dao) {
         $this->dao = $dao;
     }
 
+    /**
+     * Updates the entity with <pre>$values</pre> and persist it
+     *
+     * @param BaseEntity $entity
+     * @param array $values
+     * @return BaseEntity
+     */
     public function update($entity, $values) {
         $this->setData($entity, $values);
         $this->dao->save($entity);
         return $entity;
     }
 
+    /**
+     * Updates entity values with provided data
+     * Calls get* methods for all elements inside <pre>$values</pre> array
+     *
+     * @param BaseEntity $entity
+     * @param array $values
+     */
     protected function setData($entity, $values) {
         foreach ($values as $key => $value) {
             $method = "set" . ucfirst($key);
@@ -38,22 +53,27 @@ class BaseFormProcessor extends \Nette\Object {
     }
     
     /**
-     * 
      * @param string $entityName
-     * @return \Doctrine\ORM\EntityRepository
+     * @return Dao
      */
     protected function getEntityRepository($entityName) {
         return $this->dao->getEntityManager()->getRepository($entityName);
     }
     
     /**
-     * 
-     * @return \Maps\Model\Dao
+     * @return Dao
      */
     public function getDao() {
         return $this->dao;
     }
-    
+
+    /**
+     * @param \Nette\Http\FileUpload $file
+     * @param string $dir destination directory
+     * @param string $filename final file name without extension
+     * @return null|string returns name of the file, or null when no file was uploaded
+     * @throws \Maps\InvalidStateException when error occurs
+     */
     protected function handleUpload(\Nette\Http\FileUpload $file, $dir, $filename) {
         if($file->isOk()) {
             $ext = pathinfo($file->getName(), PATHINFO_EXTENSION);
@@ -71,8 +91,6 @@ class BaseFormProcessor extends \Nette\Object {
         }
         return NULL;
     }
-
-
 
 }
 

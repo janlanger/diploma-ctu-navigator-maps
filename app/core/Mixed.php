@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of the Maps (http://www.Maps.org)
- *
- * Copyright (c) 2008, 2012 Filip Procházka (filip@prochazka.su)
- *
- * For the full copyright and license information, please view the file license.md that was distributed with this source code.
- */
-
 namespace Maps\Tools;
 
 use Maps\InvalidArgumentException;
@@ -17,6 +9,7 @@ use Nette;
 
 /**
  * @author Filip Procházka <filip@prochazka.su>
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class Mixed extends Nette\Object {
 
@@ -30,8 +23,11 @@ class Mixed extends Nette\Object {
     }
 
     /**
+     * Return type of <pre>$value</type>
+     *
      * @param mixed $value
      * @return string
+     * @author Filip Procházka <filip@prochazka.su>
      */
     public static function getType($value) {
         return is_object($value) ? 'instanceof ' . get_class($value) : gettype($value);
@@ -41,6 +37,7 @@ class Mixed extends Nette\Object {
      * @param mixed $value
      * @param boolean $short
      * @return string
+     * @author Filip Procházka <filip@prochazka.su>
      */
     public static function toString($value, $short = FALSE) {
         if (is_array($value) || is_object($value)) {
@@ -65,11 +62,19 @@ class Mixed extends Nette\Object {
     /**
      * @param mixed $value
      * @return boolean
+     * @author Filip Procházka <filip@prochazka.su>
      */
     public static function isSerializable($value) {
         return is_scalar($value);
     }
 
+
+    /**
+     * Sanitazez CK editor setOutputMode using text and some regular expresions
+     * @param string $value
+     * @return string
+     * @author Jan Langer <langeja1@fit.cvut.cz>
+     */
     public static function sanitazeCKEditor($value) {
         static $texy;
 
@@ -107,6 +112,16 @@ class Mixed extends Nette\Object {
         return $value;
     }
 
+    /**
+     * Maps collection as associative array using some key inside it
+     *
+     * @param array $collection
+     * @param string $key
+     * @return array collection mapped with key
+     * @throws \Maps\InvalidArgumentException when <pre>$key</pre> is not present in every item
+     * @throws \Maps\InvalidStateException when <pre>$key</pre> is not unique
+     * @author Jan Langer <langeja1@fit.cvut.cz>
+     */
     public static function mapAssoc($collection, $key) {
         $arr = [];
         foreach($collection as $item) {
@@ -122,9 +137,12 @@ class Mixed extends Nette\Object {
     }
 
     /**
-     * @param $one string GPS coords
-     * @param $two string GPS coords
-     * @return float
+     * Computes distance between two GPS coordinates using Harvesine
+     *
+     * @param string $one GPS coords
+     * @param string $two GPS coords
+     * @return float distance in meters
+     * @author Jan Langer <langeja1@fit.cvut.cz>
      */
     public static function  calculateDistanceBetweenGPS($one, $two) {
         $one = explode(",", $one);

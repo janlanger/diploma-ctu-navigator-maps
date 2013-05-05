@@ -15,6 +15,8 @@ use Nette\Utils\Paginator as UIPaginator;
 
 
 /**
+ * Envelope over query result.
+ *
  * @author Filip Procházka <filip@prochazka.su>
  */
 class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
@@ -133,10 +135,10 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 	}
 
 
-
-	/**
-	 * @return int
-	 */
+    /**
+     * @throws \Maps\QueryException
+     * @return int
+     */
 	public function getTotalCount()
 	{
 		if ($this->totalCount === NULL) {
@@ -152,10 +154,10 @@ class ResultSet extends Nette\Object implements \Countable, \IteratorAggregate
 	}
 
 
-
-	/**
-	 * @return \ArrayIterator
-	 */
+    /**
+     * @throws \Maps\QueryException
+     * @return \ArrayIterator
+     */
 	public function getIterator()
 	{
 		try {

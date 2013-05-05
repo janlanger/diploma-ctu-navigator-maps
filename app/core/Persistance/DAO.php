@@ -17,6 +17,9 @@ use Maps\Model\Persistence\ResultSet;
 
 
 /**
+ * Extended entity repository
+ *
+ * @author Filip Prochazka, Kdyby Framework
  * @author Jan Langer
  */
 class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Persistence\IQueryExecutor, Persistence\IQueryable, Persistence\IObjectFactory
@@ -194,7 +197,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 		if (is_array($entity)) {
 			$dao = $this;
 			array_map(function ($entity) use ($dao) {
-				/** @var \Maps\Dao $dao */
+				/** @var Dao $dao */
 				return $dao->delete($entity, Persistence\IDao::NO_FLUSH);
 			}, $entity);
 
@@ -284,7 +287,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 
 
 	/**
-	 * @param \Maps\Model\Persistence\IQueryObject|\Maps\Model\QueryObjectBase $queryObject
+	 * @param \Maps\Model\Persistence\IQueryObject|QueryObjectBase $queryObject
 	 * @return integer
 	 */
 	public function count(Persistence\IQueryObject $queryObject)
@@ -318,7 +321,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 	/**
      * @param \Maps\Model\Persistence\IQueryObject|QueryObjectBase $queryObject
 	 *
-	 * @throws \InvalidStateException
+	 * @throws InvalidStateException
 	 * @return object
 	 */
 	public function fetchOne(Persistence\IQueryObject $queryObject)
@@ -330,7 +333,7 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 			return NULL;
 
 		} catch (NonUniqueResultException $e) { // this should never happen!
-			throw new \InvalidStateException("You have to setup your query calling ->setMaxResult(1).", 0, $e);
+			throw new InvalidStateException("You have to setup your query calling ->setMaxResult(1).", 0, $e);
 
 		} catch (\Exception $e) {
 			return $this->handleQueryException($e, $queryObject);
@@ -362,17 +365,15 @@ class Dao extends Doctrine\ORM\EntityRepository implements Persistence\IDao, Per
 	}
 
 
-
-	/**
-	 * Fetches all records and returns an associative array indexed by key
-	 *
+    /**
+     * Fetches all records and returns an associative array indexed by key
+     *
      * @param \Maps\Model\Persistence\IQueryObject|QueryObjectBase $queryObject
-	 * @param string $key
-	 *
-	 * @throws \Exception
-	 * @throws \InvalidStateException
-	 * @return array
-	 */
+     * @param string $key
+     *
+     * @throws \Exception|InvalidStateException
+     * @return array
+     */
 	public function fetchAssoc(Persistence\IQueryObject $queryObject, $key = NULL)
 	{
 		try {
