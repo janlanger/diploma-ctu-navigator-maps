@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 27.2.13
- * Time: 17:30
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Presenter;
 
@@ -22,16 +15,26 @@ use Maps\Model\Floor\Service\PlanFormProcessor;
 use Maps\Model\Floor\Queries\PlanRevisionsQuery;
 use Maps\Model\Persistence\BaseFormProcessor;
 
+/**
+ * Class PlanPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class PlanPresenter extends SecuredPresenter {
 
     /**
      * @persistent
+     * @var int floor id
      */
     public $floor;
 
     /** @var Floor */
     private $floorEntity = NULL;
 
+    /**
+     * @return Floor
+     */
     private function getFloor() {
         if($this->floorEntity == NULL) {
             $this->floorEntity = $this->getRepository('floor')->find($this->floor);
@@ -64,10 +67,16 @@ class PlanPresenter extends SecuredPresenter {
             ]));
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function actionMap($id) {
         $this['georeferenceForm']->bindEntity($this->getRepository('plan')->find($id));
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function actionEdit($id) {
         $this->setView('map');
 
@@ -87,6 +96,9 @@ class PlanPresenter extends SecuredPresenter {
         $this['georeferenceForm']['ok']->caption= 'Odeslat a uložit jako novu revizi';
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function handlePublish($id) {
         /** @var $plan Plan */
         $plan = $this->getRepository('plan')->find($id);

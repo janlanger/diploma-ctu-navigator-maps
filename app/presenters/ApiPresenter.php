@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 15.4.13
- * Time: 15:27
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Presenter;
 
@@ -26,6 +19,12 @@ use Nette\Application\BadRequestException;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\Responses\TextResponse;
 
+/**
+ * Class ApiPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class ApiPresenter extends BasePresenter {
 
     /**
@@ -34,7 +33,7 @@ class ApiPresenter extends BasePresenter {
      */
     public $apikey = NULL;
 
-
+    /** {@inheritdoc} */
     protected function startup() {
         parent::startup();
 
@@ -50,6 +49,10 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * Check last modification header and terminates presenter if provided date is less or equal
+     * @param \DateTime $lastModified
+     */
     private function handleLastModification($lastModified) {
         if(!$this->getHttpContext()->isModified($lastModified)) {
             $this->getHttpResponse()->setHeader('Content-length', 0);
@@ -57,18 +60,28 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * Handles HTTP 400 Bad Request
+     * @param string $msg error message
+     */
     private function badRequest($msg) {
         $this->getHttpResponse()->setCode(400);
         $this->sendResponse(new JsonErrorResponse($msg));
     }
 
+    /**
+     * Handles HTTP 404 Not Found
+     *
+     * @param string $msg error message
+     */
     private function notFound($msg) {
         $this->getHttpResponse()->setCode(404);
         $this->sendResponse(new JsonErrorResponse($msg));
     }
 
-
-
+    /**
+     * @param int|null $id building id
+     */
     public function actionBuilding($id = NULL) {
         if($id != NULL && ((int) $id) <= 0) {
             $this->badRequest("Invalid Building ID");
@@ -104,6 +117,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int|null $id building id
+     */
     public function actionBuilding_v1($id) {
         if ($id != NULL && ((int)$id) <= 0) {
             $this->badRequest("Invalid Building ID");
@@ -142,6 +158,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function actionFloor($id) {
         if ($id == NULL) {
             $this->badRequest("Floor collection resource is not supported.");
@@ -163,6 +182,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int $id floor id
+     */
     public function actionFloorPlan($id) {
         if ($id == NULL || ((int)$id) <= 0) {
             $this->badRequest("Invalid floor ID");
@@ -179,6 +201,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int $id floor id
+     */
     public function actionFloorMetadata($id) {
         if ($id == NULL || ((int)$id) <= 0) {
             $this->badRequest("Invalid floor ID");
@@ -225,6 +250,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int $id node id
+     */
     public function actionNode($id) {
         if ($id == NULL || ((int)$id) <= 0) {
             $this->badRequest("Invalid node ID");
@@ -239,6 +267,9 @@ class ApiPresenter extends BasePresenter {
         }
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function actionFloorNodes($id) {
         if ($id == NULL || ((int)$id) <= 0) {
             $this->badRequest("Invalid floor ID");
@@ -261,6 +292,7 @@ class ApiPresenter extends BasePresenter {
 
     /**
      * @deprecated
+     * @param int $id building ID
      */
     public function actionPlan_v1($id) {
         if ($id == NULL || ((int)$id) <= 0) {
@@ -304,7 +336,10 @@ class ApiPresenter extends BasePresenter {
     }
 
     /********** DATA CONVERSIONS **********/
-
+    /**
+     * @param string $c GPS coordinates string representation
+     * @return array associative latitude, longitude
+     */
     private function convertCoordinates($c) {
         $c = explode(',', $c);
         return [
@@ -313,6 +348,13 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
+    /**
+     * Generates building response payload
+     *
+     * @param Building $item
+     * @param bool $version1 include floors to response?
+     * @return array
+     */
     private function getBuildingPayload(Building $item, $version1 = FALSE) {
         $r = [
             'id' => $item->getId(),
@@ -344,6 +386,14 @@ class ApiPresenter extends BasePresenter {
         return $r;
     }
 
+    /**
+     * Generates floor payload
+     *
+     * @param Floor $floor
+     * @param array $plans
+     * @param array $nodesData
+     * @return array
+     */
     private function getFloorPayload(Floor $floor, $plans = [], $nodesData = NULL) {
         $nodes = [];
         if($nodesData != NULL) {
@@ -364,6 +414,11 @@ class ApiPresenter extends BasePresenter {
         return $r;
     }
 
+    /**
+     * Generates floor plan payload
+     * @param Plan $plan
+     * @return array
+     */
     private function getPlanPayload(Plan $plan) {
         return [
             'id' => $plan->id,
@@ -376,6 +431,13 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
+    /**
+     * Generates node response payload
+     *
+     * @param Node $node
+     * @param int|null $floorId
+     * @return array
+     */
     private function getNodePayload(Node $node, $floorId = NULL) {
         $p = $node->getProperties();
         return [
@@ -391,6 +453,11 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
+    /**
+     * @param Path $path
+     * @param int|null $floorId
+     * @return array
+     */
     private function getPathPayload(Path $path, $floorId = NULL) {
         $p = $path->getProperties();
         return [
@@ -402,6 +469,10 @@ class ApiPresenter extends BasePresenter {
         ];
     }
 
+    /**
+     * @param FloorConnection $path
+     * @return array
+     */
     private function getFloorConnectionPayload(FloorConnection $path) {
         return [
             'id' => $path->id,

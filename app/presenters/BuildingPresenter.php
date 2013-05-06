@@ -7,13 +7,13 @@ use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\Utils\Html;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 5.2.13
- * Time: 12:43
- * To change this template use File | Settings | File Templates.
+ * Class BuildingPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class BuildingPresenter extends SecuredPresenter {
+    /** {@inheritdoc} */
     protected function beforeRender()
     {
         if($this->getView() != 'default') {
@@ -22,7 +22,9 @@ class BuildingPresenter extends SecuredPresenter {
         parent::beforeRender();
     }
 
-
+    /**
+     * @param int $id building ID
+     */
     public function actionDetail($id) {
         $this->template->building = $this->getRepository("building")->find($id);
     }
@@ -34,10 +36,16 @@ class BuildingPresenter extends SecuredPresenter {
 
     }
 
+    /**
+     * @param int $id building ID
+     */
     public function actionEdit($id) {
         $this['form']->bindEntity($this->getRepository('building')->find($id));
     }
 
+    /**
+     * @param int $id building ID
+     */
     public function handleDelete($id) {
         try {
             $entity = $this->getRepository('building')->find($id);
@@ -77,8 +85,10 @@ class BuildingPresenter extends SecuredPresenter {
         $grid->addAction("Detail", "Building:detail");
     }
 
-
-
+    /**
+     * @param $name
+     * @return \Maps\Components\GoogleMaps\BasicMap
+     */
     private function googleMapBase($name) {
         $map = new \Maps\Components\GoogleMaps\BasicMap($this, $name);
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
@@ -86,9 +96,6 @@ class BuildingPresenter extends SecuredPresenter {
         return $map;
     }
 
-    /**
-     * @return \Maps\Components\GoogleMaps\BasicMap
-     */
     protected function createComponentGoogleMap($name) {
        $map = $this->googleMapBase($name);
 

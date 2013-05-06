@@ -5,10 +5,15 @@ use Nette\Application\UI;
 
 
 /**
- * Sign in/out presenters.
+ * Provides login and logout actions
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class SignPresenter extends BasePresenter {
-
+    /**
+     * @param string $key stored request backlink
+     */
     public function actionIn($key) {
         if ($this->getUser()->isLoggedIn()) {
             if ($key) {
@@ -38,7 +43,9 @@ class SignPresenter extends BasePresenter {
         return $form;
     }
 
-
+    /**
+     * @param Form $form
+     */
     public function signInFormSucceeded($form) {
         $values = $form->getValues();
         $backlink = $this->getParameter('key');
@@ -61,7 +68,6 @@ class SignPresenter extends BasePresenter {
             return;
         }
     }
-
 
     public function actionOut() {
         $this->getUser()->logout();

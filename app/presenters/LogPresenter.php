@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 3.5.13
- * Time: 11:44
- * To change this template use File | Settings | File Templates.
- */
-
 namespace Maps\Presenter;
 
 
@@ -15,6 +7,12 @@ use Nette\Application\Responses\TextResponse;
 use Nette\Diagnostics\Debugger;
 use Nette\Utils\Strings;
 
+/**
+ * Class LogPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class LogPresenter extends SecuredPresenter {
 
     protected function beforeRender() {
@@ -24,6 +22,10 @@ class LogPresenter extends SecuredPresenter {
         parent::beforeRender();
     }
 
+    /**
+     * @param string $file file to show
+     * @throws \Nette\Application\BadRequestException
+     */
     public function actionShowLogfile($file) {
         $dir = Debugger::$logDirectory;
         if (file_exists($dir . '/' . $file) && Strings::startsWith(realpath($dir . '/' . $file), $dir)) {

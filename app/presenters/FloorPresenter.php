@@ -13,17 +13,19 @@ use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\Diagnostics\Debugger;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 10.2.13
- * Time: 17:52
- * To change this template use File | Settings | File Templates.
+ * Class FloorPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class FloorPresenter extends SecuredPresenter {
 
-    /** @persistent */
+    /**
+     * @persistent
+     * @var int building ID
+     */
     public $building;
-
+    /** @var Building */
     private $buildingEntity = NULL;
 
     /**
@@ -53,6 +55,9 @@ class FloorPresenter extends SecuredPresenter {
         $this['form']->setRedirect("Building:detail?id=" . $this->getBuilding()->id);
     }
 
+    /**
+     * @param int $id floor id
+     */
     public function actionEdit($id) {
         $entity = $this->getRepository('floor')->find($id);
 
@@ -61,6 +66,9 @@ class FloorPresenter extends SecuredPresenter {
 
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function handleDelete($id) {
         $entity = $this->getRepository('floor')->find($id);
 
@@ -74,6 +82,9 @@ class FloorPresenter extends SecuredPresenter {
         $this->redirect("Building:detail?id=".$this->building);
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function actionDefault($id) {
         $this->template->floor = $floor = $this->getRepository('floor')->find($id);
         $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));

@@ -6,16 +6,22 @@ use Nette\Latte\Macros\MacroSet;
 use Nette\Security\Diagnostics\UserPanel;
 
 /**
- * Base presenter for all application presenters.
+ * Base presenter for every app presenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz
  */
 abstract class BasePresenter extends Presenter {
-
+    /** Flash message type - error */
     const FLASH_ERROR = 'error';
+    /** Flash message type - warning */
     const FLASH_WARNING = 'warning';
+    /** Flash message type - success */
     const FLASH_SUCCESS = 'success';
-
+    /** @var array  */
     public $breadcrumbs = [['link'=> '//Dashboard:','title'=>'Nástěnka']];
 
+    /** {@inheritdoc} */
     protected function startup() {
         parent::startup();
         new \DebugPanel\PresenterLinkPanel($this);
@@ -24,10 +30,6 @@ abstract class BasePresenter extends Presenter {
             $p->addCredentials("admin",'lalalalappp');
             $p->addCredentials('user', 'lalalalappp');
         }
-    }
-
-    public function formatTemplateFiles() {
-        return parent::formatTemplateFiles();
     }
 
     /**
@@ -59,16 +61,19 @@ abstract class BasePresenter extends Presenter {
         }
         return $this->getContext()->em->getRepository($entity);
     }
-
+    /** {@inheritdoc} */
     protected function beforeRender() {
         $this->template->breadcrumbs = $this->breadcrumbs;
         parent::beforeRender();
     }
 
-
+    /**
+     * @param string $link presenter:action link
+     * @param string $title title
+     */
     public function addBreadcrumb($link, $title) {
         $trimed = trim($link, '/ ');
-        if(strrpos($trimed, "?") !== false) {
+        if(strrpos($trimed, "?") !== FALSE) {
             $trimed = substr($trimed,0,strrpos($trimed, "?")- strlen($trimed));
         }
         $parts = explode(":", $trimed);
@@ -78,7 +83,7 @@ abstract class BasePresenter extends Presenter {
         }
         $presenter = implode(":", $parts);
 
-        $this->breadcrumbs[] = ['link'=>($this->getUser()->isAllowed($presenter, $action)?$link:null), 'title'=>$title];
+        $this->breadcrumbs[] = ['link'=>($this->getUser()->isAllowed($presenter, $action)?$link:NULL), 'title'=>$title];
     }
 
 

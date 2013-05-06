@@ -5,29 +5,27 @@ namespace Maps\Presenter;
 use Maps\Components\Forms\Form;
 use Maps\Components\Forms\EntityForm;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of ACLPresenter
+ * ACL management
  *
- * @author Honza
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class ACLPresenter extends SecuredPresenter {
-
+    /** @var  string[] */
     private $presenters;
+    /** @var string[]  */
     private $actions;
+    /** @var  string[] */
     private $presenterActionMap;
     /** @var \Maps\Model\Dao */
     private $repository;
-
+    /** {@inheritdoc} */
     public function startup() {
         parent::startup();
         $this->repository = $this->getContext()->em->getRepository('Maps\Model\Acl\Acl');
     }
-
+    /** {@inheritdoc} */
     protected function beforeRender()
     {
         $this->addBreadcrumb('User:','Uživatelé');
@@ -37,17 +35,22 @@ class ACLPresenter extends SecuredPresenter {
         parent::beforeRender();
     }
 
-
-    public function actionAdd($id) {
+    public function actionAdd() {
         $this['editForm']->bindEntity($this->getContext()->ACLService->createBlank());
         $this['editForm']->setSuccessFlashMessage('Role byla úspěšně vytvořena, nastavte jí oprávnění.');
     }
 
+    /**
+     * @param int $id role id
+     */
     public function actionEdit($id) {
         $this['editForm']->bindEntity($this->getContext()->ACLService->find($id));
         $this['editForm']->setSuccessFlashMessage('Data byla úspěšně uložena.');
     }
-    
+
+    /**
+     * @param int $id role id
+     */
     public function handleDelete($id) {
             try {
                 $entity = $this->getContext()->ACLService->find($id);
@@ -60,8 +63,12 @@ class ACLPresenter extends SecuredPresenter {
             $this->redirect('default');
     }
 
+    /**
+     * @param int $id role id
+     * @throws \Nette\Application\BadRequestException
+     */
     public function actionSetup($id) {
-        if($id == null || !is_numeric($id)) {
+        if($id == NULL || !is_numeric($id)) {
             throw new \Nette\Application\BadRequestException('Missing or invalid parameter format.');
         }
         $roleEnt = $this->getContext()->ACLService->find($id);
@@ -76,7 +83,7 @@ class ACLPresenter extends SecuredPresenter {
         ksort($p);
         foreach ($p as $presente) {
             if ($presente->getPresenterReflection()->isSubclassOf("Maps\\Presenter\\SecuredPresenter")) {
-                $pName = ($presente->getModule()!=null?$presente->getModule().":":""). $presente->getName();
+                $pName = ($presente->getModule()!=NULL?$presente->getModule().":":""). $presente->getName();
                 $pActions = ($presente->getActions());
 
                 $presenters[] = $pName;
@@ -171,7 +178,7 @@ class ACLPresenter extends SecuredPresenter {
                 if($value != 0) {
                     $toInsert[] = array(
                         'resource' => $k[0],
-                        'privilege' => ($k[1] == 'all'?null:$k[1]),
+                        'privilege' => ($k[1] == 'all'?NULL:$k[1]),
                         'allowed' => ($value>0?1:-1),                
                     );
                 }
