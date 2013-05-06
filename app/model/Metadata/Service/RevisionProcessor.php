@@ -715,7 +715,7 @@ class RevisionProcessor extends Object {
             $node = $floorConnection->getNodeTwo();
             if(isset($this->nodeChangedIds[$node->id])) {
                 $node = $revision->nodes->get(($this->nodeChangedIds[$node->id]))->properties;
-            } else if(is_array($this->changedKeys['nodes']) && isset($this->changedKeys['nodes'][$node->id])){
+            } else if(isset($this->changedKeys['nodes']) && is_array($this->changedKeys['nodes']) && isset($this->changedKeys['nodes'][$node->id])){
                 continue;
             }
             $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
