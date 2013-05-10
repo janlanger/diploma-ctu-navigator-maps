@@ -45,7 +45,7 @@ class NonBlockingHttp extends Object {
         }
         $command .= " ".escapeshellarg($this->url);
 
-        shell_exec($command." &");
+        shell_exec($command." >/dev/null 2>&1 &");
     }
 
     /**

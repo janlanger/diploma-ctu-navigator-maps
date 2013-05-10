@@ -564,6 +564,9 @@ class RevisionProcessor extends Object {
      */
     private function autoCloseChangesets($changesets, $keys) {
         /** @var $changeset Changeset */
+        if(!is_array($changesets)) {
+		return;
+	}
         foreach($changesets as $changeset) {
             if($changeset->getState() != Changeset::STATE_NEW) {
                 //we are dealing with this only if the changeset should stay open after this
