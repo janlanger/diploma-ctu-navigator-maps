@@ -503,6 +503,9 @@ class RevisionProcessor extends Object {
 
     private function autoCloseChangesets($changesets, $keys) {
         /** @var $changeset Changeset */
+        if(!is_array($changesets)) {
+		return;
+	}
         foreach($changesets as $changeset) {
             if($changeset->getState() != Changeset::STATE_NEW) {
                 //we are dealing with this only if the changeset should stay open after this
@@ -644,7 +647,7 @@ class RevisionProcessor extends Object {
             $node = $floorConnection->getNodeTwo();
             if(isset($this->nodeChangedIds[$node->id])) {
                 $node = $revision->nodes->get(($this->nodeChangedIds[$node->id]))->properties;
-            } else if(is_array($this->changedKeys['nodes']) && isset($this->changedKeys['nodes'][$node->id])){
+            } else if(isset($this->changedKeys['nodes']) && is_array($this->changedKeys['nodes']) && isset($this->changedKeys['nodes'][$node->id])){
                 continue;
             }
             $newFloorConnections[] = $this->floorConnectionRepository->createNew(NULL, [
