@@ -28,7 +28,7 @@ class DeactivatePlansOfFloorQuery extends QueryObjectBase {
     /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $q = $repository->createQueryBuilder("p");
-        $q->update(__NAMESPACE__.'\\Plan','p')
+        $q->update('Maps\\Model\\Floor\\Plan','p')
             ->set("p.published", $q->expr()->literal(FALSE))
             ->where("p.floor = :floor")
             ->andWhere("p.published = :published")
