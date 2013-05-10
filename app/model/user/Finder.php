@@ -1,15 +1,11 @@
 <?php
 namespace Maps\Model\User;
 use Maps\Model\BaseFinder;
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- * Description of Finder
+ * Class Finder
  *
- * @author Honza
+ * @package Maps\Model\User
  */
 class Finder extends BaseFinder {
     protected $alias = "u";
@@ -26,7 +22,7 @@ class Finder extends BaseFinder {
         try {
             return $this->qb->getQuery()->setHint(\Doctrine\ORM\Query::HINT_REFRESH, TRUE)->getSingleResult();
         } catch (\Doctrine\ORM\NoResultException $e) {
-            return null;
+            return NULL;
         }
     }
     

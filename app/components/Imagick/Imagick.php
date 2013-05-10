@@ -1,16 +1,10 @@
 <?php
 
-/**
- * This file is part of the Nette Framework (http://nette.org)
- *
- * Copyright (c) 2004, 2011 David Grudl (http://davidgrudl.com)
- *
- * For the full copyright and license information, please view
- * the file license.txt that was distributed with this source code.
- */
-
 namespace Maps\Components;
 
+use Maps\InvalidArgumentException;
+use Maps\InvalidStateException;
+use Maps\ShellCommandException;
 use Nette;
 use Nette\Image;
 
@@ -26,7 +20,7 @@ use Nette\Image;
  * $image->send();
  * </code>
  *
- * @author     David Grudl
+ * @author  David Grudl
  * @author Jan Langer
  */
 class ImageMagick extends Image
@@ -48,35 +42,37 @@ class ImageMagick extends Image
 
     /** @var int */
     private $height;
-
+    /** @var int */
     private $page;
 
 
     /**
      * Wraps image file.
-     * @param  string  detected image format
-     * @param  string
+     * @param string $file
+     * @param int $page page for multi-page files
+     * @param string $format detected format
+     * @throws \Maps\InvalidArgumentException
      */
-    public function __construct($file, $page=null, & $format = NULL)
+    public function __construct($file, $page=NULL, & $format = NULL)
     {
         if(!function_exists('exec')) {
-            throw new \InvalidArgumentException("exec() function doesn't exists, probably disabled.");
+            throw new InvalidArgumentException("exec() function doesn't exists, probably disabled.");
         }
 
         exec("convert -version", $out, $returnCode);
 
         if(!Nette\Utils\Strings::startsWith($out[0],'Version: ImageMagick')) {
-            throw new \InvalidArgumentException("ImageMagick is not installed, or I cannot execute it.");
+            throw new InvalidArgumentException("ImageMagick is not installed, or I cannot execute it.");
         }
 
         if($returnCode != 0) {
-            throw new \InvalidArgumentException("exec(convert -version) returned code ".$returnCode.", so it propably doesn't work...");
+            throw new InvalidArgumentException("exec(convert -version) returned code ".$returnCode.", so it propably doesn't work...");
         }
 
 
 
         if (!is_file($file)) {
-            throw new \InvalidArgumentException("File '$file' not found.");
+            throw new InvalidArgumentException("File '$file' not found.");
         }
         $this->page = $page;
         $format = $this->setFile(realpath($file));
@@ -133,9 +129,9 @@ class ImageMagick extends Image
 
     /**
      * Resizes image.
-     * @param  mixed  width in pixels or percent
-     * @param  mixed  height in pixels or percent
-     * @param  int    flags
+     * @param  mixed  $width in pixels or percent
+     * @param  mixed  $height in pixels or percent
+     * @param  int    $flags
      * @return ImageMagick  provides a fluent interface
      */
     public function resize($width, $height, $flags = self::FIT)
@@ -182,7 +178,7 @@ class ImageMagick extends Image
      * @param  int  optional image type
      * @return bool TRUE on success or FALSE on failure.
      */
-    public function save($file = NULL, $quality = NULL, $type = NULL, $options = null)
+    public function save($file = NULL, $quality = NULL, $type = NULL, $options = NULL)
     {
         if ($this->file === NULL) {
             return parent::save($file, $quality, $type);
@@ -211,24 +207,25 @@ class ImageMagick extends Image
         $this->file = $file;
         $res = $this->execute('identify -format "%w,%h,%m" ' . escapeshellarg($this->file));
         if (!$res) {
-            throw new \Exception("Unknown image type in file '$file' or ImageMagick not available.");
+            throw new InvalidStateException("Unknown image type in file '$file' or ImageMagick not available.");
         }
         list($this->width, $this->height, $format) = explode(',', $res, 3);
         return $format;
     }
 
 
-
     /**
      * Executes command.
-     * @param  string  command
-     * @param  string|bool  process output?
+     * @param string $command
+     * @param bool $output
+     * @param array $options
+     * @throws \Maps\ShellCommandException
      * @return string
      */
-    private function execute($command, $output = NULL, $options= null)
+    private function execute($command, $output = NULL, $options= NULL)
     {
         $arguments = "";
-        if($options != null) {
+        if($options != NULL) {
             foreach($options as $argument => $value) {
                 $arguments.=' -'.$argument;
                 if(!is_bool($value)) {
@@ -238,7 +235,7 @@ class ImageMagick extends Image
         }
 
 
-        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file.($this->page!=null?"[".$this->page."]":"")), $command);
+        $command = str_replace('%input', $arguments.' '.escapeshellarg($this->file.($this->page!=NULL?"[".$this->page."]":"")), $command);
         if ($output) {
             $newFile = is_string($output)
                 ? $output
@@ -250,12 +247,11 @@ class ImageMagick extends Image
 
         $lines = array();
         exec(self::$path . $command, $lines, $status); // $status: 0 - ok, 1 - error, 127 - command not found?
-
+        if ($status != 0) {
+            throw new ShellCommandException("Unknown error while calling ImageMagick. Command " . $command);
+        }
         if ($output) {
-            if ($status != 0) {
-                dump($lines);
-                throw new \Exception("Unknown error while calling ImageMagick. Command ".$command);
-            }
+
             if ($this->isTemporary) {
                 unlink($this->file);
             }

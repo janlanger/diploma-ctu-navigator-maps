@@ -21,6 +21,7 @@ use Nette\Diagnostics\Debugger,
  * @author	David Grudl
  * @author	Patrik Votoček
  * @author	Michael Moravec
+ * @author  Jan Langer
  */
 class ConnectionPanel extends \Nette\Object implements \Nette\Diagnostics\IBarPanel, \Doctrine\DBAL\Logging\SQLLogger
 {

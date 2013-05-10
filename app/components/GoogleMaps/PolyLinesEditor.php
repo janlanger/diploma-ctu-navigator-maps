@@ -1,61 +1,83 @@
 <?php
 namespace Maps\Components\GoogleMaps;
 use Maps\Components\Forms\Form;
-use Maps\Model\Building\DictionaryQuery;
+use Maps\Model\Building\Building;
+use Maps\Model\Building\Queries\DictionaryQuery;
 use Maps\Model\Metadata\FloorConnection;
 use Maps\Presenter\BasePresenter;
+use Nette\Forms\IControl;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 10.2.13
- * Time: 22:25
- * To change this template use File | Settings | File Templates.
+ * Metadata editor component
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz
+ * @package Maps\Components\GoogleMaps
  */
 class PolyLinesEditor extends BaseMapControl {
 
+    /** @var  IControl text field for definition */
     private $formField;
+    /** @var  IControl submit element to handle */
     private $submit;
+    /** @var  string used room prefix in this building */
     private $roomPrefix;
-    private $overiden;
 
+    /** @var  bool has this component used by another internally? */
+    private $overridden;
+
+    /** @var FloorConnection[] */
     private $floorExchangePaths;
-
-
-
+    /** @deprecated @var array  */
     private $buildings=[];
 
 
+    /**
+     * @param FloorConnection[] $floorExchangePaths
+     */
     public function setFloorExchangePaths($floorExchangePaths) {
         $this->floorExchangePaths = $floorExchangePaths;
     }
 
+    /**
+     * @return \Maps\Model\Metadata\FloorConnection[]
+     */
     public function getFloorExchangePaths() {
         return $this->floorExchangePaths;
     }
 
+    /**
+     * @param IControl $control text field to read from
+     */
     public function bindFormField(\Nette\Forms\IControl $control) {
         $this->formField = $control;
     }
 
-
-
-    public function setOveriden($overiden) {
-        $this->overiden = $overiden;
+    /**
+     * True only generates map configuration to template, but doesn't initiate the map itself.
+     * Used when metadata editor is embedded to other component
+     * @param bool $overiden
+     */
+    public function setOverridden($overiden) {
+        $this->overridden = $overiden;
     }
 
-
-
-    public function getOveriden() {
-        return $this->overiden;
+    /**
+     * @return bool
+     */
+    public function getOverridden() {
+        return $this->overridden;
     }
 
-
-
+    /**
+     * @param IControl $control submit to bind to
+     */
     public function setSubmitButton(\Nette\Forms\IControl $control) {
         $this->submit = $control;
     }
 
+    /**
+     * @param string $roomPrefix room prefix used in this building
+     */
     public function setRoomPrefix($roomPrefix)
     {
         $this->roomPrefix = $roomPrefix;
@@ -107,7 +129,7 @@ class PolyLinesEditor extends BaseMapControl {
         $template->textField = $this->formField;
         $template->submit = $this->submit;
         $template->roomPrefix = $this->roomPrefix;
-        $template->overiden = $this->overiden;
+        $template->overiden = $this->overridden;
 
 
 
@@ -131,9 +153,12 @@ class PolyLinesEditor extends BaseMapControl {
 
         $form->addButton('save','Uložit');
         $form->addButton('delete','Odstranit bod');
-
     }
 
+    /**
+     * @deprecated
+     * @param Building[] $buildings
+     */
     public function setBuildingsDictionary($buildings)
     {
         $this->buildings = $buildings;

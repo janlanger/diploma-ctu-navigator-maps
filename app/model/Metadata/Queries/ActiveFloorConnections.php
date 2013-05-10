@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 21.4.13
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
@@ -14,19 +7,25 @@ use Maps\Model\Metadata\Revision;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Floor connections to this floor revision from other floors
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class ActiveFloorConnections extends QueryObjectBase {
-
+    /** @var \Maps\Model\Metadata\Revision  */
     private $revision;
 
+    /**
+     * @param Revision $revision
+     */
     function __construct(Revision $revision) {
         $this->revision = $revision;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         return $repository->createQueryBuilder("f")
                 ->select("f, r1, r2, n1, n2")

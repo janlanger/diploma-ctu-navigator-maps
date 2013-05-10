@@ -2,19 +2,17 @@
 namespace Maps\Model;
 use Maps\Model\Persistence\QueryObjectBase;
 use Maps\Model\Persistence\IQueryable;
+
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 5.2.13
- * Time: 20:01
- * To change this template use File | Settings | File Templates.
+ * Basic datagrid query.
+ * Use when you don't require any join, rename, or aggregation
+ *
+ * @package Maps\Model
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class BaseDatagridQuery extends QueryObjectBase {
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $qb = $repository->createQueryBuilder("b")->select();
         return $qb;

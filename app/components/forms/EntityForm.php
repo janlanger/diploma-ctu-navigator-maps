@@ -5,28 +5,51 @@ namespace Maps\Components\Forms;
 use Maps\Model\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
+use Maps\Model\Persistence\BaseFormProcessor;
 
 /**
- * Description of EntityForm
+ * Binds form to defined entity and updates it after form is sended.
  *
- * @author Jan -Quinix- Langer
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Components\Forms
  */
 class EntityForm extends Form {
 
+    /** @var BaseEntity binded entity */
     private $entity;
+    /** @var BaseFormProcessor entity update service */
     private $entityService;
+    /** @var string flash message to show after successful save */
     private $successFlashMessage = 'Data byla úspěšně uložena.';
+    /** @var string redirect detination after successful save */
     private $redirect;
-    
+
+    /** @var array of function(BaseEntity $entity); occurs when entity is binded to form */
     public $onBind = array();
+
+    /** @var array of function(BaseEntity $entity, array $values); occurs when form was submitted and its valid,
+     * but before actual entity update */
     public $onHandle = array();
+
+    /** @var array of function(BaseEntity $entity); occurs when entity was saved and form processing is completed */
     public $onComplete = array();
 
+    /**
+     * @inheritdoc
+     */
     public function __construct(\Nette\ComponentModel\IContainer $parent = NULL, $name = NULL) {
         parent::__construct($parent, $name);
         $this->onSuccess[] = \callback($this, 'handler');
     }
 
+    /**
+     * Binds entity to form
+     *
+     * Loads entity values for every defined form field in to this fields. Entity has to have getters
+     * for requested values, otherwise nothing will be loaded.
+     *
+     * @param BaseEntity $entity
+     */
     public function bindEntity($entity) {
         $this->entity = $entity;
 
@@ -78,22 +101,34 @@ class EntityForm extends Form {
         }
     }
 
+    /**
+     * Return binded entity
+     *
+     * @return BaseEntity
+     */
     public function getEntity() {
         return $this->entity;
     }
 
     /**
-     *
-     * @return \SeriesCMS\Model\BaseService
+     * @return BaseFormProcessor
      */
     public function getEntityService() {
         return $this->entityService;
     }
 
+    /**
+     * @param BaseFormProcessor $entityService
+     */
     public function setEntityService($entityService) {
         $this->entityService = $entityService;
     }
 
+    /**
+     * On success form event handler
+     *
+     * @param Form
+     */
     public function handler($form) {
         if(!$form->isValid()) {
             return;
@@ -116,10 +151,16 @@ class EntityForm extends Form {
         }
     }
 
+    /**
+     * @param string $successFlashMessage message to be set as flash message after form is successfully processed
+     */
     public function setSuccessFlashMessage($successFlashMessage) {
         $this->successFlashMessage = $successFlashMessage;
     }
 
+    /**
+     * @param string $destination redirect destination
+     */
     public function setRedirect() {
         $this->redirect = func_get_args();
     }

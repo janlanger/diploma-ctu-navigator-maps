@@ -12,7 +12,7 @@ class ServiceFactories {
 
     /**
      *
-     * @param type $appDir
+     * @param string $appDir
      * @return PresenterFactory
      */
     public static function createPresenterFactory($appDir) {

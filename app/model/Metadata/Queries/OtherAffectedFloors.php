@@ -1,31 +1,31 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 1.5.13
- * Time: 20:03
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
 
+use Maps\Model\Metadata\Revision;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * IDs of floors with have connection to this revision
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class OtherAffectedFloors extends QueryObjectBase{
-
+    /** @var Revision[] */
     private $revisions = [];
 
+    /**
+     * @param Revision[] $revisions
+     */
     function __construct($revisions) {
         $this->revisions = $revisions;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         return $repository->createQueryBuilder("fc")
                 ->select("f.id")

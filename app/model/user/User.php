@@ -3,68 +3,79 @@ namespace Maps\Model\User;
 /**
  * @Entity
  * @Table(name="user")
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class User extends \Maps\Model\BaseEntity {
-    /** @var @Column(type="string", length=200) */
+    /**
+     * @var string
+     * @Column(type="string", length=200)
+     */
     private $name;
-    /** @var @Column(type="string", length=100) */
+    /**
+     * @var string
+     * @Column(type="string", length=100)
+     */
     private $username;
-    /** @var @Column(type="string", length=100) */
+    /** @var string
+     * @Column(type="string", length=100)
+     */
     private $mail;
-    /** @var @Column(type="string", length=10) */
+    /** @var string
+     * @Column(type="string", length=10)
+     */
     private $role;
 
     /**
-     * @param  $mail
+     * @param string $mail
      */
     public function setMail($mail) {
         $this->mail = $mail;
     }
 
     /**
-     * @return
+     * @return string
      */
     public function getMail() {
         return $this->mail;
     }
 
     /**
-     * @param  $name
+     * @param string $name
      */
     public function setName($name) {
         $this->name = $name;
     }
 
     /**
-     * @return
+     * @return string
      */
     public function getName() {
         return $this->name;
     }
 
     /**
-     * @param  $role
+     * @param string $role
      */
     public function setRole($role) {
         $this->role = $role;
     }
 
     /**
-     * @return
+     * @return string
      */
     public function getRole() {
         return $this->role;
     }
 
     /**
-     * @param  $username
+     * @param string $username
      */
     public function setUsername($username) {
         $this->username = $username;
     }
 
     /**
-     * @return
+     * @return string
      */
     public function getUsername() {
         return $this->username;

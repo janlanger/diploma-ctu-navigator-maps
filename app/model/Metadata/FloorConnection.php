@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 20.4.13
- * Time: 21:40
- * To change this template use File | Settings | File Templates.
- */
-
 namespace Maps\Model\Metadata;
 
 use Maps\Model\BaseEntity;
@@ -15,11 +7,14 @@ use Maps\Tools\Mixed;
 /**
  * Class FloorConnection
  * @package Maps\Model\Metadata
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ *
  * @Entity
  * @Table(name="metadata_floor_connections")
+ *
  */
 class FloorConnection extends BaseEntity {
-
+    /** Estimated slope of stairs for stairs length approximation */
     const STAIRS_SLOPE_ESTIMATE = 35;
 
     /**

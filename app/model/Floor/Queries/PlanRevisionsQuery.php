@@ -1,30 +1,31 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 28.2.13
- * Time: 19:35
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Queries;
 
 
+use Maps\Model\Floor\Floor;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Plan revision of one floor
+ *
+ * @package Maps\Model\Floor\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class PlanRevisionsQuery extends QueryObjectBase{
+    /** @var int|\Maps\Model\Floor\Floor  */
     private $floor;
 
+    /**
+     * @param Floor|int $floor
+     */
     public function __construct($floor) {
         $this->floor = $floor;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository)
     {
         $qb = $repository->createQueryBuilder("p")

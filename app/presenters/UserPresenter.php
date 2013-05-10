@@ -1,12 +1,13 @@
 <?php
 namespace Maps\Presenter;
 use Maps\Components\Forms\EntityForm;
+use Maps\Model\Persistence\BaseFormProcessor;
+
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 5.2.13
- * Time: 12:45
- * To change this template use File | Settings | File Templates.
+ * Class UserPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class UserPresenter extends SecuredPresenter {
     /** @var \Maps\Model\Dao */
@@ -25,11 +26,16 @@ class UserPresenter extends SecuredPresenter {
         parent::beforeRender();
     }
 
-
+    /**
+     * @param int $id user id
+     */
     public function actionEdit($id) {
         $this['form']->bindEntity($this->repository->find($id));
     }
 
+    /**
+     * @param int $id user id
+     */
     public function handleDelete($id) {
         try {
             $entity = $this->repository->find($id);
@@ -73,7 +79,7 @@ class UserPresenter extends SecuredPresenter {
 
     public function createComponentForm($name) {
         $form = new EntityForm($this, $name);
-        $form->setEntityService(new \Maps\Model\User\UserFormProcessor($this->repository));
+        $form->setEntityService(new BaseFormProcessor($this->repository));
 
         $form->addText("name","Jméno")
             ->setRequired();

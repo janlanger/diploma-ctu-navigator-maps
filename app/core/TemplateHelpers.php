@@ -1,25 +1,36 @@
 <?php
 
 namespace Maps\Templates;
-use Imagine\Imagick\Imagine;
 use Maps\Components\ImageMagick;
+use Maps\InvalidStateException;
 use Nette\Image;
+use Nette\Utils\Html as NHtml;
 use Nette\Utils\Strings;
 
 /**
- * Description of TemplateHelpers
- *
- * @author Jan Langer, kontakt@janlanger.cz
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class TemplateHelpers {
 
+    /**
+     * @param string $method
+     * @return string
+     */
     public static function loader($method) {
         if (\is_callable(__CLASS__ . '::' . $method)) {
             return (__CLASS__ . '::' . $method);
         }
     }
 
-    public static function dateInWords($time, $format = 'j.n.Y H:i', $onlyDate=false) {
+    /**
+     * Converts time to expressions like "day ago", "few seconds ago..."
+     *
+     * @param $time
+     * @param string $format
+     * @param bool $onlyDate
+     * @return string
+     */
+    public static function dateInWords($time, $format = 'j.n.Y H:i', $onlyDate=FALSE) {
         if (!$time) {
             return FALSE;
         } elseif (is_numeric($time)) {
@@ -61,6 +72,12 @@ class TemplateHelpers {
         return $args[($n == 1) ? 1 : (($n >= 2 && $n <= 4) ? 2 : 3)];
     }
 
+    /**
+     * Encode valid link to <a> html element
+     *
+     * @param $s
+     * @return string
+     */
     public static function linkEncode($s) {
         if (@eregi("^http:\/\/[[:alnum:]]+([-_\.]?[[:alnum:]])*\.[[:alpha:]]{2,4}(\/{1}[-_~&=\?\.a-z0-9]*)*$", $s))
             return NHtml::el('a')->href($s)->setText($s);
@@ -70,6 +87,10 @@ class TemplateHelpers {
         return $s;
     }
 
+    /**
+     * @param string $s
+     * @return NHtml
+     */
     public static function mailEncode($s) {
         if (@eregi("^[_a-zA-Z0-9\.\-]+@[_a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,4}$", $s))
             return NHtml::el('a')->href(Tools::entityEncode('mailto:' . $s))->setHtml(Tools::entityEncode($s));
@@ -77,11 +98,22 @@ class TemplateHelpers {
             return $s;
     }
 
+    /**
+     * Converts hyperlink inside text to active
+     *
+     * @param string $s searched text
+     * @return string
+     */
     public static function hyperlinks($s) {
         $pattern = "(https?|ftp:((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)";
         return preg_replace('#(http://|ftp://|(www\.))([\w\-]*\.[\w\-\.]*([/?][^\s]*)?)#e', "'<a href=\"'.('\\1'=='www.'?'http://':'\\1').'\\2\\3\">'.((strlen('\\2\\3')>43)?(substr('\\2\\3',0,40).'&hellip;'):'\\2\\3').'</a>'", $s);
     }
 
+    /**
+     * Removes entities from $s
+     * @param $s
+     * @return string
+     */
     public static function removeEntities($s) {
         return preg_replace('#(&[^\s]*;)#', "", $s);
     }
@@ -94,6 +126,7 @@ class TemplateHelpers {
      * @return string
      * @copyright Jakub Vrána, http://php.vrana.cz/
      * @author Endrju (modifications)
+     * @author Jan Langer <langeja1@fit.cvut.cz>
      */
     public static function xhtmlTruncate($s, $maxLen, $append = "\xE2\x80\xA6") {
         // ma vubec smysl retezec zkracovat?
@@ -238,14 +271,17 @@ class TemplateHelpers {
     }
 
     /**
-     * 
-     * @param type $path
-     * @param type $width
-     * @param type $height
-     * @param type $quality
-     * @param type $crop true = crop image to match width x height (no deformation), false = resize with aspect ration (dimensions <= specified)
+     * Generates thimbnail from image
+     *
+     * @param string $path
+     * @param int $width
+     * @param int $height
+     * @param int $quality
+     * @param bool $crop true = crop image to match width x height (no deformation), false = resize with aspect ration (dimensions <= specified)
+     * @throws \Maps\InvalidStateException
+     * @return string
      */
-    public static function thumbnail($path, $width = 100, $height = 100, $quality = 85, $crop = false) {
+    public static function thumbnail($path, $width = 100, $height = 100, $quality = 85, $crop = FALSE) {
         if(!file_exists(WWW_DIR.'/'.$path) || !is_file(WWW_DIR.'/'.$path)) {
             return "/".$path;
         }
@@ -264,7 +300,7 @@ class TemplateHelpers {
                 return "/" . $thumb_wwwpath;
             }
         }
-        throw new \Nette\InvalidStateException("Unable to convert $path to thumbnail.");
+        throw new InvalidStateException("Unable to convert $path to thumbnail.");
     }
 
     private static function generateThumbnail($original, $thumbpath, $width, $height,$quality, $crop) {
@@ -279,18 +315,28 @@ class TemplateHelpers {
         $image->sharpen();
         $fullpath = WWW_DIR . '/' . $thumbpath;
         if (!(file_exists(dirname($fullpath)) && is_dir(dirname($fullpath)))) {
-            mkdir(dirname($fullpath), 0777, true);
+            mkdir(dirname($fullpath), 0777, TRUE);
         }
         if ($image->save($fullpath, $quality)) {
             chmod($fullpath, 0666);
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
-    public static function image($path, $format='png', $force=false, $width, $height) {
-        $page=null;
+    /**
+     * Converts provided file to image using Imagemagick
+     *
+     * @param string$path
+     * @param string $format
+     * @param bool $force
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
+    public static function image($path, $format='png', $force=FALSE, $width, $height) {
+        $page=NULL;
         if(Strings::endsWith($path, "]")) {
             $page = Strings::match($path,"#.*\\[(\\d)\\]$#")[1];
             $path = Strings::substring($path, 0, strlen($path)-strlen($page)-2);
@@ -302,7 +348,7 @@ class TemplateHelpers {
         if(is_file($newPath)) {
             return str_replace(WWW_DIR,'',$newPath);
         }
-        if(!($force == false && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
+        if(!($force == FALSE && Strings::match($mime, "#image/*#")) || ($force && !Strings::match($mime, '#image/'.$format.'#'))) {
             //try converting it using imagemagick
             $i = new ImageMagick($fullpath, $page-1);
 
@@ -318,11 +364,11 @@ class TemplateHelpers {
 
             }
 
-            $i->save($newPath,null, $type, [
+            $i->save($newPath,NULL, $type, [
 		'transparent' => 'white',
                 'density'=> 100,
-                'trim'=> true,
-                'geometry' => $width.'x'.($height == null?$width:$height.'!').'>',
+                'trim'=> TRUE,
+                'geometry' => $width.'x'.($height == NULL?$width:$height.'!').'>',
 
             ]);
 

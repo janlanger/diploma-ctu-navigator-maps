@@ -1,23 +1,28 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 27.3.13
- * Time: 22:46
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
 
+use Maps\Model\Metadata\Revision;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Nodes by properties ids
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class NodesByPropertiesId extends QueryObjectBase {
-
+    /** @var int[] */
     private $ids;
+    /** @var Revision */
     private $revision;
 
+    /**
+     * @param int[] $ids
+     * @param Revision $revision
+     */
     function __construct($ids, $revision)
     {
         $this->ids = $ids;
@@ -25,10 +30,7 @@ class NodesByPropertiesId extends QueryObjectBase {
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository)
     {
         return $repository->createQueryBuilder("n")->select("n")

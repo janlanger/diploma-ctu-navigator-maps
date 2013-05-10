@@ -1,30 +1,31 @@
 <?php
 namespace Maps\Presenter;
-use App\Model\Proxies\__CG__\Maps\Model\Building\Building;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\BasicMap;
-use Maps\Model\Floor\ActivePlanQuery;
-use Maps\Model\Floor\Node;
-use Maps\Model\Floor\Path;
+use Maps\Model\Building\Building;
+use Maps\Model\Floor\Queries\ActivePlanQuery;
+use Maps\Model\Metadata\Node;
+use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\ActiveRevision;
 use Maps\Model\Metadata\Queries\CountUnprocessedProposals;
 use Maps\Model\Persistence\BaseFormProcessor;
 use Nette\Diagnostics\Debugger;
-use Nette\NotImplementedException;
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 10.2.13
- * Time: 17:52
- * To change this template use File | Settings | File Templates.
+ * Class FloorPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class FloorPresenter extends SecuredPresenter {
 
-    /** @persistent */
+    /**
+     * @persistent
+     * @var int building ID
+     */
     public $building;
-
+    /** @var Building */
     private $buildingEntity = NULL;
 
     /**
@@ -54,6 +55,9 @@ class FloorPresenter extends SecuredPresenter {
         $this['form']->setRedirect("Building:detail?id=" . $this->getBuilding()->id);
     }
 
+    /**
+     * @param int $id floor id
+     */
     public function actionEdit($id) {
         $entity = $this->getRepository('floor')->find($id);
 
@@ -62,6 +66,9 @@ class FloorPresenter extends SecuredPresenter {
 
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function handleDelete($id) {
         $entity = $this->getRepository('floor')->find($id);
 
@@ -75,6 +82,9 @@ class FloorPresenter extends SecuredPresenter {
         $this->redirect("Building:detail?id=".$this->building);
     }
 
+    /**
+     * @param int $id floor ID
+     */
     public function actionDefault($id) {
         $this->template->floor = $floor = $this->getRepository('floor')->find($id);
         $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));

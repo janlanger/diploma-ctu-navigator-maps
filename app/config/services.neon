@@ -18,4 +18,7 @@ services:
         class: Maps\Core\CacheSubscriber
         tags: [doctrineEvent]
 
-    tiles: Maps\Model\Floor\TilesService('data/tiles',%wwwDir%, 18,22)
+    tiles: Maps\Model\Floor\Service\TilesService('data/tiles',%wwwDir%, 18,22)
+    tileGenerator:
+        class: Maps\Model\Floor\Service\TilesGeneratorCommand(@doctrine.entityManager::getRepository(Maps\Model\Floor\Plan), @tiles)
+        tags: [consoleCommand]

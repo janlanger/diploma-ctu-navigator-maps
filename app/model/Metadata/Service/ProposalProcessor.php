@@ -1,27 +1,28 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 19.3.13
- * Time: 22:10
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Metadata;
+namespace Maps\Model\Metadata\Service;
 
 
 use Maps\Components\Forms\Form;
 use Maps\Model\Dao;
+use Maps\Model\Metadata\Changeset;
 use Maps\Model\Metadata\Queries\NodePropertiesQuery;
 use Maps\Model\Metadata\Queries\PathPropertiesByNodes;
+use Maps\Model\Metadata\Revision;
 use Maps\Model\User\User;
 use Maps\Tools\Mixed;
 
+/**
+ * Process proposal form submit
+ *
+ * @package Maps\Model\Metadata\Service
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class ProposalProcessor {
 
     /** @var Revision */
     private $actualRevision = NULL;
-
+    /** @var \Maps\Model\Dao  */
     private $nodePropertiesRepository;
     /** @var \Maps\Model\Dao */
     private $pathPropertiesRepository;
@@ -29,12 +30,20 @@ class ProposalProcessor {
     private $changesetRepository;
     /** @var Dao */
     private $nodeChangeRepository;
-
+    /** @var \Maps\Model\User\User  */
     private $user;
-
+    /** @var Changeset */
     private $changeset;
 
-
+    /**
+     * @param Revision $actualRevision
+     * @param User $user
+     * @param Dao $nodeProperties
+     * @param Dao $pathProperties
+     * @param Dao $changeset
+     * @param Dao $nodeChange
+     * @param Dao $pathChange
+     */
     function __construct($actualRevision, User $user,
                          Dao $nodeProperties, Dao $pathProperties,
                          Dao $changeset, Dao $nodeChange, Dao $pathChange) {
@@ -48,6 +57,10 @@ class ProposalProcessor {
     }
 
 
+    /**
+     * Handles the form submit
+     * @param Form $form
+     */
     public function handle(Form $form) {
         if (!$form->isValid()) {
             return;
@@ -57,7 +70,7 @@ class ProposalProcessor {
         $values = $form->getValues();
         $changes = json_decode($values['definition'], TRUE);
 
-        //remove null shitty things...
+        //remove null things...
 
         foreach ($changes as $part => $p) {
             foreach ($p as $key => $section) {
@@ -85,6 +98,10 @@ class ProposalProcessor {
         }
     }
 
+    /**
+     * Find changes and creates changeset from it
+     * @param array $changes
+     */
     private function processChanges($changes) {
 
         //load needed nodes properties for relations
@@ -213,6 +230,11 @@ class ProposalProcessor {
         $this->pathChangeRepository->add($paths);
     }
 
+    /**
+     * Was something changed?
+     * @param $changes
+     * @return bool
+     */
     private function hasChanges($changes) {
         $nodes = $changes['nodes'];
         $paths = $changes['paths'];

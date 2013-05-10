@@ -1,32 +1,33 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 17.3.13
- * Time: 16:53
- * To change this template use File | Settings | File Templates.
- */
 
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Queries;
 
 
 use Doctrine\ORM\Query\Expr;
+use Maps\Model\Building\Building;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Fetches pair id => floor name/number of a building(s)
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ * @package Maps\Model\Floor\Queries
+ */
 class DictionaryQuery extends QueryObjectBase {
 
+    /** @var int|Building|null  */
     private $building;
 
+    /**
+     * @param Building|int|null $building
+     */
     function __construct($building = NULL) {
         $this->building = $building;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository)
     {
        /* $q = $repository->createQuery("SELECT f.id, COALESCE(f.name, CONCAT(f.floor_number, ' NP')) as name FROM ".__NAMESPACE__.'\\Floor f WHERE f.building = ?1')

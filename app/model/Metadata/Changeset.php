@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 13.3.13
- * Time: 19:25
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata;
 
@@ -14,13 +7,14 @@ use Maps\Model\BaseEntity;
 use Maps\Model\User\User;
 
 /**
- * Class Changeset
+ * Changset entity
+ *
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  * @package Maps\Model\Metadata
  * @Entity
  * @table("metadata_changesets")
  */
 class Changeset extends BaseEntity {
-
     const STATE_NEW = 'new';
     const STATE_APPROVED = 'approved';
     const STATE_REJECTED = 'rejected';
@@ -80,11 +74,13 @@ class Changeset extends BaseEntity {
 
     /**
      * @OneToMany(targetEntity="NodeChange", mappedBy="changeset")
+     * @var Node[]
      */
     private $nodes;
 
     /**
      * @OneToMany(targetEntity="PathChange", mappedBy="changeset")
+     * @var Path[]
      */
     private $paths;
 
@@ -222,13 +218,16 @@ class Changeset extends BaseEntity {
     }
 
 
-
+    /**
+     * @return Node[]
+     */
     public function getNodes() {
         return $this->nodes;
     }
 
-
-
+    /**
+     * @return Path[]
+     */
     public function getPaths() {
         return $this->paths;
     }

@@ -10,17 +10,15 @@
 namespace Maps\Core;
 
 use Nette\Application\IRouter;
-use Nette\InvalidArgumentException;
-use Nette\Http\Request as HttpRequest;
 use Nette\Application\Request;
 use Nette\Http\IRequest;
 use Nette\Http\Url;
-use Nette\InvalidStateException;
 use Nette\Utils\Strings;
 use Nette;
 
 /**
  * @autor Adam Štipák <adam.stipak@gmail.com>
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class RestRoute implements IRouter {
 
@@ -45,6 +43,8 @@ class RestRoute implements IRouter {
 
     /**
      * Maps HTTP request to a Request object.
+     *
+     * @param \Nette\Http\IRequest $httpRequest
      * @return Request|NULL
      */
     function match(Nette\Http\IRequest $httpRequest) {
@@ -81,6 +81,9 @@ class RestRoute implements IRouter {
 
     /**
      * Constructs absolute URL from Request object.
+     *
+     * @param \Nette\Application\Request $appRequest
+     * @param \Nette\Http\Url $refUrl
      * @return string|NULL
      */
     function constructUrl(Request $appRequest, Nette\Http\Url $refUrl) {

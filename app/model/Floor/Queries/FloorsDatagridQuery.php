@@ -1,28 +1,27 @@
 <?php
-namespace Maps\Model\Floor;
+namespace Maps\Model\Floor\Queries;
 use Doctrine\ORM\Query\AST\Join;
 use Maps\Model\Persistence\QueryObjectBase;
 use Doctrine\ORM\Query\Expr;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- * Description of PlanDatagridQuery
+ * Fetch all floors by building id
  *
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class FloorsDatagridQuery extends QueryObjectBase {
-    
+    /** @var int  */
     private $building_id;
-    
+
+    /**
+     * @param int $building_id
+     */
     function __construct($building_id) {
         $this->building_id = $building_id;
     }
 
-    
+    /** {@inheritdoc} */
     protected function doCreateQuery(\Maps\Model\Persistence\IQueryable $repository) {
         return $repository->createQueryBuilder("f")
                 ->select("f,p.revision AS plan, m.revision AS metadata, count(c.id) as proposals")

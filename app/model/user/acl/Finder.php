@@ -4,21 +4,17 @@ namespace Maps\Model\Acl;
 
 use Maps\Model\BaseFinder;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of Finder
+ * Class Finder
  *
- * @author Honza
+ * @package Maps\Model\Acl
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 class Finder extends BaseFinder {
 
     protected $alias = 'r';
 
-    /** @var Service $secvice */
+    /** @var Service $service */
     private $service;
 
     public function __construct($service) {
@@ -118,7 +114,7 @@ class Finder extends BaseFinder {
                 return $privilege;
             }
         }
-        return null;
+        return NULL;
     }
     
     public function getResource($name, $createIfNotExists) {
@@ -133,7 +129,7 @@ class Finder extends BaseFinder {
                 return $privilege;
             }
         }
-        return null;
+        return NULL;
     }
 
 

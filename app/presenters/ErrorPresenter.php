@@ -1,11 +1,14 @@
 <?php
 namespace Maps\Presenter;
+use Nette\Application\BadRequestException;
 use Nette\Diagnostics\Debugger;
 
 
-
 /**
- * Error presenter.
+ * Class ErrorPresenter
+ *
+ * @package Maps\Presenter
+ * @author Nette
  */
 class ErrorPresenter extends \Maps\Presenter\BasePresenter
 {
@@ -20,7 +23,7 @@ class ErrorPresenter extends \Maps\Presenter\BasePresenter
 			$this->payload->error = TRUE;
 			$this->terminate();
 
-		} elseif ($exception instanceof Nette\Application\BadRequestException) {
+		} elseif ($exception instanceof BadRequestException) {
 			$code = $exception->getCode();
 			// load template 403.latte or 404.latte or ... 4xx.latte
 			$this->setView(in_array($code, array(403, 404, 405, 410, 500)) ? $code : '4xx');

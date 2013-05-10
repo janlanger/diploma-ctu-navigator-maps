@@ -120,7 +120,6 @@ class QueryBuilder extends Doctrine\ORM\QueryBuilder
 	}
 
 
-
 	public function __call($name, $args)
 	{
 		return ObjectMixin::call($this, $name, $args);

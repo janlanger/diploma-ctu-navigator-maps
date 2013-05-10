@@ -1,21 +1,18 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 13.3.13
- * Time: 19:12
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Maps\Model\BaseEntity;
+use Maps\Model\Floor\Floor;
+use Maps\Model\User\User;
 
 /**
  * Class Revision
  * @package Maps\Model\Metadata
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ *
  * @Entity
  * @table(name="metadata_revision",
  * uniqueConstraints={
@@ -30,29 +27,40 @@ class Revision extends BaseEntity {
     /**
      * @ManyToOne(targetEntity="Maps\Model\Floor\Floor")
      * @JoinColumn(name="floor_id",referencedColumnName="id",onDelete="CASCADE")
+     * @var Floor
      */
     private $floor;
     /**
      * @ManyToOne(targetEntity="Maps\Model\User\User")
      * @JoinColumn(name="user_id",referencedColumnName="id",onDelete="CASCADE")
+     * @var User
      */
     private $user;
     /**
      * @Column(type="integer")
+     * @var int
      */
     private $revision = 1;
 
-    /** @Column(type="boolean") */
+    /**
+     * @var bool
+     * @Column(type="boolean")
+     */
     private $published = FALSE;
-    /** @Column(type="datetime", nullable=true) */
+    /**
+     * @var \DateTime
+     * @Column(type="datetime", nullable=true)
+     */
     private $published_date;
 
     /**
      * @OneToMany(targetEntity="Node", mappedBy="revision")
+     * @var Node[]
      */
     private $nodes;
     /**
      * @OneToMany(targetEntity="Path", mappedBy="revision")
+     * @var Path[]
      */
     private $paths;
 
@@ -62,76 +70,105 @@ class Revision extends BaseEntity {
         $this->paths = new ArrayCollection();
     }
 
-
-    public function setFloor($floor)
-    {
+    /**
+     * @param \Maps\Model\Floor\Floor $floor
+     */
+    public function setFloor($floor) {
         $this->floor = $floor;
     }
 
-    public function getFloor()
-    {
+    /**
+     * @return \Maps\Model\Floor\Floor
+     */
+    public function getFloor() {
         return $this->floor;
     }
 
-    public function setNodes($nodes)
-    {
+    /**
+     * @param Node[] $nodes
+     */
+    public function setNodes($nodes) {
         $this->nodes = $nodes;
     }
 
-    public function getNodes()
-    {
+    /**
+     * @return Node[]
+     */
+    public function getNodes() {
         return $this->nodes;
     }
 
-    public function setPaths($paths)
-    {
+    /**
+     * @param Path[] $paths
+     */
+    public function setPaths($paths) {
         $this->paths = $paths;
     }
 
-    public function getPaths()
-    {
+    /**
+     * @return Path[]
+     */
+    public function getPaths() {
         return $this->paths;
     }
 
-    public function setPublished($published)
-    {
+    /**
+     * @param boolean $published
+     */
+    public function setPublished($published) {
         $this->published = $published;
     }
 
-    public function getPublished()
-    {
+    /**
+     * @return boolean
+     */
+    public function getPublished() {
         return $this->published;
     }
 
-    public function setPublishedDate($published_date)
-    {
+    /**
+     * @param \DateTime $published_date
+     */
+    public function setPublishedDate($published_date) {
         $this->published_date = $published_date;
     }
 
-    public function getPublishedDate()
-    {
+    /**
+     * @return \DateTime
+     */
+    public function getPublishedDate() {
         return $this->published_date;
     }
 
-    public function setRevision($revision)
-    {
+    /**
+     * @param int $revision
+     */
+    public function setRevision($revision) {
         $this->revision = $revision;
     }
 
-    public function getRevision()
-    {
+    /**
+     * @return int
+     */
+    public function getRevision() {
         return $this->revision;
     }
 
-    public function setUser($user)
-    {
+    /**
+     * @param \Maps\Model\User\User $user
+     */
+    public function setUser($user) {
         $this->user = $user;
     }
 
-    public function getUser()
-    {
+    /**
+     * @return \Maps\Model\User\User
+     */
+    public function getUser() {
         return $this->user;
     }
+
+
 
 
 

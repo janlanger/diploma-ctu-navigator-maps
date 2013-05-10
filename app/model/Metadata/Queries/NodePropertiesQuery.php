@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 27.3.13
- * Time: 22:05
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata\Queries;
 
@@ -13,20 +6,26 @@ namespace Maps\Model\Metadata\Queries;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Properties of specified node ids
+ *
+ * @package Maps\Model\Metadata\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class NodePropertiesQuery extends QueryObjectBase {
-
+    /** @var int[] */
     private $in = [];
 
+    /**
+     * @param int[] $in
+     */
     function __construct($in)
     {
         $this->in = $in;
     }
 
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository)
     {
         return $repository->createQueryBuilder("p")->select("p")

@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 13.3.13
- * Time: 19:19
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Model\Metadata;
 
@@ -15,6 +8,7 @@ use Maps\Model\BaseEntity;
 /**
  * Class Path
  * @package Maps\Model\Metadata
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  * @Entity
  * @table(name="metadata_paths")
  */

@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 27.2.13
- * Time: 17:30
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Maps\Presenter;
 
@@ -15,23 +8,33 @@ use DataGrid\DataSources\Doctrine\QueryBuilder;
 use Maps\Components\Forms\EntityForm;
 use Maps\Components\Forms\Form;
 use Maps\Components\GoogleMaps\OverlayPlacement;
-use Maps\Model\Floor\DeactivatePlansOfFloorQuery;
+use Maps\Model\Floor\Queries\DeactivatePlansOfFloorQuery;
 use Maps\Model\Floor\Floor;
 use Maps\Model\Floor\Plan;
-use Maps\Model\Floor\PlanFormProcessor;
-use Maps\Model\Floor\PlanRevisionsQuery;
+use Maps\Model\Floor\Service\PlanFormProcessor;
+use Maps\Model\Floor\Queries\PlanRevisionsQuery;
 use Maps\Model\Persistence\BaseFormProcessor;
 
+/**
+ * Class PlanPresenter
+ *
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class PlanPresenter extends SecuredPresenter {
 
     /**
      * @persistent
+     * @var int floor id
      */
     public $floor;
 
     /** @var Floor */
     private $floorEntity = NULL;
 
+    /**
+     * @return Floor
+     */
     private function getFloor() {
         if($this->floorEntity == NULL) {
             $this->floorEntity = $this->getRepository('floor')->find($this->floor);
@@ -64,10 +67,16 @@ class PlanPresenter extends SecuredPresenter {
             ]));
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function actionMap($id) {
         $this['georeferenceForm']->bindEntity($this->getRepository('plan')->find($id));
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function actionEdit($id) {
         $this->setView('map');
 
@@ -87,6 +96,9 @@ class PlanPresenter extends SecuredPresenter {
         $this['georeferenceForm']['ok']->caption= 'Odeslat a uložit jako novu revizi';
     }
 
+    /**
+     * @param int $id plan id
+     */
     public function handlePublish($id) {
         /** @var $plan Plan */
         $plan = $this->getRepository('plan')->find($id);
@@ -101,7 +113,7 @@ class PlanPresenter extends SecuredPresenter {
         }
         $plan->setInPublishQueue(TRUE);
 
-        $toUnpublish = $this->getRepository('plan')->findBy(['inPublishQueue' => TRUE]);
+        $toUnpublish = $this->getRepository('plan')->findBy(['inPublishQueue' => TRUE, 'floor' => $plan->getFloor()]);
         foreach($toUnpublish as $p) {
             if($p->id != $plan->id) {
                 $p->inPublishQueue = FALSE;
@@ -112,29 +124,6 @@ class PlanPresenter extends SecuredPresenter {
 
         $this->flashMessage('Publikace plánu byla zařazena ke zpracování do dlaždic. Vygenerování dlaždic trvá cca 5 minut.', self::FLASH_SUCCESS);
         $this->redirect('this');
-    }
-
-    public function handleRender() {
-        set_time_limit(180);
-        //load all plans in queue
-        $plans = $this->getRepository('plan')->findBy(['inPublishQueue'=>TRUE, 'published'=>FALSE]);
-        $repository = $this->getRepository('plan');
-
-        //each
-        foreach($plans as $plan) {
-            //unset actualy active plan
-            $q = new DeactivatePlansOfFloorQuery($plan->floor);
-            $q->getQuery($repository)->execute();
-            //set queued plan as active
-            $plan->setPublished(TRUE);
-            $plan->setPublishedDate(new \DateTime());
-            $plan->setInPublishQueue(FALSE);
-            //generate plan
-            $this->getContext()->tiles->generateTiles($plan);
-        }
-        $repository->getEntityManager()->flush();
-
-        $this->redirect('default');
     }
 
     public function createComponentGrid($name) {

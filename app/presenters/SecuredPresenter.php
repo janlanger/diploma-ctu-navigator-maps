@@ -3,12 +3,15 @@ namespace Maps\Presenter;
 use Nette\Security\User;
 
 /**
- * Description of BasePresenter
+ * Provides authorization on every request
  *
- * @author Jan -Quinix- Langer
+ * @package Maps\Presenter
+ * @author Jan Langer <langeja1@fit.cvut.cz>
  */
 abstract class SecuredPresenter extends BasePresenter {
-
+    /**
+     * Checks if user role is authorized to perform requested action
+     */
     public function startup() {
         parent::startup();
         $user = $this->getUser();

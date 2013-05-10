@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Jan
- * Date: 9.4.13
- * Time: 16:01
- * To change this template use File | Settings | File Templates.
- */
-
 namespace Maps\Model\Building\Queries;
 
 
@@ -14,12 +6,16 @@ use Maps\Model\Metadata\Changeset;
 use Maps\Model\Persistence\IQueryable;
 use Maps\Model\Persistence\QueryObjectBase;
 
+/**
+ * Fetch data for buildings grid
+ * Includes count of unprocessed proposals for every building.
+ *
+ * @package Maps\Model\Building\Queries
+ * @author Jan Langer <langeja1@fit.cvut.cz>
+ */
 class BuildingDatagridQuery extends QueryObjectBase {
 
-    /**
-     * @param IQueryable $repository
-     * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
-     */
+    /** {@inheritdoc} */
     protected function doCreateQuery(IQueryable $repository) {
         $qb2 = $repository->createQueryBuilder()
                 ->select("COUNT(c.id)")
