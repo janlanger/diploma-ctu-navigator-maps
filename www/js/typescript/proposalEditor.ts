@@ -297,7 +297,7 @@ module Mapping {
             var x = [];
             $.each(original, (index, item) => {
                 var y = "";
-                if (index == "id") return;
+                if (index == "id" || index == "propertyId") return;
                 if (newNode && item == newNode[index]) return;
                 if (newNode) {
                     if (index == "gpsCoordinates") {
