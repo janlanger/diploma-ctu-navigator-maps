@@ -11,7 +11,7 @@
             <li>Aktivní revize plánu: <b>{if $plan}{$plan->revision} z {$plan->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
             <li>Aktivní revize metadat: <b>{if $metadata}{$metadata->revision} z {$metadata->publishedDate|date:'d.m.Y H:i'}{else}žádná{/if}</b></li>
             <li n:if="$user->isAllowed('Floor','edit')" n:ifset="$unprocessedProposals"><br>
-                Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>{if $unprocessedProposals>0} - <a n:href="Metadata:approve">Zpracovat</a>{/if}
+                Nezpracované návrhy pro toto podlaží: <b>{$unprocessedProposals}</b>{if $unprocessedProposals>0} - <a n:href="Metadata:approval?floor=$floor->id">Zpracovat</a>{/if}
             </li>
         </ul>
 
