@@ -54,7 +54,7 @@ class MetadataPresenter extends SecuredPresenter {
      */
     private function getFloor() {
         if ($this->floorEntity == NULL) {
-            $this->floorEntity = $this->getRepository('floor')->find($this->floor);
+            $this->floorEntity = $this->context->floorRepository->find($this->floor);
         }
         return $this->floorEntity;
     }
@@ -79,7 +79,7 @@ class MetadataPresenter extends SecuredPresenter {
      * @param int $id Revision id
      */
     public function actionView($id) {
-        $this->template->revision = $this->getRepository('meta_revision')->find($id);
+        $this->template->revision = $this->context->metadataRevisionRepository->find($id);
     }
 
     public function createComponentViewMap($name) {
@@ -92,7 +92,7 @@ class MetadataPresenter extends SecuredPresenter {
         $map->setCenter($this->getFloor()->getBuilding()->gpsCoordinates);
         $map->setZoomLevel(20);
 
-        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
+        $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($this->getFloor()));
         if ($plan != NULL) {
             $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
@@ -142,7 +142,7 @@ class MetadataPresenter extends SecuredPresenter {
     }
 
     public function renderProposal() {
-        $data = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor()));
+        $data = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($this->getFloor()));
         if ($data != NULL) {
             $this['pointForm']['definition']->setDefaultValue($this->encodePointData($data));
         }
@@ -153,7 +153,7 @@ class MetadataPresenter extends SecuredPresenter {
      */
     public function handlePublish($id) {
         try {
-            $this->getRepository('meta_revision')->transactional(function (Dao $repository) use ($id) {
+            $this->context->metadataRevisionRepository->transactional(function (Dao $repository) use ($id) {
                 /** @var $oldOne Revision */
                 $oldOne = $repository->fetchOne(new ActiveRevision($this->getFloor()));
                 $oldOne->setPublished(FALSE);
@@ -166,7 +166,7 @@ class MetadataPresenter extends SecuredPresenter {
 
                 //inform core
 
-                $data = $this->getRepository('meta_floor_connection')->fetch(new OtherAffectedFloors([$oldOne, $newOne]));
+                $data = $this->context->floorConnectionRepository->fetch(new OtherAffectedFloors([$oldOne, $newOne]));
                 $floors = [$newOne->getFloor()->id];
                 foreach($data as $x) {
                     $floors[] = $x['id'];
@@ -200,15 +200,15 @@ class MetadataPresenter extends SecuredPresenter {
 
 
         $form->onSuccess[] = function (Form $form) {
-            $user = $this->getRepository('user')->find($this->getUser()->getId());
+            $user = $this->context->userRepository->find($this->getUser()->getId());
             $revision = $this->getOrCreateActiveRevision($user);
             $x = new ProposalProcessor(
                 $revision, $user,
-                $this->getRepository("meta_node_properties"),
-                $this->getRepository("meta_path_properties"),
-                $this->getRepository('meta_changeset'),
-                $this->getRepository('meta_node_change'),
-                $this->getRepository('meta_path_change')
+                $this->context->nodePropertiesRepository,
+                $this->context->pathPropertiesRepository,
+                $this->context->changesetRepository,
+                $this->context->nodeChangeRepository,
+                $this->context->pathChangeRepository
             );
             $x->handle($form);
             if($this->getUser()->isInRole('admin'))
@@ -255,9 +255,9 @@ class MetadataPresenter extends SecuredPresenter {
             'strokeWeight' => 1.5
         ]);
 
-        $map->setBuildingsDictionary($this->getRepository('building')->fetchPairs(new DictionaryQuery()));
+        $map->setBuildingsDictionary($this->context->buildingRepository->fetchPairs(new DictionaryQuery()));
 
-        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
+        $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($this->getFloor()));
         if ($plan != NULL) {
             $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
@@ -296,15 +296,15 @@ class MetadataPresenter extends SecuredPresenter {
         $map->setCenter($this->getFloor()->getBuilding()->gpsCoordinates);
         $map->setZoomLevel(20);
         $map->setRoomPrefix($this->getFloor()->getBuilding()->roomPrefix);
-        $map->setBuildingsDictionary($this->getRepository('building')->fetchPairs(new DictionaryQuery()));
+        $map->setBuildingsDictionary($this->context->buildingRepository->fetchPairs(new DictionaryQuery()));
 
 
-        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($this->getFloor()));
+        $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($this->getFloor()));
         if ($plan != NULL) {
             $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
 
-        $map->setProposalRepository($this->getRepository('meta_changeset'));
+        $map->setProposalRepository($this->context->changesetRepository);
 
         $map->setNodeTypes([
             'intersection' => ['anchor' => [4, 4], 'legend' => 'Křižovatka'],
@@ -326,7 +326,7 @@ class MetadataPresenter extends SecuredPresenter {
         $map->setNodeIconBase('images/markers/types');
         $map->setActiveRevision($this->getOrCreateActiveRevision());
 
-        $map->setRevisionDictionary($this->getRepository("meta_revision")->fetchPairs(new RevisionDictionary($this->getFloor()), "id", "revision"));
+        $map->setRevisionDictionary($this->context->metadataRevisionRepository->fetchPairs(new RevisionDictionary($this->getFloor()), "id", "revision"));
 
         $map->setPathOptions([
             'strokeColor' => '#ff0000',
@@ -335,19 +335,19 @@ class MetadataPresenter extends SecuredPresenter {
         ]);
 
         $map->setSubmitHandler(function (Form $form) {
-            $user = $this->getRepository('user')->find($this->getUser()->getId());
+            $user = $this->context->userRepository->find($this->getUser()->getId());
             $revision = $this->getOrCreateActiveRevision($user);
             $p = new RevisionProcessor(
                 $revision, $user,
-                $this->getRepository('meta_revision'),
-                $this->getRepository("meta_node_properties"),
-                $this->getRepository("meta_path_properties"),
-                $this->getRepository('meta_changeset'),
-                $this->getRepository('meta_node_change'),
-                $this->getRepository('meta_path_change'),
-                $this->getRepository('meta_node'),
-                $this->getRepository('meta_path'),
-                $this->getRepository('meta_floor_connection')
+                $this->context->metadataRevisionRepository,
+                $this->context->nodePropertiesRepository,
+                $this->context->pathPropertiesRepository,
+                $this->context->changesetRepository,
+                $this->context->nodeChangeRepository,
+                $this->context->pathChangeRepository,
+                $this->context->nodeRepository,
+                $this->context->pathRepository,
+                $this->context->floorConnectionRepository
             );
             if ($p->handle($form)) {
                 $this->flashMessage("Data byla úspěšně uložena. Nezapomeňte novou revizi publikovat.", self::FLASH_SUCCESS);
@@ -362,7 +362,7 @@ class MetadataPresenter extends SecuredPresenter {
     public function createComponentProposalGrid($name) {
         $grid = new DataGrid($this, $name);
         $q = new ProposalsGridQuery($this->getFloor());
-        $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('meta_changeset')));
+        $datasource = new QueryBuilder($q->getQueryBuilder($this->context->changesetRepository));
 
         $datasource->setMapping([
             'date' => 'c.submitted_date',
@@ -436,7 +436,7 @@ class MetadataPresenter extends SecuredPresenter {
 
     public function createComponentRevisionGrid($name) {
         $q = new RevisionGridQuery($this->getFloor());
-        $ds = new QueryBuilder($q->getQueryBuilder($this->getRepository("meta_revision")));
+        $ds = new QueryBuilder($q->getQueryBuilder($this->context->metadataRevisionRepository));
         $ds->setMapping([
             'id' => 'r.id',
             'revision' => 'r.revision',
@@ -478,18 +478,18 @@ class MetadataPresenter extends SecuredPresenter {
             return $revision;
         }
         if($user == NULL) {
-            $user = $this->getRepository('user')->find($this->getUser()->getId());
+            $user = $this->context->userRepository->find($this->getUser()->getId());
         }
-        $revision = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($this->getFloor()));
+        $revision = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($this->getFloor()));
 
         if ($revision == NULL) {
-            $revision = $this->getRepository('meta_revision')->createNew(NULL, array(
+            $revision = $this->context->metadataRevisionRepository->createNew(NULL, array(
                 'floor' => $this->getFloor(),
                 'user' => $user,
                 'published' => TRUE,
                 'publishedDate' => new \DateTime(),
             ));
-            $this->getRepository('meta_revision')->add($revision);
+            $this->context->metadataRevisionRepository->add($revision);
         }
         return $revision;
     }
@@ -513,7 +513,7 @@ class MetadataPresenter extends SecuredPresenter {
     public function createComponentModalForm($name) {
         $form = new Form($this, $name);
 
-        $form->addSelect("building", 'Budova', $this->getRepository('building')->fetchPairs(new DictionaryQuery()))
+        $form->addSelect("building", 'Budova', $this->context->buildingRepository->fetchPairs(new DictionaryQuery()))
                 ->setDefaultValue($this->getFloor()->getBuilding()->id);
         $form->addDependedSelect('floor', 'Podlaží', $form['building'], callback($this, 'getFloorDictionary'), FALSE)
                 ->setDefaultValue($this->getFloor()->id)
@@ -540,7 +540,7 @@ class MetadataPresenter extends SecuredPresenter {
             if(isset($cache[$values['building']])) {
                 return $cache[$values['building']];
             }
-            $r = $cache[$values['building']] = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['building']), 'id', 'name');
+            $r = $cache[$values['building']] = $this->context->planRepository->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['building']), 'id', 'name');
             if ($r == NULL) {
                 $r = array();
             }
@@ -550,7 +550,7 @@ class MetadataPresenter extends SecuredPresenter {
 
     public function createComponentModalMap() {
         $map = new ModalMap();
-        $floor = $this->getRepository('floor')->find($this['modalForm']['floor']->getValue());
+        $floor = $this->context->floorRepository->find($this['modalForm']['floor']->getValue());
 
         $map->setApiKey($this->getContext()->parameters['google']['apiKey']);
         if($this->getParameter('coords') != NULL) {
@@ -559,12 +559,12 @@ class MetadataPresenter extends SecuredPresenter {
             $map->setCenter($floor->getBuilding()->gpsCoordinates);
         }
         $map->setZoomLevel(20);
-        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
+        $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($floor));
         if ($plan != NULL) {
             $map->addCustomTilesLayer(0, $this->getContext()->tiles->getTilesBasePath($plan));
         }
 
-        $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($floor));
+        $metadata = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($floor));
 
         if ($metadata != NULL) {
             $map->setNodeTypes([

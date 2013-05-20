@@ -36,7 +36,7 @@ class DashboardPresenter extends SecuredPresenter
 
     public function createComponentMyProposals($name) {
         $q = new MyProposalsQuery($this->getUser()->id);
-        $ds = new QueryBuilder($q->getQueryBuilder($this->getRepository('meta_changeset')));
+        $ds = new QueryBuilder($q->getQueryBuilder($this->context->changesetRepository));
 
         $ds->setMapping([
             'id' => 'c.id',
@@ -119,7 +119,7 @@ class DashboardPresenter extends SecuredPresenter
      * @throws \Nette\Security\AuthenticationException
      */
     public function handleWithdraw($id) {
-        $changeset = $this->getRepository('meta_changeset')->find($id);
+        $changeset = $this->context->changesetRepository->find($id);
         if($changeset == NULL) {
             throw new BadRequestException(404);
         }
@@ -127,7 +127,7 @@ class DashboardPresenter extends SecuredPresenter
             throw new AuthenticationException();
         }
         $changeset->setState(Changeset::STATE_WITHDRAWN);
-        $this->getRepository('meta_changeset')->save($changeset);
+        $this->context->changesetRepository->save($changeset);
         $this->flashMessage('Návrh byl stažen', self::FLASH_SUCCESS);
         $this->redirect('this');
     }
@@ -141,7 +141,7 @@ class DashboardPresenter extends SecuredPresenter
     public function createComponentForm($name) {
         $form = new Form($this, $name);
 
-        $form->addSelect('buildings', 'Budova', $this->getRepository('building')->fetchPairs(new DictionaryQuery(), 'id', 'name'))
+        $form->addSelect('buildings', 'Budova', $this->context->buildingRepository->fetchPairs(new DictionaryQuery(), 'id', 'name'))
             ->setPrompt("-- vyberte budovu --");
         $s = $form->addDependedSelect('floor', 'Podlaží', $form['buildings'], callback($this, 'getFloorDict'), FALSE)
             ->setPrompt("-- vyberte podlaží --");
@@ -165,7 +165,7 @@ class DashboardPresenter extends SecuredPresenter
         $values = $form->getValues();
         $r = [];
         if($values['buildings'] > 0) {
-            $r = $this->getRepository('floor')->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['buildings']), 'id', 'name');
+            $r = $this->context->floorRepository->fetchPairs(new \Maps\Model\Floor\Queries\DictionaryQuery($values['buildings']), 'id', 'name');
             if($r == NULL) {
                 $r = array();
             }

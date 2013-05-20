@@ -26,11 +26,11 @@ class BuildingPresenter extends SecuredPresenter {
      * @param int $id building ID
      */
     public function actionDetail($id) {
-        $this->template->building = $this->getRepository("building")->find($id);
+        $this->template->building = $this->context->buildingRepository->find($id);
     }
 
     public function actionAdd() {
-        $this['form']->bindEntity($this->getRepository("building")->createNew());
+        $this['form']->bindEntity($this->context->buildingRepository->createNew());
         $this['googleMapGeocoder']->setCenter("50.087547,14.433289");
         $this['googleMapGeocoder']->setZoomLevel(12);
 
@@ -40,7 +40,7 @@ class BuildingPresenter extends SecuredPresenter {
      * @param int $id building ID
      */
     public function actionEdit($id) {
-        $this['form']->bindEntity($this->getRepository('building')->find($id));
+        $this['form']->bindEntity($this->context->buildingRepository->find($id));
     }
 
     /**
@@ -48,8 +48,8 @@ class BuildingPresenter extends SecuredPresenter {
      */
     public function handleDelete($id) {
         try {
-            $entity = $this->getRepository('building')->find($id);
-            $this->getRepository('building')->delete($entity);
+            $entity = $this->context->buildingRepository->find($id);
+            $this->context->buildingRepository->delete($entity);
             $this->flashMessage("Záznam byl úspěšně smazán", self::FLASH_SUCCESS);
         } catch (\Exception $e) {
             $this->flashMessage('Záznam nebyl smazán. ' . $e->getMessage(), self::FLASH_ERROR);
@@ -100,7 +100,7 @@ class BuildingPresenter extends SecuredPresenter {
        $map = $this->googleMapBase($name);
 
         /** @var $entity \Maps\Model\Building\Building */
-        $entity = $this->getRepository("building")->find($this->getParameter('id'));
+        $entity = $this->context->buildingRepository->find($this->getParameter('id'));
         if($entity->getGpsCoordinates() != NULL) {
             $map->setCenter($entity->getGpsCoordinates());
             $map->addPoint($entity->getGpsCoordinates());
@@ -114,7 +114,7 @@ class BuildingPresenter extends SecuredPresenter {
 
     public function createComponentForm($name) {
         $form = new \Maps\Components\Forms\EntityForm($this, $name);
-        $form->setEntityService(new BaseFormProcessor($this->getRepository('building')));
+        $form->setEntityService(new BaseFormProcessor($this->context->buildingRepository));
 
         $form->addText('name','Název')
             ->setRequired();
@@ -139,7 +139,7 @@ class BuildingPresenter extends SecuredPresenter {
     public function createComponentPlansGrid($name) {
         $grid = new \DataGrid\DataGrid($this, $name);
         $q = new \Maps\Model\Floor\Queries\FloorsDatagridQuery($this->getParameter('id'));
-        $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('floor')));
+        $datasource = new QueryBuilder($q->getQueryBuilder($this->context->floorRepository));
         $datasource->setMapping([
             'id' => 'f.id',
             'floor_number' => 'f.floor_number',

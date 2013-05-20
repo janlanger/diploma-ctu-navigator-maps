@@ -86,7 +86,7 @@ class ApiPresenter extends BasePresenter {
         if($id != NULL && ((int) $id) <= 0) {
             $this->badRequest("Invalid Building ID");
         }
-        $result = $this->getRepository('building')->fetch(new BuildingWithFloors($id));
+        $result = $this->context->buildingRepository->fetch(new BuildingWithFloors($id));
         $payload = [];
 
         if(count($result)) {
@@ -125,10 +125,10 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid Building ID");
         }
         if($id != NULL) {
-            $result = [$this->getRepository('building')->find($id)];
+            $result = [$this->context->buildingRepository->find($id)];
         }
         else {
-            $result = $this->getRepository('building')->findAll();
+            $result = $this->context->buildingRepository->findAll();
         }
         $payload = [];
 
@@ -169,7 +169,7 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid floor ID");
         }
 
-        $floor = $this->getRepository('floor')->find($id);
+        $floor = $this->context->floorRepository->find($id);
         if($floor) {
             $lastUpdate = $floor->getLastUpdate();
 
@@ -190,7 +190,7 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid floor ID");
         }
 
-        $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($id));
+        $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($id));
 
         if ($plan != NULL) {
             $this->handleLastModification($plan->getPublishedDate());
@@ -209,13 +209,13 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid floor ID");
         }
 
-        $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($id));
+        $metadata = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($id));
 
         if ($metadata != NULL) {
 
             $lastModified = $metadata->getPublishedDate();
 
-            $floorConnections = $this->getRepository('meta_floor_connection')->fetch(new ActiveFloorConnections($metadata));
+            $floorConnections = $this->context->floorConnectionRepository->fetch(new ActiveFloorConnections($metadata));
 
             $paths = [];
             /** @var $connection FloorConnection */
@@ -258,7 +258,7 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid node ID");
         }
 
-        $node = $this->getRepository('meta_node')->fetchOne(new SingleNode($id));
+        $node = $this->context->nodeRepository->fetchOne(new SingleNode($id));
         if($node != NULL) {
             $this->sendResponse(new JsonResponse($this->getNodePayload($node)));
         }
@@ -275,7 +275,7 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid floor ID");
         }
 
-        $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($id));
+        $metadata = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($id));
         if($metadata != NULL) {
             $this->handleLastModification($metadata->getPublishedDate());
             $nodes = [];
@@ -299,7 +299,7 @@ class ApiPresenter extends BasePresenter {
             $this->badRequest("Invalid building ID");
         }
 
-        $building = $this->getRepository('building')->fetchOne(new BuildingWithFloors($id));
+        $building = $this->context->buildingRepository->fetchOne(new BuildingWithFloors($id));
         if($building == NULL) {
             $this->notFound("Building #$id does not exists.");
         }
@@ -308,7 +308,7 @@ class ApiPresenter extends BasePresenter {
             $floorIds[] = $floor->id;
         }
 
-        $metadata = $this->getRepository('meta_revision')->fetchAssoc(new ActiveRevision($floorIds), 'floor');
+        $metadata = $this->context->metadataRevisionRepository->fetchAssoc(new ActiveRevision($floorIds), 'floor');
         $floors = [];
         foreach ($building->getFloors() as $floor) {
             $floors[] = $this->getFloorPayload($floor, [$floor->id => $building->id], isset($metadata[$floor->id])?$metadata[$floor->id]->nodes:NULL);
@@ -318,7 +318,7 @@ class ApiPresenter extends BasePresenter {
         $plan = NULL;
 
         if(!empty($floorIds)) {
-            $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floorIds));
+            $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($floorIds));
 
             $tilesUrl = $this->getContext()->tiles->getTilesBasePath($plan);
             $tilesUrl = substr($tilesUrl,0, strrpos($tilesUrl, "/"))."/";

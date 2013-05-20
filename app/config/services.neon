@@ -20,5 +20,23 @@ services:
 
     tiles: Maps\Model\Floor\Service\TilesService('data/tiles',%wwwDir%, 18,22)
     tileGenerator:
-        class: Maps\Model\Floor\Service\TilesGeneratorCommand(@doctrine.entityManager::getRepository(Maps\Model\Floor\Plan), @tiles)
+        class: Maps\Model\Floor\Service\TilesGeneratorCommand(@planRepository, @tiles)
         tags: [consoleCommand]
+# entity repositories
+    userRepository: @doctrine.entityManager::getRepository(Maps\Model\User\User)
+    buildingRepository: @doctrine.entityManager::getRepository(Maps\Model\Building\Building)
+    aclRoleRepository: @doctrine.entityManager::getRepository(Maps\Model\ACL\Role)
+    aclPrivilegeRepository: @doctrine.entityManager::getRepository(Maps\Model\ACL\Privilege)
+    aclResourceRepository: @doctrine.entityManager::getRepository(Maps\Model\ACL\Resource)
+    aclRepository: @doctrine.entityManager::getRepository(Maps\Model\ACL\ACL)
+    floorRepository: @doctrine.entityManager::getRepository(Maps\Model\Floor\Floor)
+    planRepository: @doctrine.entityManager::getRepository(Maps\Model\Floor\Plan)
+    metadataRevisionRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\Revision)
+    nodePropertiesRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\NodeProperties)
+    pathPropertiesRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\PathProperties)
+    changesetRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\Changeset)
+    nodeChangeRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\NodeChange)
+    pathChangeRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\PathChange)
+    nodeRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\Node)
+    pathRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\Path)
+    floorConnectionRepository: @doctrine.entityManager::getRepository(Maps\Model\Metadata\FloorConnection)

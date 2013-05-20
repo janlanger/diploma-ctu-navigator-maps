@@ -15,7 +15,7 @@ class UserPresenter extends SecuredPresenter {
 
     public function startup() {
         parent::startup();
-        $this->repository = $this->getContext()->em->getRepository('Maps\Model\User\User');
+        $this->repository = $this->getContext()->userRepository;
     }
 
     protected function beforeRender()

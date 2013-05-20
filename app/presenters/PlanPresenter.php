@@ -37,7 +37,7 @@ class PlanPresenter extends SecuredPresenter {
      */
     private function getFloor() {
         if($this->floorEntity == NULL) {
-            $this->floorEntity = $this->getRepository('floor')->find($this->floor);
+            $this->floorEntity = $this->context->floorRepository->find($this->floor);
         }
         return $this->floorEntity;
     }
@@ -60,10 +60,10 @@ class PlanPresenter extends SecuredPresenter {
 
     public function actionAdd() {
 
-        $this['formOne']->bindEntity($this->getRepository('plan')
+        $this['formOne']->bindEntity($this->context->planRepository
             ->createNew(NULL, [
                 'floor'=>$this->getFloor(),
-                'user'=>$this->getRepository('user')->find($this->getUser()->getId())
+                'user'=>$this->context->userRepository->find($this->getUser()->getId())
             ]));
     }
 
@@ -71,7 +71,7 @@ class PlanPresenter extends SecuredPresenter {
      * @param int $id plan id
      */
     public function actionMap($id) {
-        $this['georeferenceForm']->bindEntity($this->getRepository('plan')->find($id));
+        $this['georeferenceForm']->bindEntity($this->context->planRepository->find($id));
     }
 
     /**
@@ -82,16 +82,16 @@ class PlanPresenter extends SecuredPresenter {
 
         $form = $this['georeferenceForm'];
         if($form->isSubmitted()) {
-            $plan = $this->getRepository('plan')->find($id);
-            $form->bindEntity($this->getRepository('plan')
+            $plan = $this->context->planRepository->find($id);
+            $form->bindEntity($this->context->planRepository
                 ->createNew(NULL, ['floor'=>$plan->floor,
-                    'user'=>$this->getRepository('user')->find($this->getUser()->getId()),
+                    'user'=>$this->context->userRepository->find($this->getUser()->getId()),
                     'sourceFile'=>$plan->sourceFile,
                     'sourceFilePage'=>$plan->sourceFilePage,
                 ]));
         }
         else {
-            $form->bindEntity($this->getRepository('plan')->find($id));
+            $form->bindEntity($this->context->planRepository->find($id));
         }
         $this['georeferenceForm']['ok']->caption= 'Odeslat a uložit jako novu revizi';
     }
@@ -101,7 +101,7 @@ class PlanPresenter extends SecuredPresenter {
      */
     public function handlePublish($id) {
         /** @var $plan Plan */
-        $plan = $this->getRepository('plan')->find($id);
+        $plan = $this->context->planRepository->find($id);
         if($plan->getPublished()) {
             $this->flashMessage("Tato revize již je publikována.", self::FLASH_ERROR);
             $this->redirect('this');
@@ -113,14 +113,14 @@ class PlanPresenter extends SecuredPresenter {
         }
         $plan->setInPublishQueue(TRUE);
 
-        $toUnpublish = $this->getRepository('plan')->findBy(['inPublishQueue' => TRUE, 'floor' => $plan->getFloor()]);
+        $toUnpublish = $this->context->planRepository->findBy(['inPublishQueue' => TRUE, 'floor' => $plan->getFloor()]);
         foreach($toUnpublish as $p) {
             if($p->id != $plan->id) {
                 $p->inPublishQueue = FALSE;
             }
         }
 
-        $this->getRepository('plan')->getEntityManager()->flush();
+        $this->context->planRepository->getEntityManager()->flush();
 
         $this->flashMessage('Publikace plánu byla zařazena ke zpracování do dlaždic. Vygenerování dlaždic trvá cca 5 minut.', self::FLASH_SUCCESS);
         $this->redirect('this');
@@ -128,7 +128,7 @@ class PlanPresenter extends SecuredPresenter {
 
     public function createComponentGrid($name) {
         $q = new PlanRevisionsQuery($this->floor);
-        $datasource = new QueryBuilder($q->getQueryBuilder($this->getRepository('plan')));
+        $datasource = new QueryBuilder($q->getQueryBuilder($this->context->planRepository));
         $datasource->setMapping([
                                 'id' => 'p.id',
                                 'revision' => 'p.revision',
@@ -177,7 +177,7 @@ class PlanPresenter extends SecuredPresenter {
             ->addRule($form::NUMERIC)
             ->setDefaultValue(1)
             ->setOption("description", "V případě vícestránkových dokumentů uveďte na které stránce se plán nachází.");
-        $form->setEntityService(new PlanFormProcessor($this->getRepository('plan')));
+        $form->setEntityService(new PlanFormProcessor($this->context->planRepository));
 
         $form->addSubmit("ok","Další krok");
 
@@ -190,7 +190,7 @@ class PlanPresenter extends SecuredPresenter {
     public function createComponentMap($name) {
         $map = new OverlayPlacement($this, $name);
 
-        $plan = $this->getRepository('plan')->find($this->getParameter('id'));
+        $plan = $this->context->planRepository->find($this->getParameter('id'));
 
         $map->setApikey($this->getContext()->parameters['google']['apiKey']);
         $map->setCenter($plan->floor->building->gpsCoordinates);
@@ -203,7 +203,7 @@ class PlanPresenter extends SecuredPresenter {
         $form = new EntityForm($this, $name);
 
 
-        $form->setEntityService(new BaseFormProcessor($this->getRepository('plan')));
+        $form->setEntityService(new BaseFormProcessor($this->context->planRepository));
 
         $form->addText('referenceTopLeft','A')
             ->setHtmlId('topLeft');

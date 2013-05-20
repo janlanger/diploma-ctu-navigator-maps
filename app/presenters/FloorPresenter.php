@@ -33,7 +33,7 @@ class FloorPresenter extends SecuredPresenter {
      */
     private function getBuilding() {
         if ($this->buildingEntity == NULL) {
-            $this->buildingEntity = $this->getRepository('building')->find($this->building);
+            $this->buildingEntity = $this->context->buildingRepository->find($this->building);
         }
         return $this->buildingEntity;
     }
@@ -48,7 +48,7 @@ class FloorPresenter extends SecuredPresenter {
 
 
     public function actionAdd() {
-        $entity = $this->getRepository('floor')->createNew();
+        $entity = $this->context->floorRepository->createNew();
         $entity->setBuilding($this->getBuilding());
 
         $this['form']->bindEntity($entity);
@@ -59,7 +59,7 @@ class FloorPresenter extends SecuredPresenter {
      * @param int $id floor id
      */
     public function actionEdit($id) {
-        $entity = $this->getRepository('floor')->find($id);
+        $entity = $this->context->floorRepository->find($id);
 
         $this['form']->bindEntity($entity);
         $this['form']->setRedirect("default?id=".$entity->id);
@@ -70,10 +70,10 @@ class FloorPresenter extends SecuredPresenter {
      * @param int $id floor ID
      */
     public function handleDelete($id) {
-        $entity = $this->getRepository('floor')->find($id);
+        $entity = $this->context->floorRepository->find($id);
 
         try {
-            $this->getRepository('floor')->delete($entity);
+            $this->context->floorRepository->delete($entity);
             $this->flashMessage('Záznamy byly úspěšně smazány.', self::FLASH_SUCCESS);
         } catch (\Exception $e) {
             $this->flashMessage('Záznamy nebyly smazány.', self::FLASH_ERROR);
@@ -86,11 +86,11 @@ class FloorPresenter extends SecuredPresenter {
      * @param int $id floor ID
      */
     public function actionDefault($id) {
-        $this->template->floor = $floor = $this->getRepository('floor')->find($id);
-        $this->template->plan = $plan = $this->getRepository('plan')->fetchOne(new ActivePlanQuery($floor));
-        $this->template->metadata = $metadata = $this->getRepository('meta_revision')->fetchOne(new ActiveRevision($floor));
+        $this->template->floor = $floor = $this->context->floorRepository->find($id);
+        $this->template->plan = $plan = $this->context->planRepository->fetchOne(new ActivePlanQuery($floor));
+        $this->template->metadata = $metadata = $this->context->metadataRevisionRepository->fetchOne(new ActiveRevision($floor));
 
-        $proposal = $this->getRepository('meta_changeset')->fetchOne(new CountUnprocessedProposals($floor));
+        $proposal = $this->context->changesetRepository->fetchOne(new CountUnprocessedProposals($floor));
         if (!empty($proposal)) {
             $this->template->unprocessedProposals = array_shift($proposal);
         }
@@ -108,7 +108,7 @@ class FloorPresenter extends SecuredPresenter {
     public function createComponentForm($name) {
         $form = new EntityForm($this, $name);
 
-        $form->setEntityService(new BaseFormProcessor($this->getRepository('floor')));
+        $form->setEntityService(new BaseFormProcessor($this->context->floorRepository));
         $form->addText('floorNumber', 'Číslo podlaží')
                 ->setRequired()
                 ->addRule(Form::NUMERIC)
