@@ -19,11 +19,14 @@ abstract class BasePresenter extends Presenter {
     /** Flash message type - success */
     const FLASH_SUCCESS = 'success';
     /** @var array  */
-    public $breadcrumbs = [['link'=> '//Dashboard:','title'=>'Nástěnka']];
+    public $breadcrumbs = [];
 
     /** {@inheritdoc} */
     protected function startup() {
         parent::startup();
+        if(!$this->user->isInRole('admin')) {
+            $this->addBreadcrumb('//Dashboard:', 'Nástěnka');
+        }
         new \DebugPanel\PresenterLinkPanel($this);
         if($this->getUser()->isLoggedIn()) {
             $p = \Panel\UserPanel::register();
@@ -35,6 +38,7 @@ abstract class BasePresenter extends Presenter {
 
     /** {@inheritdoc} */
     protected function beforeRender() {
+
         $this->template->breadcrumbs = $this->breadcrumbs;
         parent::beforeRender();
     }
@@ -44,6 +48,7 @@ abstract class BasePresenter extends Presenter {
      * @param string $title title
      */
     public function addBreadcrumb($link, $title) {
+
         $trimed = trim($link, '/ ');
         if(strrpos($trimed, "?") !== FALSE) {
             $trimed = substr($trimed,0,strrpos($trimed, "?")- strlen($trimed));

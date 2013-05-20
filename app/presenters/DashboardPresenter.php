@@ -22,8 +22,10 @@ class DashboardPresenter extends SecuredPresenter
 {
     /** {@inheritdoc} */
     protected function beforeRender() {
+        $this->breadcrumbs = [];
         parent::beforeRender();
         JsonDependentSelectBox::tryJsonResponse($this);
+
     }
 
 

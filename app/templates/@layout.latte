@@ -73,7 +73,7 @@
 
                 <div id="container" class="row-fluid">
                         <h1 n:ifset="#pageTitle">{include #pageTitle}</h1>
-                        <ul class="breadcrumb" n:if="!empty($breadcrumbs)">
+                        <ul class="breadcrumb" n:if="isset($breadcrumbs)">
                                 <li n:foreach="$breadcrumbs as $item">
                                     <a n:tag-if="isset($item['link']) && !is_null($item['link'])" n:href="$item['link']">{$item['title']}</a>
                                     <span class="divider">/</span>
