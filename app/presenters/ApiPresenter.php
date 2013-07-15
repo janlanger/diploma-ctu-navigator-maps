@@ -231,7 +231,7 @@ class ApiPresenter extends BasePresenter {
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
-                $nodes[] = $this->getNodePayload($node, $id);
+                $nodes[] = $this->getNodePayload($node, $id, $metadata->getFloor()->getBuilding()->id);
             }
 
             /** @var $path Path */
@@ -281,7 +281,7 @@ class ApiPresenter extends BasePresenter {
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
-                $nodes[] = $this->getNodePayload($node, $id);
+                $nodes[] = $this->getNodePayload($node, $id, $metadata->getFloor()->getBuilding()->id);
             }
             $this->sendResponse(new JsonResponse($nodes));
         }
@@ -398,7 +398,7 @@ class ApiPresenter extends BasePresenter {
         $nodes = [];
         if($nodesData != NULL) {
             foreach($nodesData as $node) {
-                $nodes[] = $this->getNodePayload($node, $floor->id);
+                $nodes[] = $this->getNodePayload($node, $floor->id, $floor->getBuilding()->id);
             }
         }
         $r = [
@@ -438,7 +438,7 @@ class ApiPresenter extends BasePresenter {
      * @param int|null $floorId
      * @return array
      */
-    private function getNodePayload(Node $node, $floorId = NULL) {
+    private function getNodePayload(Node $node, $floorId = NULL, $buildingId = null) {
         $p = $node->getProperties();
         return [
             'id' => $p->id,
@@ -449,7 +449,7 @@ class ApiPresenter extends BasePresenter {
             'toFloor' => ($p->getToFloor() != NULL ? $p->getToFloor()->id : NULL),
             'coordinates' => $this->convertCoordinates($p->getGpsCoordinates()),
             'floor' => (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId),
-            'building' => (is_null($floorId) ? $node->getRevision()->getFloor()->getBuilding()->id : $floorId),
+            'building' => (is_null($buildingId) ? $node->getRevision()->getFloor()->getBuilding()->id : $buildingId),
         ];
     }
 
