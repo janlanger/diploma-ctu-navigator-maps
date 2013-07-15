@@ -79,6 +79,10 @@ class ApiPresenter extends BasePresenter {
         $this->sendResponse(new JsonErrorResponse($msg));
     }
 
+    private function stripNulls($data) {
+        return array_filter($data);
+    }
+
     /**
      * @param int|null $id building id
      */
@@ -324,14 +328,14 @@ class ApiPresenter extends BasePresenter {
             $tilesUrl = substr($tilesUrl,0, strrpos($tilesUrl, "/"))."/";
         }
 
-        $payload = [
+        $payload = $this->stripNulls([
             'id' => $building->id,
             'name' => $building->name,
             'tiles' => ($tilesUrl != NULL ? $this->getHttpRequest()->getUrl()->getBaseUrl().$tilesUrl : NULL),
             'maxZoom' => ($plan != NULL ? $plan->getMaxZoom() : NULL),
             'minZoom' => ($plan != NULL ? $plan->getMinZoom() : NULL),
             'floors' => $floors
-        ];
+        ]);
         $this->sendResponse(new JsonResponse($payload));
     }
 
@@ -356,7 +360,7 @@ class ApiPresenter extends BasePresenter {
      * @return array
      */
     private function getBuildingPayload(Building $item, $version1 = FALSE) {
-        $r = [
+        $r = $this->stripNulls([
             'id' => $item->getId(),
             'name' => $item->getName(),
             'type' => 'building',
@@ -364,7 +368,7 @@ class ApiPresenter extends BasePresenter {
             'floorNumber' => $item->getFloorCount(),
             'address' => $item->getAddress(),
             //'minFloor' => $floors[0]['floor'],
-        ];
+        ]);
 
         if($version1) {
             $r['plan'] = $item->getId();
@@ -373,7 +377,7 @@ class ApiPresenter extends BasePresenter {
         if(!$version1) {
             $floors = [];
             foreach ($item->getFloors() as $floor) {
-                $floors[] = $this->getFloorPayload($floor);
+                $floors[] = $this->stripNulls($this->getFloorPayload($floor));
             }
 
             usort($floors, function ($a, $b) {
@@ -401,15 +405,15 @@ class ApiPresenter extends BasePresenter {
                 $nodes[] = $this->getNodePayload($node, $floor->id, $floor->getBuilding()->id);
             }
         }
-        $r = [
+        $r = $this->stripNulls([
             'id' => $floor->id,
             'floorName' => $floor->getName(),
             'floor' => $floor->getFloorNumber(),
             'height' => $floor->getFloorHeight(),
             'building' => $floor->getBuilding()->id,
-        ];
+        ]);
         if(!empty($nodes)) {
-            $r['nodes'] = $nodes;
+            $r['nodes'] = $this->stripNulls($nodes);
         }
         return $r;
     }
@@ -420,7 +424,7 @@ class ApiPresenter extends BasePresenter {
      * @return array
      */
     private function getPlanPayload(Plan $plan) {
-        return [
+        return $this->stripNulls([
             'id' => $plan->id,
             'tiles' => $this->getHttpRequest()->getUrl()->getBaseUrl() . $this->context->tiles->getTilesBasePath($plan),
             'minZoom' => $plan->getMinZoom(),
@@ -428,7 +432,7 @@ class ApiPresenter extends BasePresenter {
             'boundingSW' => $this->convertCoordinates($plan->getBoundingSW()),
             'boundingNE' => $this->convertCoordinates($plan->getBoundingNE()),
             'floor' => $plan->floor->id,
-        ];
+        ]);
     }
 
     /**
@@ -440,7 +444,7 @@ class ApiPresenter extends BasePresenter {
      */
     private function getNodePayload(Node $node, $floorId = NULL, $buildingId = null) {
         $p = $node->getProperties();
-        return [
+        return $this->stripNulls([
             'id' => $p->id,
             'type' => $p->getType(),
             'name' => is_null($p->getName())?$p->getRoom():$p->getName().(is_null($p->getRoom())?" - ".$p->getRoom():""),
@@ -450,7 +454,7 @@ class ApiPresenter extends BasePresenter {
             'coordinates' => $this->convertCoordinates($p->getGpsCoordinates()),
             'floor' => (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId),
             'building' => (is_null($buildingId) ? $node->getRevision()->getFloor()->getBuilding()->id : $buildingId),
-        ];
+        ]);
     }
 
     /**
@@ -460,13 +464,13 @@ class ApiPresenter extends BasePresenter {
      */
     private function getPathPayload(Path $path, $floorId = NULL) {
         $p = $path->getProperties();
-        return [
+        return $this->stripNulls([
             'id' => $p->id,
             'start' => $p->getStartNode()->id,
             'end' => $p->getEndNode()->id,
             'length' => $path->getLength(),
             'isFloorConnection' => FALSE,
-        ];
+        ]);
     }
 
     /**
@@ -474,7 +478,7 @@ class ApiPresenter extends BasePresenter {
      * @return array
      */
     private function getFloorConnectionPayload(FloorConnection $path) {
-        return [
+        return $this->stripNulls([
             'id' => $path->id,
             'start' => $path->getNodeOne()->id,
             'end' => $path->getNodeTwo()->id,
@@ -482,7 +486,7 @@ class ApiPresenter extends BasePresenter {
             'isFloorConnection' => TRUE,
             'destinationFloor' => $path->getRevisionTwo()->getFloor()->getId(),
             'type'=>$path->getType(),
-        ];
+        ]);
     }
 
 
