@@ -285,7 +285,7 @@ class ApiPresenter extends BasePresenter {
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
-                $nodes[] = $this->getNodePayload($node, $id, $metadata->getFloor()->getBuilding()->id);
+                $nodes[] = $this->getNodePayload($node, (int) $id, $metadata->getFloor()->getBuilding()->id);
             }
             $this->sendResponse(new JsonResponse($nodes));
         }
@@ -431,7 +431,7 @@ class ApiPresenter extends BasePresenter {
             'maxZoom' => $plan->getMaxZoom(),
             'boundingSW' => $this->convertCoordinates($plan->getBoundingSW()),
             'boundingNE' => $this->convertCoordinates($plan->getBoundingNE()),
-            'floor' => $plan->floor->id,
+            'floor' => $plan->floor->getFloorNumber(),
         ]);
     }
 
@@ -452,8 +452,8 @@ class ApiPresenter extends BasePresenter {
             'fromFloor' => $p->getFromFloor(),
             'toFloor' => ($p->getToFloor() != NULL ? $p->getToFloor()->id : NULL),
             'coordinates' => $this->convertCoordinates($p->getGpsCoordinates()),
-            'floor' => (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId),
-            'building' => (is_null($buildingId) ? $node->getRevision()->getFloor()->getBuilding()->id : $buildingId),
+            'floor' => ((int) (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId)),
+            'building' => (int) (is_null($buildingId) ? $node->getRevision()->getFloor()->getBuilding()->id : $buildingId),
         ]);
     }
 
