@@ -13,6 +13,7 @@ use Maps\Model\Metadata\Node;
 use Maps\Model\Metadata\Path;
 use Maps\Model\Metadata\Queries\ActiveFloorConnections;
 use Maps\Model\Metadata\Queries\ActiveRevision;
+use Maps\Model\Metadata\Queries\NodeByRoom;
 use Maps\Model\Metadata\Queries\SingleNode;
 use Maps\Tools\JsonErrorResponse;
 use Nette\Application\BadRequestException;
@@ -269,6 +270,20 @@ class ApiPresenter extends BasePresenter {
         else {
             $this->notFound("Node with id $id does not exists.");
         }
+    }
+
+    public function actionRoomNode($id) {
+        if($id == NULL) {
+            $this->badRequest("Invalid room number");
+        }
+
+        $node = $this->context->nodeRepository->fetchOne(new NodeByRoom($id));
+        if($node == null) {
+            $this->notFound("Node for your room was not found.");
+        }
+
+        $this->sendResponse(new JsonResponse($this->getNodePayload($node)));
+
     }
 
     /**
