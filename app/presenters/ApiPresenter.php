@@ -236,7 +236,7 @@ class ApiPresenter extends BasePresenter {
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
-                $nodes[] = $this->getNodePayload($node, $id, $metadata->getFloor()->getBuilding()->id);
+                $nodes[] = $this->getNodePayload($node, $id, $metadata->getFloor()->getBuilding()->id, $metadata->getFloor()->getName());
             }
 
             /** @var $path Path */
@@ -300,7 +300,7 @@ class ApiPresenter extends BasePresenter {
             $nodes = [];
             /** @var $node Node */
             foreach ($metadata->getNodes() as $node) {
-                $nodes[] = $this->getNodePayload($node, (int) $id, $metadata->getFloor()->getBuilding()->id);
+                $nodes[] = $this->getNodePayload($node, (int) $id, $metadata->getFloor()->getBuilding()->id, $metadata->getFloor()->getName());
             }
             $this->sendResponse(new JsonResponse($nodes));
         }
@@ -417,7 +417,7 @@ class ApiPresenter extends BasePresenter {
         $nodes = [];
         if($nodesData != NULL) {
             foreach($nodesData as $node) {
-                $nodes[] = $this->getNodePayload($node, $floor->id, $floor->getBuilding()->id);
+                $nodes[] = $this->getNodePayload($node, $floor->id, $floor->getBuilding()->id, $floor->getName());
             }
         }
         $r = $this->stripNulls([
@@ -457,7 +457,7 @@ class ApiPresenter extends BasePresenter {
      * @param int|null $floorId
      * @return array
      */
-    private function getNodePayload(Node $node, $floorId = NULL, $buildingId = null) {
+    private function getNodePayload(Node $node, $floorId = NULL, $buildingId = null, $floorName=NULL) {
         $p = $node->getProperties();
         return $this->stripNulls([
             'id' => $p->id,
@@ -468,6 +468,7 @@ class ApiPresenter extends BasePresenter {
             'toFloor' => ($p->getToFloor() != NULL ? $p->getToFloor()->id : NULL),
             'coordinates' => $this->convertCoordinates($p->getGpsCoordinates()),
             'floor' => ((int) (is_null($floorId) ? $node->getRevision()->getFloor()->id : $floorId)),
+            'floorName' => ((is_null($floorName) ? $node->getRevision()->getFloor()->getName() : $floorName)),
             'building' => (int) (is_null($buildingId) ? $node->getRevision()->getFloor()->getBuilding()->id : $buildingId),
         ]);
     }
