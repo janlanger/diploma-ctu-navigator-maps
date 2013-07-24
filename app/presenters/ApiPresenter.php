@@ -81,7 +81,9 @@ class ApiPresenter extends BasePresenter {
     }
 
     private function stripNulls($data) {
-        return array_filter($data);
+        return array_filter($data, function($v) {
+            return $v !== NULL;
+        });
     }
 
     /**
